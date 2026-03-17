@@ -1,76 +1,143 @@
 'use client';
 
-import styles from './OperationModal.module.css'; // Importando o módulo
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import styles from './OperationModal.module.css';
 import { useStockActions } from '@/hooks/useStockActions';
-import { IProductBalance } from '@/types';
+import { parseScaleBarcode } from '@/utils/barcodeParser';
 
 export function OperationModal({ products, onSuccess, onClose }: any) {
-  const { registerOperation } = useStockActions();
-  const [formData, setFormData] = useState({ productId: '', type: 'IN', quant: 1, customer: '' });
+  const { registerBatchOperations } = useStockActions();
+  const [barcode, setBarcode] = useState('');
+  const [items, setItems] = useState<any[]>([]); // Lista de itens bipados
+  const [type, setType] = useState<'IN' | 'OUT'>('OUT');
+  const [customer, setCustomer] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleBarcodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const code = e.target.value;
+    setBarcode(code);
+
+    if (code.length === 13) {
+      const result = parseScaleBarcode(code);
+      if (result) {
+        const product = products.find((p: any) => Number(p.id) === result.productId);
+        if (product) {
+          // Adiciona à lista local em vez de enviar pro banco
+          setItems(prev => [{
+            ...result,
+            name: product.name,
+            tempId: Date.now() // ID temporário para o map
+          }, ...prev]);
+          setBarcode(''); // Limpa para o próximo bip
+        } else {
+          alert("Produto não cadastrado!");
+          setBarcode('');
+        }
+      }
+    }
+  };
+
+  const handleFinalize = async () => {
+    if (items.length === 0) return;
+    setLoading(true);
     try {
-      await registerOperation({
-        product_id: Number(formData.productId),
-        type: formData.type as 'IN' | 'OUT',
-        quant: formData.quant,
-        customer: formData.customer
-      });
+      const payload = items.map(item => ({
+        product_id: item.productId,
+        type: type,
+        quant: item.weightKg,
+        customer: customer
+      }));
+
+      await registerBatchOperations(payload);
       onSuccess();
       onClose();
-    } catch (err) { alert("Erro ao salvar"); }
+    } catch (err) {
+      alert("Erro ao salvar lote");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeItem = (tempId: number) => {
+    setItems(items.filter(i => i.tempId !== tempId));
   };
 
   return (
     <div className={styles.overlay}>
-      <div className={styles.modalCard}>
+      <div className={styles.modalCard} style={{ maxWidth: '600px' }}>
         <div className={styles.header}>
-          <h2 style={{margin: 0, fontSize: '1.25rem'}}>Nova Movimentação</h2>
-          <button onClick={onClose} style={{background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer'}}>&times;</button>
+          <h2 className="text-lg font-bold">Venda em Lote (Multi-Bip)</h2>
+          <button onClick={onClose} className={styles.closeBtn}>&times;</button>
         </div>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Produto</label>
-            <select 
-              className={styles.select}
-              onChange={e => setFormData({...formData, productId: e.target.value})}
-            >
-              <option value="">Selecione...</option>
-              {products.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
+        <div className={styles.form}>
+          <div className="grid grid-cols-2 gap-4">
+             <div className={styles.inputGroup}>
+                <label className={styles.label}>Responsável</label>
+                <input 
+                  className={styles.input} 
+                  value={customer} 
+                  onChange={e => setCustomer(e.target.value)}
+                  placeholder="Nome do cliente"
+                />
+             </div>
+             <div className={styles.inputGroup}>
+                <label className={styles.label}>Tipo da Operação</label>
+                <div className="flex gap-2">
+                   <button 
+                    type="button" 
+                    onClick={() => setType('IN')}
+                    className={`${styles.typeBtn} ${type === 'IN' ? styles.activeIn : ''}`}
+                   >Entrada</button>
+                   <button 
+                    type="button" 
+                    onClick={() => setType('OUT')}
+                    className={`${styles.typeBtn} ${type === 'OUT' ? styles.activeOut : ''}`}
+                   >Saída</button>
+                </div>
+             </div>
           </div>
 
-          <div className={styles.buttonGroup}>
-             <button 
-              type="button" 
-              onClick={() => setFormData({...formData, type: 'IN'})}
-              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid', borderColor: formData.type === 'IN' ? '#22c55e' : '#e2e8f0', background: formData.type === 'IN' ? '#f0fdf4' : 'white'}}
-             >Entrada</button>
-             <button 
-              type="button" 
-              onClick={() => setFormData({...formData, type: 'OUT'})}
-              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid', borderColor: formData.type === 'OUT' ? '#ef4444' : '#e2e8f0', background: formData.type === 'OUT' ? '#fef2f2' : 'white'}}
-             >Saída</button>
-          </div>
-
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Quantidade</label>
-            <input 
-              type="number" 
+            <label className={styles.label}>Aguardando Leitura...</label>
+            <input
+              type="text"
+              autoFocus
               className={styles.input}
-              onChange={e => setFormData({...formData, quant: Number(e.target.value)})}
-              value={formData.quant}
+              style={{ fontSize: '20px', textAlign: 'center', borderColor: '#3b82f6' }}
+              value={barcode}
+              onChange={handleBarcodeChange}
+              placeholder="Bipe as etiquetas uma após a outra"
             />
           </div>
 
-          <div className={styles.buttonGroup}>
-            <button type="button" onClick={onClose} className={styles.btnSecondary}>Cancelar</button>
-            <button type="submit" className={styles.btnPrimary}>Confirmar</button>
+          {/* LISTA DE ITENS BIPADOS */}
+          <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', borderRadius: '8px' }}>
+            {items.map(item => (
+              <div key={item.tempId} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid #f8fafc', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{item.name}</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>{item.weightKg.toFixed(2)} KG</div>
+                </div>
+                <button 
+                  onClick={() => removeItem(item.tempId)}
+                  style={{ color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer', fontSize: '18px' }}
+                >&times;</button>
+              </div>
+            ))}
           </div>
-        </form>
+
+          <div className={styles.buttonGroup}>
+            <button onClick={onClose} className={styles.btnSecondary}>Cancelar</button>
+            <button 
+              onClick={handleFinalize} 
+              disabled={loading || items.length === 0}
+              className={styles.btnPrimary}
+            >
+              {loading ? 'Finalizando...' : `Finalizar (${items.length} itens)`}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
