@@ -1,0 +1,106 @@
+.container {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.thead {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.th {
+  padding: 16px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+.tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+
+.tr:hover {
+  background: #f1f5f9;
+}
+
+.td {
+  padding: 16px;
+  color: #1e293b;
+}
+
+.productName {
+  font-weight: 600;
+  display: block;
+}
+
+.productType {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* Badges de Saldo */
+.badge {
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.stockSafe {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.stockWarning {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.stockDanger {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.rowMain {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rowMain:hover {
+  background: #f8fafc;
+}
+
+.expandedRow {
+  background: #ffffff;
+}
+
+.expandedContainer {
+  padding: 0 16px 16px 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
