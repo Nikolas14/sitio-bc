@@ -1,0 +1,159 @@
+.container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.header {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filterSection {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.typeGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.typeBtn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.typeBtnActive {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: white;
+}
+
+.searchBar {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 14px;
+  outline: none;
+}
+
+.printBtn {
+  background: #1e293b;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+}
+
+.table {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 140px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  align-items: center;
+}
+
+.rowHeader {
+  background: #f8fafc;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.idText { font-family: monospace; color: #cbd5e1; font-size: 12px; }
+.nameText { font-weight: 700; color: #334155; text-transform: uppercase; font-size: 14px; }
+.typeTag { 
+  font-size: 10px; 
+  font-weight: 800; 
+  color: #3b82f6; 
+  background: #eff6ff; 
+  padding: 2px 8px; 
+  border-radius: 4px;
+  text-align: center;
+}
+
+.stockText { font-size: 16px; font-weight: 900; text-align: right; }
+.positive { color: #10b981; }
+.negative { color: #ef4444; }
+.zero { color: #94a3b8; }
+
+/* REGRAS DE IMPRESSÃO - PARA CABER EM 1 PÁGINA */
+@media print {
+  @page {
+    margin: 0.5cm;
+    size: A4;
+  }
+
+  .filterSection, .header, .printBtn, :global(button) {
+    display: none !important;
+  }
+
+  .container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .container::before {
+    content: "RELATÓRIO DE ESTOQUE - BEIT STOCK";
+    display: block;
+    text-align: center;
+    font-weight: 900;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 5px;
+  }
+
+  .table {
+    border: 1px solid #000;
+    border-radius: 0;
+  }
+
+  .row {
+    grid-template-columns: 50px 1fr 100px 120px;
+    padding: 2px 10px !important; /* Altura mínima da linha */
+    border-bottom: 1px solid #ddd;
+  }
+
+  .rowHeader {
+    background: #eee !important;
+    -webkit-print-color-adjust: exact;
+    font-size: 9px !important;
+  }
+
+  .idText { font-size: 9px !important; }
+  .nameText { font-size: 11px !important; white-space: nowrap; overflow: hidden; }
+  .typeTag { font-size: 8px !important; border: 1px solid #ccc; background: transparent !important; }
+  .stockText { font-size: 11px !important; }
+}
