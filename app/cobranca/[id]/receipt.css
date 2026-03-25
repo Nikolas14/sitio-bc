@@ -1,0 +1,144 @@
+/* /app/cobranca/[id]/receipt.css */
+
+/* Container que envolve todas as páginas para a captura */
+.captureContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: #f1f5f9;
+  width: 100%;
+  align-items: center;
+}
+
+/* Tamanho fixo A4 (proporcional para 800px de largura) */
+.receiptPaper {
+  width: 800px;
+  height: 1131px; /* Proporção A4 */
+  background: white;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Área que cresce para empurrar o resumo/rodapé para baixo */
+.tableArea {
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.itemTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.itemTable th {
+  border-bottom: 2px solid #0f172a;
+  padding: 12px 5px;
+  text-align: left;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.itemTable td {
+  padding: 10px 5px;
+  border-bottom: 1px dashed #e2e8f0;
+  font-size: 14px;
+}
+
+.summarySection {
+  border-top: 2px solid #0f172a;
+  padding-top: 20px;
+}
+
+.summaryLine {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+.grandTotalLabel {
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 800;
+  display: block;
+}
+
+.grandTotalValue {
+  font-size: 32px;
+  font-weight: 950;
+  display: block;
+}
+
+.paidStamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  border: 12px solid #10b981;
+  color: #10b981;
+  font-size: 120px;
+  font-weight: 900;
+  padding: 20px 60px;
+  border-radius: 20px;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 10;
+  text-transform: uppercase;
+}
+
+.receiptHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 10px;
+}
+
+.brandName {
+  font-weight: 900;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+
+.itemTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 30px 0;
+}
+
+.mono {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+}
+
+.textRight {
+  text-align: right;
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.pageFooter {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  text-align: center;
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}

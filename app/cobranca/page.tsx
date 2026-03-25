@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/api/supabase';
 import styles from './page.module.css';
 
-const STATUS_LIST = ['TODOS', 'PENDENTE', 'COBRADO', 'ENVIADO', 'CONCLUIDO', 'CANCELADO'];
+const STATUS_LIST = ['TODOS', 'PENDENTE',  'ENVIADO', 'COBRADO', 'CONCLUIDO', 'CANCELADO'];
 
 export default function ListaCobrancasPage() {
   const router = useRouter();
