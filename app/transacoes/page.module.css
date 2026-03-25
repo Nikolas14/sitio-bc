@@ -1,0 +1,102 @@
+.screen {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f8fafc;
+}
+
+.leftPanel {
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.filterHeader {
+  padding: 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+/* Cards da Lista */
+.transCard {
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.transCard:hover { background: #f8fafc; }
+.activeCard { border-color: #3b82f6; background: #eff6ff; }
+
+/* Detalhes à Direita */
+.rightPanel {
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.receipt {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Tabela de Itens */
+.itemTable {
+  width: 100%;
+  margin-top: 25px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.itemTable th {
+  text-align: left;
+  padding: 12px;
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.itemTable td {
+  padding: 12px;
+  border-bottom: 1px solid #f8fafc;
+  font-size: 14px;
+}
+
+/* Resumo Financeiro */
+.financeGrid {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #f1f5f9;
+}
+
+.financeLine {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 5px;
+}
+
+.totalLine {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24px;
+  font-weight: 900;
+  color: #1e293b;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+}

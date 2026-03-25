@@ -2,6 +2,7 @@ export interface IProduct {
   id: number;
   name: string;
   type?: string;
+  current_stock: number;
   price: number;
   weightAlt?: number;
 }
@@ -10,9 +11,9 @@ export interface IOperation {
   id?: string;
   product_id: number;
   type: 'IN' | 'OUT';
-  quant: number;
-  customer?: string;
-  date?: string;
+  quantity: number;
+  customer_or_vendor?: string;
+  operation_date?: string;
 }
 
 // Interface específica para a nossa VIEW do Supabase

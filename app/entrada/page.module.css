@@ -1,17 +1,17 @@
-.container {
+.screen {
   display: grid;
   grid-template-columns: 400px 1fr;
   height: 100vh;
-  background-color: #f0fdf4; /* Fundo levemente esverdeado */
+  overflow: hidden;
+  background-color: #f8fafc;
 }
 
 .leftPanel {
   background: white;
-  border-right: 1px solid #dcfce7;
+  border-right: 1px solid #e2e8f0;
   padding: 30px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 .rightPanel {
@@ -19,71 +19,72 @@
   overflow-y: auto;
 }
 
+.inputLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 900;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.inputField {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-weight: 700;
+  margin-bottom: 20px;
+  outline: none;
+}
+
+.inputField:focus { border-color: #3b82f6; }
+
 .barcodeBox {
-  margin-top: 20px;
-  padding: 20px;
-  background: #f8fafc;
-  border-radius: 16px;
+  background: #f1f5f9;
+  padding: 25px;
+  border-radius: 15px;
   border: 2px dashed #cbd5e1;
+  text-align: center;
 }
 
 .bigInput {
   width: 100%;
   font-size: 24px;
   font-weight: 900;
-  padding: 15px;
-  border-radius: 12px;
-  border: 2px solid #e2e8f0;
+  background: transparent;
+  border: none;
   outline: none;
   text-align: center;
-}
-
-.bigInput:focus {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
-}
-
-.finishBtn {
-  width: 100%;
-  background: #16a34a;
-  color: white;
-  padding: 20px;
-  border-radius: 15px;
-  font-size: 18px;
-  font-weight: 900;
-  text-transform: uppercase;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-}
-
-.finishBtn:hover {
-  background: #15803d;
-  transform: translateY(-2px);
-}
-
-.finishBtn:disabled {
-  background: #d1d5db;
-  cursor: not-allowed;
 }
 
 .itemRow {
   background: white;
   padding: 15px 20px;
   border-radius: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #f1f5f9;
 }
 
-.itemName { font-weight: 800; text-transform: uppercase; color: #1e293b; }
-.itemWeight { font-family: monospace; font-weight: 900; color: #16a34a; font-size: 18px; }
+.totalSection {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 2px solid #f1f5f9;
+}
 
-.removeBtn {
-  color: #ef4444;
+.submitBtn {
+  width: 100%;
+  background: #1e293b;
+  color: white;
+  padding: 18px;
+  border-radius: 12px;
   font-weight: 900;
+  text-transform: uppercase;
   cursor: pointer;
-  padding: 5px 10px;
+  border: none;
 }
+
+.submitBtn:disabled { background: #cbd5e1; }

@@ -1,34 +1,34 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
-import { IProductBalance } from '@/types';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/api/supabase';
 
-export const useInventory = () => {
-  const [products, setProducts] = useState<IProductBalance[]>([]);
+export function useInventory() {
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const refreshStock = useCallback(async () => {
-    setLoading(true);
+  async function fetchInventory() {
     try {
-      const { data, error } = await supabase
-        .from('product_stock_balance_new')
+      setLoading(true);
+      // Alterado para a nova View que criamos
+      const { data, error: supabaseError } = await supabase
+        .from('ESTOQUE_v_inventory_summary')
         .select('*')
-        .order('name', { ascending: true })
-        .returns<IProductBalance[]>();
+        .order('name', { ascending: true });
 
-      if (error) throw error;
+      if (supabaseError) throw supabaseError;
+
       setProducts(data || []);
-    } catch (err) {
-      console.error("Erro ao carregar estoque:", err);
+    } catch (err: any) {
+      console.error('Erro ao carregar estoque:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
-    refreshStock();
-  }, [refreshStock]);
+    fetchInventory();
+  }, []);
 
-  return { products, loading, refreshStock };
-};
+  return { products, loading, error, refresh: fetchInventory };
+}
