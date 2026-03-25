@@ -1,123 +1,89 @@
-.wrapper {
+.container {
   display: grid;
-  grid-template-columns: 450px 1fr;
+  grid-template-columns: 400px 1fr;
   height: 100vh;
-  background-color: #f1f5f9;
+  background-color: #f0fdf4; /* Fundo levemente esverdeado */
 }
 
 .leftPanel {
   background: white;
-  padding: 40px;
+  border-right: 1px solid #dcfce7;
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  box-shadow: 10px 0 15px -3px rgba(0,0,0,0.05);
-  z-index: 10;
+  justify-content: space-between;
 }
 
 .rightPanel {
   padding: 40px;
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
 }
 
-.backBtn {
-  background: none;
-  border: none;
-  color: #64748b;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: left;
-}
-
-.barcodeSection {
-  border: 3px solid;
+.barcodeBox {
+  margin-top: 20px;
   padding: 20px;
-  border-radius: 16px;
   background: #f8fafc;
+  border-radius: 16px;
+  border: 2px dashed #cbd5e1;
 }
 
 .bigInput {
   width: 100%;
-  border: none;
-  background: transparent;
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 900;
-  text-align: center;
+  padding: 15px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
   outline: none;
-  color: #1e293b;
+  text-align: center;
 }
 
-.label {
-  display: block;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  margin-bottom: 10px;
-  color: #94a3b8;
-}
-
-.summary {
-  margin-top: auto;
-  padding: 30px;
-  border-radius: 20px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.totalRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.bigInput:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
 }
 
 .finishBtn {
-  padding: 20px;
-  border: none;
-  border-radius: 12px;
-  font-size: 20px;
-  font-weight: 900;
+  width: 100%;
+  background: #16a34a;
   color: white;
+  padding: 20px;
+  border-radius: 15px;
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: transform 0.1s;
+  border: none;
+  transition: all 0.2s;
 }
 
-.finishBtn:active { transform: scale(0.98); }
-.finishBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.finishBtn:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+}
 
-.cartContainer {
-  background: white;
-  flex: 1;
-  border-radius: 20px;
-  padding: 20px;
-  overflow-y: auto;
-  box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);
+.finishBtn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
 }
 
 .itemRow {
+  background: white;
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #f1f5f9;
+  border: 1px solid #e2e8f0;
 }
 
-.itemName { font-weight: 700; font-size: 18px; color: #1e293b; display: block; }
-.itemSub { font-size: 12px; color: #94a3b8; font-weight: bold; }
-.itemWeight { font-size: 22px; font-weight: 900; color: #1e293b; }
+.itemName { font-weight: 800; text-transform: uppercase; color: #1e293b; }
+.itemWeight { font-family: monospace; font-weight: 900; color: #16a34a; font-size: 18px; }
 
 .removeBtn {
-  background: #fef2f2;
   color: #ef4444;
-  border: 1px solid #fee2e2;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 24px;
+  font-weight: 900;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 5px 10px;
 }
