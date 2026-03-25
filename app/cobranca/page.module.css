@@ -1,0 +1,95 @@
+.container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.filterBar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.filterBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.filterBtnActive {
+  background: #1e293b;
+  color: white;
+  border-color: #1e293b;
+}
+
+.table {
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  border-collapse: collapse;
+  overflow: hidden;
+}
+
+.table th {
+  text-align: left;
+  padding: 15px 20px;
+  background: #f8fafc;
+  font-size: 10px;
+  font-weight: 900;
+  color: #94a3b8;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+}
+
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+/* Cores por Status */
+.statusPENDENTE { background: #fef9c3; color: #854d0e; }
+.statusCOBRADO { background: #dbeafe; color: #1e40af; }
+.statusENVIADO { background: #f3e8ff; color: #6b21a8; }
+.statusCONCLUIDO { background: #dcfce7; color: #15803d; }
+.statusCANCELADO { background: #fee2e2; color: #991b1b; }
+
+.actionBtn {
+  background: #f1f5f9;
+  color: #1e293b;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.actionBtn:hover { background: #e2e8f0; }

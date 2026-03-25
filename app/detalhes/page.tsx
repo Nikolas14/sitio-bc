@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import { useInventory } from '@/hooks/useInventory';
-import { supabase } from '@/api/supabase';
+import { supabase } from '@/api/supabase'; // Ajustado para seu caminho padrão
 
 type Period = 'yesterday' | '3d' | '7d' | '30d' | 'all';
 
@@ -28,28 +28,42 @@ export default function DetalhesPage() {
     async function fetchHistory() {
       setHistoryLoading(true);
       
+      // Mudança: Buscando na nova tabela ESTOQUE_operation 
+      // e trazendo o customer_vendor da ESTOQUE_transaction
       let query = supabase
-        .from('operation_new')
-        .select('*')
+        .from('ESTOQUE_operation')
+        .select(`
+          id,
+          type,
+          quant,
+          created_at,
+          ESTOQUE_transaction (
+            customer_vendor,
+            serial_number
+          )
+        `)
         .eq('product_id', selectedId)
-        .order('date', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (period !== 'all') {
         const dateLimit = new Date();
-        
         if (period === 'yesterday') {
-          // Ontem às 00:00:00
           dateLimit.setDate(dateLimit.getDate() - 1);
           dateLimit.setHours(0, 0, 0, 0);
         } else {
           const days = period === '3d' ? 3 : period === '7d' ? 7 : 30;
           dateLimit.setDate(dateLimit.getDate() - days);
         }
-        
-        query = query.gte('date', dateLimit.toISOString());
+        // Mudança: Coluna agora é created_at
+        query = query.gte('created_at', dateLimit.toISOString());
       }
 
-      const { data } = await query;
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error("Erro ao buscar histórico:", error);
+      }
+
       setHistory(data || []);
       setHistoryLoading(false);
     }
@@ -58,18 +72,17 @@ export default function DetalhesPage() {
 
   const selectedProduct = products.find(p => p.id === selectedId);
 
-  // Soma de pesos do período para o resumo
   const totals = useMemo(() => {
     return history.reduce((acc, curr) => {
-      if (curr.type === 'IN') acc.in += curr.quant;
-      else acc.out += curr.quant;
+      const q = Number(curr.quant) || 0;
+      if (curr.type === 'IN') acc.in += q;
+      else acc.out += q;
       return acc;
     }, { in: 0, out: 0 });
   }, [history]);
 
   return (
     <div className={styles.screen}>
-      {/* ESQUERDA: LISTA */}
       <aside className={styles.leftPanel}>
         <div className="p-5 border-b bg-white sticky top-0 z-10">
           <div className="flex justify-between items-center mb-4">
@@ -85,7 +98,7 @@ export default function DetalhesPage() {
         </div>
 
         <div className={styles.scrollArea}>
-          {loading ? <p className="p-10 text-center text-xs">A carregar...</p> : 
+          {loading ? <p className="p-10 text-center text-xs text-slate-400 font-bold animate-pulse">CARREGANDO LISTA...</p> : 
             filteredList.map(p => (
               <div 
                 key={p.id} 
@@ -93,7 +106,7 @@ export default function DetalhesPage() {
                 onClick={() => setSelectedId(p.id)}
               >
                 <div>
-                  <p className="text-[9px] font-black text-slate-300">ID {p.id}</p>
+                  <p className="text-[9px] font-black text-slate-300 uppercase">ID {p.id}</p>
                   <p className="font-bold text-xs uppercase text-slate-700">{p.name}</p>
                 </div>
                 <p className={`font-black text-sm ${Number(p.current_stock) > 0 ? 'text-green-500' : 'text-slate-300'}`}>
@@ -105,7 +118,6 @@ export default function DetalhesPage() {
         </div>
       </aside>
 
-      {/* DIREITA: DETALHES */}
       <main className={styles.rightPanel}>
         {selectedProduct ? (
           <div className={styles.detailCard}>
@@ -114,10 +126,10 @@ export default function DetalhesPage() {
                 <span className="bg-slate-100 text-slate-500 px-2 py-1 rounded font-black text-[9px] uppercase mb-2 inline-block">
                   {selectedProduct.type || 'GERAL'}
                 </span>
-                <h2 className="text-5xl font-black text-slate-900 uppercase leading-none">{selectedProduct.name}</h2>
-                <div className="flex gap-4 mt-2">
-                   <p className="text-green-600 font-bold text-xs">Entradas: +{totals.in.toFixed(2)}kg</p>
-                   <p className="text-red-500 font-bold text-xs">Saídas: -{totals.out.toFixed(2)}kg</p>
+                <h2 className="text-5xl font-black text-slate-900 uppercase leading-none tracking-tighter">{selectedProduct.name}</h2>
+                <div className="flex gap-4 mt-4">
+                   <p className="text-green-600 font-bold text-[10px] uppercase">Entradas: +{totals.in.toFixed(3)}kg</p>
+                   <p className="text-red-500 font-bold text-[10px] uppercase">Saídas: -{totals.out.toFixed(3)}kg</p>
                 </div>
               </div>
               
@@ -126,8 +138,8 @@ export default function DetalhesPage() {
                   🖨️ IMPRIMIR EXTRATO
                 </button>
                 <div className="text-right">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saldo Atual</p>
-                  <p className="text-6xl font-black text-slate-900">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saldo Disponível</p>
+                  <p className="text-6xl font-black text-slate-900 leading-none">
                     {Number(selectedProduct.current_stock).toFixed(3)}
                     <span className="text-xl ml-1 text-slate-300">KG</span>
                   </p>
@@ -136,8 +148,8 @@ export default function DetalhesPage() {
             </header>
 
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-black text-slate-800 tracking-tight text-lg underline decoration-blue-500 underline-offset-8">
-                HISTÓRICO DE OPERAÇÕES
+              <h3 className="font-black text-slate-800 tracking-tight text-lg">
+                HISTÓRICO DE MOVIMENTAÇÕES
               </h3>
               
               <div className={styles.periodToggle}>
@@ -154,28 +166,31 @@ export default function DetalhesPage() {
             </div>
 
             {historyLoading ? (
-              <div className="p-20 text-center font-black text-slate-200 text-2xl animate-pulse">A BUSCAR HISTÓRICO...</div>
+              <div className="p-20 text-center font-black text-slate-100 text-3xl italic">BUSCANDO...</div>
             ) : (
               <table className={styles.historyTable}>
                 <thead>
                   <tr>
-                    <th>Data/Hora</th>
+                    <th>Data</th>
                     <th>Tipo</th>
                     <th>Qtd (KG)</th>
-                    <th>Origem / Destino</th>
+                    <th>Origem / Cliente</th>
                   </tr>
                 </thead>
                 <tbody>
                   {history.map(h => (
                     <tr key={h.id}>
-                      <td className="font-mono text-slate-500 text-xs">{new Date(h.date).toLocaleString('pt-PT')}</td>
+                      <td className="font-bold text-slate-400 text-[11px]">{new Date(h.created_at).toLocaleDateString()}</td>
                       <td>
                         <span className={h.type === 'IN' ? styles.badgeIn : styles.badgeOut}>
                           {h.type === 'IN' ? '▲ ENTRADA' : '▼ SAÍDA'}
                         </span>
                       </td>
-                      <td className="font-black text-slate-800">{h.quant.toFixed(3)}</td>
-                      <td className="text-slate-400 font-medium uppercase text-[11px]">{h.customer || 'Ajuste Interno'}</td>
+                      <td className="font-black text-slate-800">{Number(h.quant).toFixed(3)}</td>
+                      <td className="text-slate-500 font-bold uppercase text-[11px]">
+                        {h.ESTOQUE_transaction?.customer_vendor || 'Ajuste Interno'}
+                        <span className="block text-[8px] text-slate-300 font-black">Ref: #{h.ESTOQUE_transaction?.serial_number || 'S/N'}</span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -184,7 +199,8 @@ export default function DetalhesPage() {
           </div>
         ) : (
           <div className="h-full flex items-center justify-center text-slate-200 font-black flex-col">
-            <p className="tracking-widest text-[10px] uppercase">Selecione um produto para começar</p>
+            <span className="text-8xl mb-4">🔎</span>
+            <p className="tracking-widest text-xs uppercase">Selecione um produto na lista lateral</p>
           </div>
         )}
       </main>
