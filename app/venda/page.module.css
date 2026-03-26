@@ -1,34 +1,48 @@
 .screen {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 500px 1fr;
   height: 100vh;
-  background-color: #f8fafc;
+  background-color: #989899;
 }
 
 .leftPanel {
   background: white;
   border-right: 1px solid #e2e8f0;
-  padding: 30px;
+  padding: 25px;
   display: flex;
   flex-direction: column;
 }
 
-.rightPanel {
-  padding: 40px;
-  overflow-y: auto;
+.header{
+  display: flex;
+  width: 100%;
+  gap: 6.5em;
+}
+.header button{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 0.5rem;
+  color: #000000;
+  text-transform: uppercase;
 }
 
 .inputGroup {
-  margin-bottom: 20px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .label {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 900;
   color: #94a3b8;
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .field {
@@ -36,7 +50,7 @@
   padding: 14px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  font-weight: 700;
+  font-weight: 900;
   font-size: 15px;
   outline: none;
 }
@@ -54,7 +68,7 @@
 
 .bigInput {
   width: 100%;
-  font-size: 32px;
+  font-size: 22px;
   font-weight: 900;
   background: transparent;
   border: none;
@@ -101,14 +115,124 @@
 
 .submitBtn:disabled { background: #cbd5e1; cursor: not-allowed; }
 
+.rightPanel {
+  padding: 32px;
+  background-color: #ffffff;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: #0f172a;
+}
+
+/* Cabeçalho */
+.headerCart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 16px;
+}
+
+.titleCart {
+  font-weight: 900;
+  color: #64748b;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.totalWeight {
+  font-size: 36px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* Linha do Item */
 .itemRow {
-  background: white;
-  padding: 18px 25px;
-  border-radius: 15px;
-  margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #f1f5f9;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  margin: 0 -20px;
 }
 
+/* Destaque para o último item bipado (o primeiro da lista) */
+.itemRow:first-of-type {
+  background-color: #f8fafc;
+  border-left: 5px solid #0f172a;
+}
+
+.itemRow:hover {
+  background-color: #f1f5f9;
+}
+
+.productInfo {
+  flex: 2;
+}
+
+.labelSmall {
+  font-size: 9px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin: 0 0 2px 0;
+}
+
+.itemName {
+  font-weight: 700;
+  font-size: 16px;
+  color: #1e293b;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Colunas de Valores */
+.itemActions {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex: 3;
+  justify-content: flex-end;
+}
+
+.dataColumn {
+  text-align: right;
+  min-width: 90px;
+}
+
+.valueMain {
+  font-weight: 700;
+  font-size: 14px;
+  color: #334155;
+  margin: 0;
+}
+
+.subtotalValue {
+  font-weight: 900;
+  font-size: 18px;
+  color: #0f172a;
+  min-width: 110px;
+  text-align: right;
+  margin: 0;
+}
+
+/* Botão Remover */
+.removeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #cbd5e1;
+  font-size: 28px;
+  line-height: 1;
+  padding: 0 8px;
+  transition: all 0.2s ease;
+}
+
+.removeBtn:hover {
+  color: #ef4444;
+  transform: scale(1.2);
+}

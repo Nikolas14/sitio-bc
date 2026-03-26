@@ -17,7 +17,7 @@ export default function VendaSimplificadaPage() {
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
+const displayItems = [...items].reverse();
   // Cálculos Financeiros
   const financial = useMemo(() => {
     const subtotal = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
@@ -57,12 +57,12 @@ export default function VendaSimplificadaPage() {
         .from('ESTOQUE_transaction')
         .insert([{
           type: 'OUT',
-          customer_vendor: customer || 'CONSUMIDOR FINAL',
+          customer_vendor: customer || 'LOJA_BC',
           total_price: financial.subtotal,
           total_kg: financial.totalKg,
           discount_percent: discountPercent,
-          shipping_cost: 0, // Resetado
-          tax_amount: 0     // Resetado
+          shipping_cost: 0,
+          tax_amount: 0
         }])
         .select()
         .single();
@@ -101,9 +101,9 @@ export default function VendaSimplificadaPage() {
       {/* PAINEL DE CONTROLE (ESQUERDA) */}
       <aside className={styles.leftPanel}>
         <div>
-          <header className="mb-8">
-            <button onClick={() => router.push('/')} className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">← Dashboard</button>
-            <h1 className="text-3xl font-black italic text-slate-800 tracking-tighter">CAIXA</h1>
+          <header className={styles.header}>
+            <button onClick={() => router.push('/')}>← Voltar</button>
+            <h1>CAIXA</h1>
           </header>
 
           <div className={styles.inputGroup}>
@@ -118,13 +118,13 @@ export default function VendaSimplificadaPage() {
 
           <div className={styles.barcodeBox}>
             <label className={styles.label}>Bipe o Código</label>
-            <input 
+            <input
               ref={inputRef}
               className={styles.bigInput}
               value={barcode}
               onChange={e => handleBarcode(e.target.value)}
               autoFocus
-              placeholder="0000000"
+              placeholder="Cod. barras"
             />
           </div>
         </div>
@@ -138,14 +138,14 @@ export default function VendaSimplificadaPage() {
             <span>Desconto:</span>
             <span className="text-red-500">- R$ {financial.discountVal.toFixed(2)}</span>
           </div>
-          
+
           <div className={styles.totalValue}>
             <span>TOTAL</span>
             <span>R$ {financial.totalFinal.toFixed(2)}</span>
           </div>
 
-          <button 
-            className={styles.submitBtn} 
+          <button
+            className={styles.submitBtn}
             onClick={finalizarVenda}
             disabled={loading || items.length === 0}
           >
@@ -155,34 +155,62 @@ export default function VendaSimplificadaPage() {
       </aside>
 
       {/* PAINEL DE ITENS (DIREITA) */}
-      <main className={styles.rightPanel}>
-        <div className="flex justify-between items-end mb-8 border-b pb-4">
-          <h2 className="font-black text-slate-400 text-sm uppercase tracking-widest">Produtos no Carrinho</h2>
-          <p className="text-3xl font-black text-slate-800">{financial.totalKg.toFixed(3)} KG</p>
-        </div>
+<main className={styles.rightPanel}>
+      {/* Cabeçalho com Total Geral */}
+      <div className={styles.headerCart}>
+        <h2 className={styles.titleCart}>Produtos no Carrinho</h2>
+        <p className={styles.totalWeight}>{financial.totalKg.toFixed(3)} KG</p>
+      </div>
 
-        {items.map(item => (
+      {/* Lista de Itens */}
+      {displayItems.length > 0 ? (
+        displayItems.map((item) => (
           <div key={item.tempId} className={styles.itemRow}>
-            <div>
-              <p className="text-[9px] font-black text-slate-300 uppercase">ID {item.productId}</p>
-              <p className="font-bold text-lg uppercase text-slate-700">{item.name}</p>
+            
+            {/* Informação do Produto */}
+            <div className={styles.productInfo}>
+              <p className={styles.labelSmall}>ID {item.productId}</p>
+              <h3 className={styles.itemName}>{item.name}</h3>
             </div>
-            <div className="flex items-center gap-12">
-              <div className="text-right">
-                <p className="text-[9px] font-bold text-slate-300 uppercase">Preço/KG</p>
-                <p className="font-bold text-sm">R$ {item.price.toFixed(2)}</p>
+
+            <div className={styles.itemActions}>
+              {/* Preço por Unidade/KG */}
+              <div className={styles.dataColumn}>
+                <p className={styles.labelSmall}>Preço/KG</p>
+                <p className={styles.valueMain}>R$ {item.price.toFixed(2)}</p>
               </div>
-              <span className="font-black text-2xl text-slate-800">{item.weightKg.toFixed(3)} KG</span>
-              <button 
-                onClick={() => setItems(items.filter(i => i.tempId !== item.tempId))}
-                className="text-slate-200 hover:text-red-500 font-bold text-2xl"
+
+              {/* Quantidade Bipada */}
+              <div className={styles.dataColumn}>
+                <p className={styles.labelSmall}>QTD</p>
+                <p className={styles.valueMain}>{item.weightKg.toFixed(3)} KG</p>
+              </div>
+
+              {/* Subtotal (Preço * Peso) */}
+              <div className={styles.dataColumn}>
+                <p className={styles.labelSmall}>Subtotal</p>
+                <p className={styles.subtotalValue}>
+                  R$ {(item.price * item.weightKg).toFixed(2)}
+                </p>
+              </div>
+
+              {/* Ação de Remover */}
+              <button
+                onClick={() => setItems(items.filter((i) => i.tempId !== item.tempId))}
+                className={styles.removeBtn}
+                title="Remover este item"
               >
                 &times;
               </button>
             </div>
           </div>
-        ))}
-      </main>
+        ))
+      ) : (
+        <p style={{ color: '#94a3b8', textAlign: 'center', marginTop: '40px' }}>
+          Nenhum produto bipado ainda.
+        </p>
+      )}
+    </main>
     </div>
   );
 }
