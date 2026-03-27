@@ -49,19 +49,18 @@ export default function Dashboard() {
   }, []);
 
   const atalhos = [
-    { title: 'Entrada de Carga', desc: 'Registrar chegada de mercadoria', icon: '📥', path: '/entrada' },
-    { title: 'Caixa / Venda', desc: 'Bipar produtos e criar pedido', icon: '🛒', path: '/venda' },
-    { title: 'Gestão de Cobranças', desc: 'Status, fretes e pagamentos', icon: '💰', path: '/cobranca' },
-    { title: 'Estoque Detalhado', desc: 'Saldos e extratos por produto', icon: '📋', path: '/detalhes' },
+    { title: 'Entrada de Carga', desc: 'Registrar chegada de mercadoria', icon: '📥', path: '/mov/entrada' },
+    { title: 'Caixa / Venda', desc: 'Bipar produtos e criar pedido', icon: '🛒', path: '/mov/venda' },
+    { title: 'Estoque Geral', desc: 'Status, fretes e pagamentos', icon: '💰', path: '/estoque' },
+    { title: 'Estoque Detalhado', desc: 'Status, fretes e pagamentos', icon: '💰', path: '/estoque/detalhado' },
     { title: 'Histórico Geral', desc: 'Auditoria de todas transações', icon: '📜', path: '/transacoes' },
-    { title: 'Produtos', desc: 'Cadastrar e editar preços', icon: '📦', path: '/produtos' },
   ];
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-1">Sistema de Gestão</p>
-        <h1>BEIT STOCK</h1>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-1">Sistema de Gestão Carnes</p>
+        <h1>BEIT CHABAD BELÉM</h1>
       </header>
 
       {/* GRID DE FUNCIONALIDADES */}
@@ -80,7 +79,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* RESUMO FINANCEIRO */}
+      {/* RESUMO FINANCEIRO
       <div className={styles.statsRow}>
         <div className={styles.statBox} style={{ borderLeft: '8px solid #ef4444' }}>
           <span className={styles.statLabel}>Total a Receber</span>
@@ -93,10 +92,10 @@ export default function Dashboard() {
           <span className={styles.statValue}>{stats.vendasHoje} Pedidos</span>
           <span className={styles.statSub}>Vendas registradas nas últimas 24h</span>
         </div>
-      </div>
+      </div> */}
 
       <footer className="mt-20 text-center opacity-20">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em]">Beit Stock v2.0 • 2026</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em]">Beit Chabad Belém Carnes v2.0 • 2026</p>
       </footer>
     </div>
   );
