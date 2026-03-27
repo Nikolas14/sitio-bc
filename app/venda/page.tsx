@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import { supabase } from '@/api/supabase';
@@ -17,7 +17,10 @@ export default function VendaSimplificadaPage() {
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-const displayItems = [...items].reverse();
+
+  // Itens invertidos para o último bipado aparecer no topo
+  const displayItems = useMemo(() => [...items].reverse(), [items]);
+
   // Cálculos Financeiros
   const financial = useMemo(() => {
     const subtotal = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
@@ -27,6 +30,18 @@ const displayItems = [...items].reverse();
 
     return { subtotal, totalKg, discountVal, totalFinal };
   }, [items, discountPercent]);
+
+  // Atalho de teclado para finalizar (F10)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F10' && items.length > 0 && !loading) {
+        e.preventDefault();
+        finalizarVenda();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [items, loading, financial]);
 
   const handleBarcode = (val: string) => {
     setBarcode(val);
@@ -52,17 +67,16 @@ const displayItems = [...items].reverse();
     setLoading(true);
 
     try {
-      // 1. Criar Cabeçalho da Venda (OUT)
+      // 1. Criar Cabeçalho da Venda
       const { data: trans, error: transError } = await supabase
         .from('ESTOQUE_transaction')
         .insert([{
           type: 'OUT',
           customer_vendor: customer || 'LOJA_BC',
-          total_price: financial.subtotal,
+          total_price: financial.totalFinal,
           total_kg: financial.totalKg,
           discount_percent: discountPercent,
-          shipping_cost: 0,
-          tax_amount: 0
+          status: 'PENDENTE'
         }])
         .select()
         .single();
@@ -83,7 +97,7 @@ const displayItems = [...items].reverse();
 
       if (opError) throw opError;
 
-      alert("Venda finalizada!");
+      alert("Venda enviada para cobrança!");
       setItems([]);
       setCustomer('');
       setDiscountPercent(0);
@@ -98,11 +112,11 @@ const displayItems = [...items].reverse();
 
   return (
     <div className={styles.screen}>
-      {/* PAINEL DE CONTROLE (ESQUERDA) */}
+      {/* PAINEL DE CONTROLE (ESQUERDA) - FIXO */}
       <aside className={styles.leftPanel}>
-        <div>
+        <div className={styles.controlTop}>
           <header className={styles.header}>
-            <button onClick={() => router.push('/')}>← Voltar</button>
+            <button className={styles.backBtn} onClick={() => router.push('/')}>← Voltar</button>
             <h1>CAIXA</h1>
           </header>
 
@@ -124,7 +138,7 @@ const displayItems = [...items].reverse();
               value={barcode}
               onChange={e => handleBarcode(e.target.value)}
               autoFocus
-              placeholder="Cod. barras"
+              placeholder="0000000000000"
             />
           </div>
         </div>
@@ -136,7 +150,7 @@ const displayItems = [...items].reverse();
           </div>
           <div className={styles.summaryLine}>
             <span>Desconto:</span>
-            <span className="text-red-500">- R$ {financial.discountVal.toFixed(2)}</span>
+            <span style={{ color: '#ef4444' }}>- R$ {financial.discountVal.toFixed(2)}</span>
           </div>
 
           <div className={styles.totalValue}>
@@ -149,68 +163,62 @@ const displayItems = [...items].reverse();
             onClick={finalizarVenda}
             disabled={loading || items.length === 0}
           >
-            {loading ? 'SALVANDO...' : 'FINALIZAR (F10)'}
+            {loading ? 'PROCESSANDO...' : 'FINALIZAR (F10)'}
           </button>
         </div>
       </aside>
 
-      {/* PAINEL DE ITENS (DIREITA) */}
-<main className={styles.rightPanel}>
-      {/* Cabeçalho com Total Geral */}
-      <div className={styles.headerCart}>
-        <h2 className={styles.titleCart}>Produtos no Carrinho</h2>
-        <p className={styles.totalWeight}>{financial.totalKg.toFixed(3)} KG</p>
-      </div>
+      {/* PAINEL DE ITENS (DIREITA) - ROLÁVEL */}
+      <main className={styles.rightPanel}>
+        <div className={styles.headerCart}>
+          <h2 className={styles.titleCart}>Produtos no Carrinho ({items.length})</h2>
+          <p className={styles.totalWeight}>{financial.totalKg.toFixed(3)} KG</p>
+        </div>
 
-      {/* Lista de Itens */}
-      {displayItems.length > 0 ? (
-        displayItems.map((item) => (
-          <div key={item.tempId} className={styles.itemRow}>
-            
-            {/* Informação do Produto */}
-            <div className={styles.productInfo}>
-              <p className={styles.labelSmall}>ID {item.productId}</p>
-              <h3 className={styles.itemName}>{item.name}</h3>
+        <div className={styles.itemsList}>
+          {displayItems.length > 0 ? (
+            displayItems.map((item) => (
+              <div key={item.tempId} className={styles.itemRow}>
+                <div className={styles.productInfo}>
+                  <p className={styles.labelSmall}>ID {item.productId}</p>
+                  <h3 className={styles.itemName}>{item.name}</h3>
+                </div>
+
+                <div className={styles.itemActions}>
+                  <div className={styles.dataColumn}>
+                    <p className={styles.labelSmall}>Preço/KG</p>
+                    <p className={styles.valueMain}>R$ {item.price.toFixed(2)}</p>
+                  </div>
+
+                  <div className={styles.dataColumn}>
+                    <p className={styles.labelSmall}>QTD</p>
+                    <p className={styles.valueMain}>{item.weightKg.toFixed(3)} KG</p>
+                  </div>
+
+                  <div className={styles.dataColumn}>
+                    <p className={styles.labelSmall}>Subtotal</p>
+                    <p className={styles.subtotalValue}>
+                      R$ {(item.price * item.weightKg).toFixed(2)}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => setItems(items.filter((i) => i.tempId !== item.tempId))}
+                    className={styles.removeBtn}
+                  >
+                    &times;
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className={styles.emptyState}>
+              <p>Nenhum produto bipado ainda.</p>
+              <span>Aguardando leitura do código de barras...</span>
             </div>
-
-            <div className={styles.itemActions}>
-              {/* Preço por Unidade/KG */}
-              <div className={styles.dataColumn}>
-                <p className={styles.labelSmall}>Preço/KG</p>
-                <p className={styles.valueMain}>R$ {item.price.toFixed(2)}</p>
-              </div>
-
-              {/* Quantidade Bipada */}
-              <div className={styles.dataColumn}>
-                <p className={styles.labelSmall}>QTD</p>
-                <p className={styles.valueMain}>{item.weightKg.toFixed(3)} KG</p>
-              </div>
-
-              {/* Subtotal (Preço * Peso) */}
-              <div className={styles.dataColumn}>
-                <p className={styles.labelSmall}>Subtotal</p>
-                <p className={styles.subtotalValue}>
-                  R$ {(item.price * item.weightKg).toFixed(2)}
-                </p>
-              </div>
-
-              {/* Ação de Remover */}
-              <button
-                onClick={() => setItems(items.filter((i) => i.tempId !== item.tempId))}
-                className={styles.removeBtn}
-                title="Remover este item"
-              >
-                &times;
-              </button>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p style={{ color: '#94a3b8', textAlign: 'center', marginTop: '40px' }}>
-          Nenhum produto bipado ainda.
-        </p>
-      )}
-    </main>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

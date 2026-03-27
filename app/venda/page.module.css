@@ -2,83 +2,98 @@
   display: grid;
   grid-template-columns: 500px 1fr;
   height: 100vh;
-  background-color: #989899;
+  background-color: #f8fafc;
+  overflow: hidden; /* Impede scroll na página inteira */
 }
 
+/* PAINEL ESQUERDO */
 .leftPanel {
   background: white;
   border-right: 1px solid #e2e8f0;
-  padding: 25px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
+  height: 100vh;
 }
 
-.header{
-  display: flex;
-  width: 100%;
-  gap: 6.5em;
+.controlTop {
+  flex: 1;
 }
-.header button{
+
+.header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  background: none;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-weight: 900;
+  font-size: 24px;
+  letter-spacing: -1px;
+}
+
+.backBtn {
+  background: #f1f5f9;
   border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-weight: 800;
   cursor: pointer;
-  padding: 8px 0;
-  margin-bottom: 0.5rem;
-  color: #000000;
   text-transform: uppercase;
+  font-size: 12px;
 }
 
 .inputGroup {
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .label {
   display: block;
-  font-size: 12px;
-  font-weight: 900;
-  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
 }
 
 .field {
   width: 100%;
   padding: 14px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid #e2e8f0;
-  font-weight: 900;
-  font-size: 15px;
+  font-weight: 700;
+  font-size: 16px;
   outline: none;
+  transition: border-color 0.2s;
 }
 
-.field:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+.field:focus {
+  border-color: #0f172a;
+}
 
 .barcodeBox {
-  background: #f1f5f9;
-  padding: 30px;
-  border-radius: 20px;
+  background: #f8fafc;
+  padding: 40px 20px;
+  border-radius: 15px;
   border: 2px dashed #cbd5e1;
   text-align: center;
-  margin: 20px 0;
 }
 
 .bigInput {
   width: 100%;
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 900;
   background: transparent;
   border: none;
   outline: none;
   text-align: center;
-  color: #1e293b;
+  color: #0f172a;
 }
 
+/* SUMÁRIO FINANCEIRO */
 .summary {
-  margin-top: auto;
   border-top: 2px solid #f1f5f9;
   padding-top: 20px;
 }
@@ -86,153 +101,134 @@
 .summaryLine {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: 700;
   color: #64748b;
-  font-size: 14px;
 }
 
 .totalValue {
   display: flex;
   justify-content: space-between;
-  font-size: 36px;
-  font-weight: 900;
-  color: #1e293b;
-  margin: 15px 0;
+  font-size: 42px;
+  font-weight: 950;
+  color: #0f172a;
+  margin: 20px 0;
+  letter-spacing: -2px;
 }
 
 .submitBtn {
   width: 100%;
-  background: #1e293b;
+  background: #0f172a;
   color: white;
-  padding: 20px;
-  border-radius: 15px;
+  padding: 22px;
+  border-radius: 12px;
   font-weight: 900;
   text-transform: uppercase;
   cursor: pointer;
   border: none;
+  font-size: 16px;
+  transition: transform 0.1s;
 }
 
+.submitBtn:active { transform: scale(0.98); }
 .submitBtn:disabled { background: #cbd5e1; cursor: not-allowed; }
 
+/* PAINEL DIREITO */
 .rightPanel {
-  padding: 32px;
-  background-color: #ffffff;
-  min-height: 100vh;
-  font-family: 'Inter', sans-serif;
-  color: #0f172a;
+  background: #ffffff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
 }
 
-/* Cabeçalho */
 .headerCart {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 32px;
-  border-bottom: 2px solid #0f172a;
-  padding-bottom: 16px;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #0f172a;
+  padding-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .titleCart {
-  font-weight: 900;
-  color: #64748b;
-  font-size: 12px;
+  font-weight: 800;
+  color: #94a3b8;
+  font-size: 14px;
   text-transform: uppercase;
-  letter-spacing: 2px;
   margin: 0;
 }
 
 .totalWeight {
-  font-size: 36px;
+  font-size: 48px;
   font-weight: 900;
-  color: #0f172a;
   margin: 0;
+  line-height: 1;
 }
 
-/* Linha do Item */
+/* A LISTA ROLÁVEL */
+.itemsList {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 15px;
+  /* Estilo da Scrollbar */
+}
+
+.itemsList::-webkit-scrollbar {
+  width: 8px;
+}
+.itemsList::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.itemsList::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
 .itemRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-  margin: 0 -20px;
+  padding: 20px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-/* Destaque para o último item bipado (o primeiro da lista) */
 .itemRow:first-of-type {
-  background-color: #f8fafc;
-  border-left: 5px solid #0f172a;
+  background: #f8fafc;
+  border-left: 6px solid #0f172a;
+  border-radius: 0 8px 8px 0;
 }
 
-.itemRow:hover {
-  background-color: #f1f5f9;
-}
+.productInfo { flex: 2; }
+.itemName { font-weight: 800; font-size: 18px; text-transform: uppercase; margin: 0; }
+.labelSmall { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin: 0; }
 
-.productInfo {
-  flex: 2;
-}
-
-.labelSmall {
-  font-size: 9px;
-  font-weight: 800;
-  color: #94a3b8;
-  text-transform: uppercase;
-  margin: 0 0 2px 0;
-}
-
-.itemName {
-  font-weight: 700;
-  font-size: 16px;
-  color: #1e293b;
-  text-transform: uppercase;
-  margin: 0;
-}
-
-/* Colunas de Valores */
 .itemActions {
   display: flex;
+  gap: 40px;
   align-items: center;
-  gap: 32px;
-  flex: 3;
-  justify-content: flex-end;
 }
 
-.dataColumn {
-  text-align: right;
-  min-width: 90px;
-}
+.dataColumn { text-align: right; min-width: 100px; }
+.valueMain { font-weight: 700; font-size: 16px; margin: 0; }
+.subtotalValue { font-weight: 900; font-size: 20px; margin: 0; min-width: 120px; }
 
-.valueMain {
-  font-weight: 700;
-  font-size: 14px;
-  color: #334155;
-  margin: 0;
-}
-
-.subtotalValue {
-  font-weight: 900;
-  font-size: 18px;
-  color: #0f172a;
-  min-width: 110px;
-  text-align: right;
-  margin: 0;
-}
-
-/* Botão Remover */
 .removeBtn {
   background: none;
   border: none;
-  cursor: pointer;
+  font-size: 32px;
   color: #cbd5e1;
-  font-size: 28px;
-  line-height: 1;
-  padding: 0 8px;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-.removeBtn:hover {
-  color: #ef4444;
-  transform: scale(1.2);
+.removeBtn:hover { color: #ef4444; }
+
+.emptyState {
+  text-align: center;
+  margin-top: 100px;
+  color: #94a3b8;
 }
+
+.emptyState p { font-weight: 800; font-size: 20px; margin-bottom: 5px; }
