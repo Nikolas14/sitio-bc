@@ -1,234 +1,61 @@
+/* 1. Base da Tela: Ocupa 100% da visão sem scroll na página toda */
 .screen {
   display: grid;
-  grid-template-columns: 500px 1fr;
+  grid-template-columns: 420px 1fr; /* Largura fixa ideal para painéis de controle */
   height: 100vh;
-  background-color: #f8fafc;
-  overflow: hidden; /* Impede scroll na página inteira */
+  background-color: #f1f5f9; /* Cinza azulado muito leve para reduzir cansaço visual */
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* PAINEL ESQUERDO */
+/* 2. Painel da Esquerda: Onde o operador interage */
 .leftPanel {
-  background: white;
-  border-right: 1px solid #e2e8f0;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.controlTop {
-  flex: 1;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.header h1 {
-  font-weight: 900;
-  font-size: 24px;
-  letter-spacing: -1px;
-}
-
-.backBtn {
-  background: #f1f5f9;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 8px;
-  font-weight: 800;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-size: 12px;
-}
-
-.inputGroup {
-  margin-bottom: 20px;
-}
-
-.label {
-  display: block;
-  font-size: 11px;
-  font-weight: 800;
-  color: #64748b;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-}
-
-.field {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  font-weight: 700;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.field:focus {
-  border-color: #0f172a;
-}
-
-.barcodeBox {
-  background: #f8fafc;
-  padding: 40px 20px;
-  border-radius: 15px;
-  border: 2px dashed #cbd5e1;
-  text-align: center;
-}
-
-.bigInput {
-  width: 100%;
-  font-size: 28px;
-  font-weight: 900;
-  background: transparent;
-  border: none;
-  outline: none;
-  text-align: center;
-  color: #0f172a;
-}
-
-/* SUMÁRIO FINANCEIRO */
-.summary {
-  border-top: 2px solid #f1f5f9;
-  padding-top: 20px;
-}
-
-.summaryLine {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-weight: 700;
-  color: #64748b;
-}
-
-.totalValue {
-  display: flex;
-  justify-content: space-between;
-  font-size: 42px;
-  font-weight: 950;
-  color: #0f172a;
-  margin: 20px 0;
-  letter-spacing: -2px;
-}
-
-.submitBtn {
-  width: 100%;
-  background: #0f172a;
-  color: white;
-  padding: 22px;
-  border-radius: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-  cursor: pointer;
-  border: none;
-  font-size: 16px;
-  transition: transform 0.1s;
-}
-
-.submitBtn:active { transform: scale(0.98); }
-.submitBtn:disabled { background: #cbd5e1; cursor: not-allowed; }
-
-/* PAINEL DIREITO */
-.rightPanel {
   background: #ffffff;
-  height: 100vh;
+  border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  padding: 40px;
+  justify-content: space-between; /* Empurra o botão de finalizar para o rodapé */
+  padding: 32px 24px;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.03);
+  z-index: 20;
 }
 
-.headerCart {
+/* 3. Agrupador de Inputs (Topo da Esquerda) */
+.controlTop {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 30px;
-  border-bottom: 3px solid #0f172a;
-  padding-bottom: 20px;
-  flex-shrink: 0;
+  flex-direction: column;
+  gap: 28px; /* Espaçamento generoso para não clicar errado */
 }
 
-.titleCart {
-  font-weight: 800;
-  color: #94a3b8;
-  font-size: 14px;
-  text-transform: uppercase;
-  margin: 0;
-}
-
-.totalWeight {
-  font-size: 48px;
-  font-weight: 900;
-  margin: 0;
-  line-height: 1;
-}
-
-/* A LISTA ROLÁVEL */
-.itemsList {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 15px;
-  /* Estilo da Scrollbar */
-}
-
-.itemsList::-webkit-scrollbar {
-  width: 8px;
-}
-.itemsList::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-.itemsList::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
-}
-
-.itemRow {
+/* 4. Área do Carrinho (Direita) */
+.cartWrapper {
+  padding: 24px;
+  background-color: #f8fafc;
+  height: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #f1f5f9;
+  flex-direction: column;
+  overflow: hidden; /* O scroll será gerenciado dentro do InventoryCart */
 }
 
-.itemRow:first-of-type {
-  background: #f8fafc;
-  border-left: 6px solid #0f172a;
-  border-radius: 0 8px 8px 0;
+/* 5. Ajustes de Responsividade */
+@media (max-width: 1100px) {
+  .screen {
+    grid-template-columns: 350px 1fr;
+  }
 }
 
-.productInfo { flex: 2; }
-.itemName { font-weight: 800; font-size: 18px; text-transform: uppercase; margin: 0; }
-.labelSmall { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin: 0; }
-
-.itemActions {
-  display: flex;
-  gap: 40px;
-  align-items: center;
+/* 6. Estilo para Impressão (Otimizado) */
+@media print {
+  .screen {
+    display: block;
+    background: white;
+    height: auto;
+  }
+  .leftPanel {
+    display: none !important; /* Esconde controles na hora de imprimir o relatório */
+  }
+  .cartWrapper {
+    padding: 0;
+    width: 100%;
+  }
 }
-
-.dataColumn { text-align: right; min-width: 100px; }
-.valueMain { font-weight: 700; font-size: 16px; margin: 0; }
-.subtotalValue { font-weight: 900; font-size: 20px; margin: 0; min-width: 120px; }
-
-.removeBtn {
-  background: none;
-  border: none;
-  font-size: 32px;
-  color: #cbd5e1;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.removeBtn:hover { color: #ef4444; }
-
-.emptyState {
-  text-align: center;
-  margin-top: 100px;
-  color: #94a3b8;
-}
-
-.emptyState p { font-weight: 800; font-size: 20px; margin-bottom: 5px; }

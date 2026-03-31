@@ -6,6 +6,12 @@ import styles from './page.module.css';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
+import HeaderMov from '../components/HeaderMov/HeaderMov';
+import BarcodeScanner from '../components/BarcodeScanner/BarcodeScanner';
+import InventoryCart from '../components/InventoryCart/InventoryCart';
+import ButtonFinish from '../components/ButtonFinish/ButtonFinish';
+import FinancialSummary from '../components/FinancialSummary/FinancialSummary';
+import DiscountInput from '../components/DiscountInput/DiscountInput';
 
 export default function VendaSimplificadaPage() {
   const router = useRouter();
@@ -97,7 +103,7 @@ export default function VendaSimplificadaPage() {
 
       if (opError) throw opError;
 
-      alert("Venda enviada para cobrança!");
+      alert("Saida enviada para o estoque!");
       setItems([]);
       setCustomer('');
       setDiscountPercent(0);
@@ -112,112 +118,52 @@ export default function VendaSimplificadaPage() {
 
   return (
     <div className={styles.screen}>
-      {/* PAINEL DE CONTROLE (ESQUERDA) - FIXO */}
+      
       <aside className={styles.leftPanel}>
         <div className={styles.controlTop}>
-          <header className={styles.header}>
-            <button className={styles.backBtn} onClick={() => router.push('/')}>← Voltar</button>
-            <h1>CAIXA</h1>
-          </header>
 
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Cliente</label>
-            <input className={styles.field} value={customer} onChange={e => setCustomer(e.target.value)} placeholder="Nome do Cliente" />
-          </div>
+          <HeaderMov
+            titulo="Venda"
+            labelDescricao="Nome do Cliente"
+            valor={customer}
+            setValor={setCustomer}
+            placeholder="Ex: Moshe/ Yaakov"
+          />
 
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Desconto Aplicado (%)</label>
-            <input type="number" className={styles.field} value={discountPercent} onChange={e => setDiscountPercent(Number(e.target.value))} />
-          </div>
+          <BarcodeScanner
+            ref={inputRef}
+            barcode={barcode}
+            onChange={handleBarcode}
+          />
 
-          <div className={styles.barcodeBox}>
-            <label className={styles.label}>Bipe o Código</label>
-            <input
-              ref={inputRef}
-              className={styles.bigInput}
-              value={barcode}
-              onChange={e => handleBarcode(e.target.value)}
-              autoFocus
-              placeholder="0000000000000"
-            />
-          </div>
         </div>
 
-        <div className={styles.summary}>
-          <div className={styles.summaryLine}>
-            <span>Subtotal:</span>
-            <span>R$ {financial.subtotal.toFixed(2)}</span>
-          </div>
-          <div className={styles.summaryLine}>
-            <span>Desconto:</span>
-            <span style={{ color: '#ef4444' }}>- R$ {financial.discountVal.toFixed(2)}</span>
-          </div>
+        <DiscountInput
+          value={discountPercent}
+          onApply={(val) => setDiscountPercent(val)}
+        />
 
-          <div className={styles.totalValue}>
-            <span>TOTAL</span>
-            <span>R$ {financial.totalFinal.toFixed(2)}</span>
-          </div>
+        <FinancialSummary
+          subtotal={financial.subtotal}
+          discountVal={financial.discountVal}
+          totalFinal={financial.totalFinal}
+        />
+        <ButtonFinish
+          onClick={finalizarVenda}
+          loading={loading}
+          disabled={items.length === 0}
+        />
 
-          <button
-            className={styles.submitBtn}
-            onClick={finalizarVenda}
-            disabled={loading || items.length === 0}
-          >
-            {loading ? 'PROCESSANDO...' : 'FINALIZAR (F10)'}
-          </button>
-        </div>
       </aside>
 
-      {/* PAINEL DE ITENS (DIREITA) - ROLÁVEL */}
-      <main className={styles.rightPanel}>
-        <div className={styles.headerCart}>
-          <h2 className={styles.titleCart}>Produtos no Carrinho ({items.length})</h2>
-          <p className={styles.totalWeight}>{financial.totalKg.toFixed(3)} KG</p>
-        </div>
-
-        <div className={styles.itemsList}>
-          {displayItems.length > 0 ? (
-            displayItems.map((item) => (
-              <div key={item.tempId} className={styles.itemRow}>
-                <div className={styles.productInfo}>
-                  <p className={styles.labelSmall}>ID {item.productId}</p>
-                  <h3 className={styles.itemName}>{item.name}</h3>
-                </div>
-
-                <div className={styles.itemActions}>
-                  <div className={styles.dataColumn}>
-                    <p className={styles.labelSmall}>Preço/KG</p>
-                    <p className={styles.valueMain}>R$ {item.price.toFixed(2)}</p>
-                  </div>
-
-                  <div className={styles.dataColumn}>
-                    <p className={styles.labelSmall}>QTD</p>
-                    <p className={styles.valueMain}>{item.weightKg.toFixed(3)} KG</p>
-                  </div>
-
-                  <div className={styles.dataColumn}>
-                    <p className={styles.labelSmall}>Subtotal</p>
-                    <p className={styles.subtotalValue}>
-                      R$ {(item.price * item.weightKg).toFixed(2)}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => setItems(items.filter((i) => i.tempId !== item.tempId))}
-                    className={styles.removeBtn}
-                  >
-                    &times;
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className={styles.emptyState}>
-              <p>Nenhum produto bipado ainda.</p>
-              <span>Aguardando leitura do código de barras...</span>
-            </div>
-          )}
-        </div>
+      <main className={styles.cartWrapper}>
+        <InventoryCart
+          tituloCart="Venda de Produtos"
+          items={items}
+          setItems={setItems}
+          totalWeight={financial.totalKg}
+          isVenda={true} // <--- Isso ativa a exibição dos preços!
+        />
       </main>
     </div>
   );

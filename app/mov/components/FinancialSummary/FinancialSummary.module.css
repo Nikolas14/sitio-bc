@@ -1,0 +1,45 @@
+.summary {
+  margin-top: auto;
+  padding: 20px 0;
+  border-top: 2px dashed #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summaryLine {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.discountText {
+  color: #ef4444; /* Vermelho para destaque de desconto */
+}
+
+.totalValue {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.totalValue span:first-child {
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+}
+
+.totalValue span:last-child {
+  font-size: 26px;
+  font-weight: 900;
+  color: #0f172a;
+}

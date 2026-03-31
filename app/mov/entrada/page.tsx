@@ -6,6 +6,10 @@ import styles from './page.module.css';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
+import HeaderMov from '../components/HeaderMov/HeaderMov';
+import BarcodeScanner from '../components/BarcodeScanner/BarcodeScanner';
+import InventoryCart from '../components/InventoryCart/InventoryCart';
+import ButtonFinish from '../components/ButtonFinish/ButtonFinish';
 
 export default function EntradaSimplificadaPage() {
   const router = useRouter();
@@ -95,7 +99,7 @@ export default function EntradaSimplificadaPage() {
 
       if (opError) throw opError;
 
-      alert("Venda enviada para cobrança!");
+      alert("Entrada enviada para o estoque!");
       setItems([]);
       setCustomer('');
       inputRef.current?.focus();
@@ -109,83 +113,38 @@ export default function EntradaSimplificadaPage() {
 
   return (
     <div className={styles.screen}>
-      {/* PAINEL DE CONTROLE (ESQUERDA) - FIXO */}
+
       <aside className={styles.leftPanel}>
         <div className={styles.controlTop}>
-          <header className={styles.header}>
-            <button className={styles.backBtn} onClick={() => router.push('/')}>← Voltar</button>
-            <h1>ENTRADA</h1>
-          </header>
-
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Resumo</label>
-            <input className={styles.field} value={customer} onChange={e => setCustomer(e.target.value)} placeholder="Resumo do abate" />
-          </div>
-
-          <div className={styles.barcodeBox}>
-            <label className={styles.label}>Bipe o Código</label>
-            <input
-              ref={inputRef}
-              className={styles.bigInput}
-              value={barcode}
-              onChange={e => handleBarcode(e.target.value)}
-              autoFocus
-              placeholder="0000000000000"
-            />
-          </div>
+          <HeaderMov
+            titulo="Entrada"
+            labelDescricao="Quantidade abate"
+            valor={customer}
+            setValor={setCustomer}
+            placeholder="50 Bois/ 900 Frangos"
+          />
+          <BarcodeScanner
+            ref={inputRef}
+            barcode={barcode}
+            onChange={handleBarcode}
+          />
         </div>
 
-        <div className={styles.summary}>
-
-          <button
-            className={styles.submitBtn}
-            onClick={finalizarVenda}
-            disabled={loading || items.length === 0}
-          >
-            {loading ? 'PROCESSANDO...' : 'FINALIZAR (F10)'}
-          </button>
-        </div>
+        <ButtonFinish
+          onClick={finalizarVenda}
+          loading={loading}
+          disabled={items.length === 0}
+        />
       </aside>
 
-      {/* PAINEL DE ITENS (DIREITA) - ROLÁVEL */}
-      <main className={styles.rightPanel}>
-        <div className={styles.headerCart}>
-          <h2 className={styles.titleCart}>Produtos no Carrinho ({items.length})</h2>
-          <p className={styles.totalWeight}>{financial.totalKg.toFixed(3)} KG</p>
-        </div>
-
-        <div className={styles.itemsList}>
-          {displayItems.length > 0 ? (
-            displayItems.map((item) => (
-              <div key={item.tempId} className={styles.itemRow}>
-                <div className={styles.productInfo}>
-                  <p className={styles.labelSmall}>ID {item.productId}</p>
-                  <h3 className={styles.itemName}>{item.name}</h3>
-                </div>
-
-                <div className={styles.itemActions}>
-
-                  <div className={styles.dataColumn}>
-                    <p className={styles.labelSmall}>QTD</p>
-                    <p className={styles.subtotalValue}>{item.weightKg.toFixed(3)} KG</p>
-                  </div>
-
-                  <button
-                    onClick={() => setItems(items.filter((i) => i.tempId !== item.tempId))}
-                    className={styles.removeBtn}
-                  >
-                    &times;
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className={styles.emptyState}>
-              <p>Nenhum produto bipado ainda.</p>
-              <span>Aguardando leitura do código de barras...</span>
-            </div>
-          )}
-        </div>
+      <main className={styles.cartWrapper}>
+        <InventoryCart
+          tituloCart="Conferência de Entrada"
+          items={items}
+          setItems={setItems}
+          totalWeight={financial.totalKg}
+          isVenda={false} // <--- Mostra apenas o peso
+        />
       </main>
     </div>
   );
