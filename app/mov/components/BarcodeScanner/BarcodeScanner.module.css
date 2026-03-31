@@ -1,73 +1,71 @@
 .barcodeBox {
-  background: #f1f5f9;
-  padding: 32px;
-  border-radius: 20px;
-  border: 2px dashed #cbd5e1;
+  background: #f8fafc; /* Um tom mais claro */
+  padding: 16px; /* Reduzido de 32px para 16px */
+  border-radius: 12px;
+  border: 1.5px dashed #cbd5e1;
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .label {
   display: block;
-  font-size: 14px;
+  font-size: 11px; /* Reduzido de 14px */
   font-weight: 800;
-  color: #475569;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px; /* Reduzido de 16px */
 }
 
 .inputWrapper {
   position: relative;
-  max-width: 400px;
+  max-width: 350px; /* Levemente mais estreito */
   margin: 0 auto;
 }
 
 .barcodeIcon {
   position: absolute;
-  left: 16px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 20px;
-  opacity: 0.5;
+  font-size: 16px; /* Ícone menor */
+  opacity: 0.4;
 }
 
 .bigInput {
   width: 100%;
-  padding: 20px 20px 20px 50px;
-  font-size: 32px; /* Números bem grandes */
-  font-family: 'Courier New', Courier, monospace; /* Fonte estilo código */
-  font-weight: 900;
-  border-radius: 12px;
-  border: 3px solid #3b82f6;
+  /* Padding reduzido: 12px em cima/baixo e 40px na esquerda para o ícone */
+  padding: 12px 12px 12px 40px; 
+  font-size: 20px; /* Reduzido de 32px para ficar mais discreto */
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 800;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0; /* Borda inicial mais leve */
   background: white;
   color: #1e293b;
   text-align: center;
-  letter-spacing: 0.2em;
-  transition: all 0.3s ease;
+  letter-spacing: 0.1em;
+  transition: all 0.2s ease;
 }
 
 .bigInput:focus {
   outline: none;
-  box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.2);
-  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  background-color: #fff;
 }
 
 .helperText {
-  margin-top: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #94a3b8;
+  margin-top: 8px;
+  font-size: 9px; /* Texto de ajuda bem pequeno */
+  font-weight: 700;
+  color: #cbd5e1;
   text-transform: uppercase;
 }
 
-/* Animação para indicar que está pronto */
-.bigInput:focus {
-  animation: pulse-border 2s infinite;
-}
-
+/* Mantivemos a animação, mas de forma mais suave */
 @keyframes pulse-border {
   0% { border-color: #3b82f6; }
-  50% { border-color: #60a5fa; }
+  50% { border-color: #93c5fd; }
   100% { border-color: #3b82f6; }
 }
