@@ -1,0 +1,71 @@
+.productGroup {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+  overflow: hidden; /* Garante que as bordas da tabela respeitem o arredondamento */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.groupTitle {
+  background: #f8fafc;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+  letter-spacing: 0.05em;
+}
+
+.tableContainer {
+  padding: 8px 16px;
+}
+
+.reportTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.reportTable th {
+  text-align: left;
+  padding: 12px 8px;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.reportTable td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #f8fafc;
+  color: #1e293b;
+}
+
+.idCell {
+  font-weight: 800;
+  color: #64748b;
+  width: 60px;
+}
+
+.nameCell {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.quantValue {
+  text-align: right;
+  font-weight: 900;
+  color: #0f172a;
+  font-family: 'Inter', sans-serif;
+}
+
+.colQuant {
+  text-align: right;
+}
+
+/* Efeito de zebra bem sutil */
+.reportTable tr:hover {
+  background-color: #fcfdfe;
+}

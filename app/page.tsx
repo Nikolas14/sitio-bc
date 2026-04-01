@@ -12,6 +12,7 @@ export default function Dashboard() {
 
     { title: 'Estoque Geral', path: '/estoque' },
     { title: 'Estoque Detalhado', path: '/estoque/detalhado' },
+    { title: 'Estoque projecao', path: '/estoque' },
     { title: 'Histórico Geral', path: '/transacoes' },
 
     { title: 'Funcionarios abate', path: '/abate' },
