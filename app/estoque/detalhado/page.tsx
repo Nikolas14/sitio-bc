@@ -4,7 +4,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import { useInventory } from '@/hooks/useInventory';
-import { supabase } from '@/api/supabase'; // Ajustado para seu caminho padrão
+import { supabase } from '@/api/supabase';
+import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 
 type Period = 'yesterday' | '3d' | '7d' | '30d' | 'all';
 
@@ -85,10 +86,7 @@ export default function DetalhesPage() {
     <div className={styles.screen}>
       <aside className={styles.leftPanel}>
         <div className="p-5 border-b bg-white sticky top-0 z-10">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="font-black italic text-xl tracking-tighter">DETALHES</h1>
-            <button onClick={() => router.push('/')} className="text-[10px] font-black text-blue-500 uppercase">Voltar</button>
-          </div>
+          <HeaderPadrao titulo='Estoque detalhado'/>
           <input 
             className="w-full p-2.5 bg-slate-100 rounded-xl text-sm outline-none border border-transparent focus:border-blue-400"
             placeholder="Procurar produto..."
