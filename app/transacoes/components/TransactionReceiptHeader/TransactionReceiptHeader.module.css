@@ -1,0 +1,74 @@
+.receiptHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 24px;
+  margin-bottom: 30px;
+}
+
+.titleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upperLabel {
+  font-size: 10px;
+  font-weight: 900;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.mainTitle {
+  font-size: 36px;
+  font-weight: 950;
+  color: #0f172a;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.subLabel {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.subLabel strong {
+  color: #334155;
+}
+
+.weightBox {
+  text-align: right;
+  background: #f8fafc;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.weightValue {
+  font-size: 32px;
+  font-weight: 900;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.weightValue span {
+  font-size: 14px;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+/* Ajuste para impressão */
+@media print {
+  .receiptHeader {
+    border-bottom-width: 1px;
+  }
+  .weightBox {
+    border: none;
+    padding: 0;
+  }
+}

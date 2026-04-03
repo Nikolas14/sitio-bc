@@ -1,0 +1,44 @@
+.financeFooter {
+  display: flex;
+  justify-content: flex-end; /* Alinha o bloco à direita como um recibo */
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #f1f5f9;
+}
+
+.financeSummary {
+  width: 100%;
+  max-width: 320px; /* Largura fixa para manter o padrão visual */
+}
+
+.financeLine {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.discountText {
+  color: #f43f5e; /* Vermelho para indicar subtração */
+}
+
+.totalLine {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #e2e8f0;
+  font-size: 22px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+/* Responsividade para impressão */
+@media print {
+  .totalLine {
+    font-size: 18px;
+    border-top-style: solid;
+  }
+}

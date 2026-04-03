@@ -9,12 +9,12 @@ export default function Dashboard() {
   const atalhos = [
     { title: 'Entrada de Carga', path: '/mov/entrada' },
     { title: 'Caixa / Venda', path: '/mov/venda' },
-
     { title: 'Estoque Geral', path: '/estoque' },
     { title: 'Estoque Detalhado', path: '/estoque/detalhado' },
-    { title: 'Estoque projecao', path: '/estoque' },
+    
     { title: 'Histórico Geral', path: '/transacoes' },
-
+    
+    { title: 'Estoque Projeção', path: '/projecao' },
     { title: 'Funcionarios abate', path: '/abate' },
     { title: 'Envio de avisos', path: '/avisos' },
   ];

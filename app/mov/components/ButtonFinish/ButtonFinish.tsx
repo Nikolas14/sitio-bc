@@ -9,7 +9,7 @@ interface ButtonFinishProps {
   label?: string;
 }
 
-const ButtonFinish = ({ onClick, loading, disabled, label = 'FINALIZAR (F10)' }: ButtonFinishProps) => {
+const ButtonFinish = ({ onClick, loading, disabled, label = 'FINALIZAR' }: ButtonFinishProps) => {
   return (
     <div className={styles.container}>
       <button

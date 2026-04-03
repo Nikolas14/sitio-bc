@@ -1,102 +1,151 @@
 .screen {
   display: grid;
-  grid-template-columns: 400px 1fr;
+  grid-template-columns: 420px 1fr;
   height: 100vh;
-  overflow: hidden;
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
+  overflow: hidden; /* Trava a tela para o scroll ser interno */
 }
 
+/* --- PAINEL LATERAL (ESQUERDA) --- */
 .leftPanel {
-  background: white;
+  background: #ffffff;
   border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
+  height: 100vh;
 }
 
 .filterHeader {
-  padding: 20px;
+  padding: 24px 20px;
+  background: white;
   border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0; /* Não deixa o header "encolher" */
+}
+
+.searchBox {
+  margin-top: 12px;
+}
+
+.dateInput {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.dateInput:focus {
+  border-color: #3b82f6;
 }
 
 .scrollArea {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
-}
-
-/* Cards da Lista */
-.transCard {
   padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #f1f5f9;
-  cursor: pointer;
-  margin-bottom: 8px;
-  transition: all 0.2s;
+  background-color: #fcfcfd;
 }
 
-.transCard:hover { background: #f8fafc; }
-.activeCard { border-color: #3b82f6; background: #eff6ff; }
+/* Customização da Scrollbar da lista */
+.scrollArea::-webkit-scrollbar {
+  width: 5px;
+}
 
-/* Detalhes à Direita */
+.scrollArea::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+/* --- PAINEL PRINCIPAL (DIREITA) --- */
 .rightPanel {
-  padding: 40px;
+  height: 100vh;
   overflow-y: auto;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); /* Efeito sutil de pontilhado */
+  background-size: 20px 20px;
 }
 
 .receipt {
   background: white;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-/* Tabela de Itens */
-.itemTable {
+  padding: 50px;
+  border-radius: 8px; /* Bordas mais retas para parecer papel */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   width: 100%;
-  margin-top: 25px;
-  border-top: 1px dashed #cbd5e1;
+  max-width: 850px;
+  margin: 0 auto;
+  min-height: fit-content;
+  position: relative;
 }
 
-.itemTable th {
-  text-align: left;
-  padding: 12px;
-  font-size: 10px;
+/* Efeito de detalhe no topo do recibo (opcional) */
+.receipt::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #0f172a;
+  border-radius: 8px 8px 0 0;
+}
+
+/* --- ESTADOS DE MENSAGEM --- */
+.statusMsg {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 12px;
+  font-weight: 800;
   color: #94a3b8;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.itemTable td {
-  padding: 12px;
-  border-bottom: 1px solid #f8fafc;
-  font-size: 14px;
-}
-
-/* Resumo Financeiro */
-.financeGrid {
-  display: grid;
-  grid-template-columns: 1fr 200px;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 2px solid #f1f5f9;
-}
-
-.financeLine {
+.emptyState {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  gap: 15px;
+}
+
+.emptyState span {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.emptyState p {
   font-size: 13px;
-  color: #64748b;
-  margin-bottom: 5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-.totalLine {
-  display: flex;
-  justify-content: space-between;
-  font-size: 24px;
-  font-weight: 900;
-  color: #1e293b;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #e2e8f0;
+/* --- AJUSTE PARA IMPRESSÃO --- */
+@media print {
+  .leftPanel {
+    display: none !important;
+  }
+  .screen {
+    display: block;
+    background: white;
+  }
+  .rightPanel {
+    padding: 0;
+    overflow: visible;
+  }
+  .receipt {
+    box-shadow: none;
+    max-width: 100%;
+    padding: 20px;
+  }
+  .receipt::before {
+    display: none;
+  }
 }

@@ -1,0 +1,63 @@
+.itemTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.itemTable th {
+  text-align: left;
+  padding: 12px 8px;
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.itemTable td {
+  padding: 14px 8px;
+  border-bottom: 1px solid #f8fafc;
+  font-size: 14px;
+}
+
+.productName {
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+}
+
+.centerCol {
+  text-align: center;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.weight {
+  color: #0f172a;
+  font-weight: 900;
+}
+
+.rightCol {
+  text-align: right;
+  font-weight: 900;
+  color: #1e293b;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: #cbd5e1;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+/* Alinhamento dos headers para bater com as colunas */
+.itemTable th:nth-child(2),
+.itemTable th:nth-child(3) {
+  text-align: center;
+}
+
+.itemTable th:last-child {
+  text-align: right;
+}
