@@ -6,7 +6,7 @@ import styles from './page.module.css';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
-import HeaderMov from '../components/HeaderMov/HeaderMov';
+import HeaderMov from '../../../components/HeaderMov/HeaderMov';
 import BarcodeScanner from '../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../components/ButtonFinish/ButtonFinish';

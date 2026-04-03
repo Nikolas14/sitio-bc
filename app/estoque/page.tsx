@@ -7,6 +7,7 @@ import GrupoEstoque from './components/GrupoEstoque/GrupoEstoque';
 import { useRouter } from 'next/navigation';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import CategoryFilter from './components/CategoryFilter/CategoryFilter';
+import HeaderMov from '../../components/HeaderMov/HeaderMov';
 
 export default function EstoqueReportPage() {
   const { products, loading, error, refresh } = useInventory();
@@ -51,7 +52,7 @@ export default function EstoqueReportPage() {
       {/* BARRA LATERAL DE CONTROLE */}
       <aside className={styles.sidebar}>
 
-        <HeaderPadrao titulo='Estoque geral' />
+        <HeaderPadrao titulo='Estoque geral' />       
 
         <CategoryFilter
           categories={categories}
