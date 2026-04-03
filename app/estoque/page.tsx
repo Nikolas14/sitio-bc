@@ -7,7 +7,7 @@ import GrupoEstoque from './components/GrupoEstoque/GrupoEstoque';
 import { useRouter } from 'next/navigation';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import CategoryFilter from './components/CategoryFilter/CategoryFilter';
-import HeaderMov from '../../components/HeaderMov/HeaderMov';
+import HeaderMov from '../../components/HeaderInput/HeaderInput';
 
 export default function EstoqueReportPage() {
   const { products, loading, error, refresh } = useInventory();

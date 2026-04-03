@@ -6,13 +6,12 @@ import styles from './page.module.css';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
-import HeaderMov from '../../../components/HeaderMov/HeaderMov';
 import BarcodeScanner from '../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../components/ButtonFinish/ButtonFinish';
+import HeaderInput from '@/components/HeaderInput/HeaderInput';
 
 export default function EntradaSimplificadaPage() {
-  const router = useRouter();
   const { products } = useInventory();
 
   const [customer, setCustomer] = useState('');
@@ -116,7 +115,7 @@ export default function EntradaSimplificadaPage() {
 
       <aside className={styles.leftPanel}>
         <div className={styles.controlTop}>
-          <HeaderMov
+          <HeaderInput
             titulo="Entrada"
             labelDescricao="Quantidade abate"
             valor={customer}

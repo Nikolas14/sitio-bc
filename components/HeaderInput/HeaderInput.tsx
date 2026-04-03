@@ -1,7 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import styles from './HeaderMov.module.css';
+import styles from './HeaderInput.module.css';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 
 // Definindo o que o componente precisa receber
@@ -13,14 +12,13 @@ interface FormSectionProps {
   placeholder?: string; // O '?' indica que é opcional
 }
 
-export default function HeaderMov({
+export default function HeaderInput({
   titulo,
   labelDescricao,
   valor,
   setValor,
   placeholder
 }: FormSectionProps) {
-  const router = useRouter();
 
   return (
     <div className={styles.container}>

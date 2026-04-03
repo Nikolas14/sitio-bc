@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
 
-export type Period = 'yesterday' | '3d' | '7d' | '30d' | 'all';
+export type Period = 'yesterday' | '3d' | '7d'  | '15d' | '30d' | 'all';
 
 export function useHistory(productId: number | null, period: Period) {
   const [history, setHistory] = useState<any[]>([]);

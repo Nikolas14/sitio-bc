@@ -6,15 +6,14 @@ import styles from './page.module.css';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
-import HeaderMov from '../../../components/HeaderMov/HeaderMov';
 import BarcodeScanner from '../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../components/ButtonFinish/ButtonFinish';
 import FinancialSummary from '../components/FinancialSummary/FinancialSummary';
 import DiscountInput from '../components/DiscountInput/DiscountInput';
+import HeaderInput from '@/components/HeaderInput/HeaderInput';
 
 export default function VendaSimplificadaPage() {
-  const router = useRouter();
   const { products } = useInventory();
 
   const [customer, setCustomer] = useState('');
@@ -122,7 +121,7 @@ export default function VendaSimplificadaPage() {
       <aside className={styles.leftPanel}>
         <div className={styles.controlTop}>
 
-          <HeaderMov
+          <HeaderInput
             titulo="Venda"
             labelDescricao="Nome do Cliente"
             valor={customer}

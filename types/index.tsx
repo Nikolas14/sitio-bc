@@ -8,12 +8,14 @@ export interface IProduct {
 }
 
 export interface IOperation {
-  id?: string;
-  product_id: number;
+  id: number;
+  created_at: string;
   type: 'IN' | 'OUT';
-  quantity: number;
-  customer_or_vendor?: string;
-  operation_date?: string;
+  quant: number;
+  ESTOQUE_transaction?: {
+    customer_vendor: string;
+    serial_number: string;
+  };
 }
 
 // Interface específica para a nossa VIEW do Supabase
