@@ -11,8 +11,9 @@ export default function Dashboard() {
     { title: 'Caixa / Venda', path: '/mov/venda' },
     { title: 'Estoque Geral', path: '/estoque' },
     { title: 'Estoque Detalhado', path: '/estoque/detalhado' },
+    { title: 'Histórico transações', path: '/transacoes' },
     
-    { title: 'Histórico Geral', path: '/transacoes' },
+    { title: 'Cobrança', path: '/cobranca' },
     
     { title: 'Estoque Projeção', path: '/projecao' },
     { title: 'Funcionarios abate', path: '/abate' },
