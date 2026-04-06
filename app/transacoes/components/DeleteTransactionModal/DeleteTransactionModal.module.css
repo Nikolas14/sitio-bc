@@ -1,0 +1,50 @@
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal h3 { font-weight: 900; color: #0f172a; margin-bottom: 8px; text-transform: uppercase; }
+.modal p { color: #64748b; font-size: 13px; margin-bottom: 24px; line-height: 1.5; }
+
+.passwordInput {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #f1f5f9;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  outline: none;
+  text-align: center;
+  font-weight: 800;
+}
+
+.actions { display: flex; gap: 12px; }
+
+.cancelBtn, .confirmBtn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+}
+
+.cancelBtn { background: #f1f5f9; color: #64748b; }
+.confirmBtn { background: #f43f5e; color: white; }
+.confirmBtn:disabled { opacity: 0.5; cursor: not-allowed; }

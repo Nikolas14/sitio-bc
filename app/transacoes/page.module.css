@@ -149,3 +149,38 @@
     display: none;
   }
 }
+
+.dangerZone {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px dashed #fee2e2;
+  padding-top: 20px;
+}
+
+.deleteBtn {
+  background-color: #fff1f2;
+  color: #f43f5e;
+  border: 1px solid #fecdd3;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background-color: #f43f5e;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Responsividade de Impressão */
+@media print {
+  .dangerZone {
+    display: none !important;
+  }
+}
