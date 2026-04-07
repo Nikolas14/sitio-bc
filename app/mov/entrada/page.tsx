@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
@@ -72,12 +71,12 @@ export default function EntradaSimplificadaPage() {
       const { data: trans, error: transError } = await supabase
         .from('ESTOQUE_transaction')
         .insert([{
-          type: 'OUT',
+          type: 'IN',
           customer_vendor: customer || 'LOJA_BC',
           total_price: financial.totalFinal,
           total_kg: financial.totalKg,
           discount_percent: 0,
-          status: 'PENDENTE'
+          status: 'ENTRADA'
         }])
         .select()
         .single();
@@ -88,7 +87,7 @@ export default function EntradaSimplificadaPage() {
       const operations = items.map(item => ({
         transaction_id: trans.id,
         product_id: item.productId,
-        type: 'OUT',
+        type: 'IN',
         quant: item.weightKg
       }));
 
@@ -104,7 +103,7 @@ export default function EntradaSimplificadaPage() {
       inputRef.current?.focus();
 
     } catch (err: any) {
-      alert("Erro ao salvar venda: " + err.message);
+      alert("Erro ao salvar Entrada: " + err.message);
     } finally {
       setLoading(false);
     }
