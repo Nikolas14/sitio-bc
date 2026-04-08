@@ -5,26 +5,27 @@ import styles from './page.module.css';
 import GrupoEstoque from './components/GrupoEstoque/GrupoEstoque';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import CategoryFilter from './components/CategoryFilter/CategoryFilter';
-import { useFetchInventory } from '@/hooks/useFetchInventory';
+import { useInventory } from '@/hooks/useInventory';
 
 export default function EstoqueReportPage() {
-  const { products, loading, error, refresh } = useFetchInventory();
+  const { products, loading, error, refresh } = useInventory();
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 
-  // Agrupamento dos dados
-const groupedData = useMemo(() => {
+  // Agrupamento dos dados corrigido
+  const groupedData = useMemo(() => {
     const groups: Record<string, any[]> = {};
     
-    inventory.forEach((item) => {
-      // Acessamos o tipo através do objeto product
-      const category = item.product?.type || 'Sem Categoria';
+    // USAR 'products' que vem do hook, não 'inventory'
+    products.forEach((item) => {
+      // Como é uma View, os campos estão na raiz do objeto (item.type, item.name, etc)
+      const category = item.type || 'Sem Categoria';
       
       if (!groups[category]) groups[category] = [];
       
       groups[category].push({
-        id: item.product?.id,
-        name: item.product?.name,
-        quant: Number(item.current_stock) || 0 // Saldo vindo da View
+        id: item.id,
+        name: item.name,
+        current_stock: Number(item.current_stock) || 0 
       });
     });
 
@@ -32,7 +33,7 @@ const groupedData = useMemo(() => {
       category: cat,
       items: groups[cat]
     }));
-  }, [inventory]);
+  }, [products]); // Dependência corrigida para 'products'
 
   const toggleGroup = (cat: string) => {
     setSelectedGroups(prev =>
@@ -51,9 +52,7 @@ const groupedData = useMemo(() => {
 
   return (
     <div className={styles.screen}>
-      {/* BARRA LATERAL DE CONTROLE */}
       <aside className={styles.sidebar}>
-
         <HeaderPadrao titulo='Estoque geral' />       
 
         <CategoryFilter
@@ -66,22 +65,24 @@ const groupedData = useMemo(() => {
         <div className={styles.sideFooter}>
           <button onClick={() => refresh()} className={styles.secondaryBtn}>🔄 Atualizar Dados</button>
         </div>
-        
       </aside>
 
-      {/* ÁREA DE CONTEÚDO (ESTOQUE) */}
       <main className={styles.mainContent}>
         {loading ? (
           <div className={styles.loading}>Buscando inventário...</div>
         ) : (
           <div className={styles.reportGrid}>
-            {visibleGroups.map((group) => (
-              <GrupoEstoque
-                key={group.category}
-                category={group.category}
-                list={group.items}
-              />
-            ))}
+            {visibleGroups.length > 0 ? (
+              visibleGroups.map((group) => (
+                <GrupoEstoque
+                  key={group.category}
+                  category={group.category}
+                  list={group.items}
+                />
+              ))
+            ) : (
+              <div className={styles.empty}>Nenhum produto encontrado no estoque.</div>
+            )}
           </div>
         )}
       </main>

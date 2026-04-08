@@ -2,8 +2,8 @@ import { IProduct } from '@/types';
 import styles from './GrupoEstoque.module.css'
 
 interface GrupoEstoqueProps {
-  category: string;
-  list: IProduct[];
+    category: string;
+    list: IProduct[];
 }
 
 const GrupoEstoque = ({ category, list }: GrupoEstoqueProps) => {
@@ -25,12 +25,11 @@ const GrupoEstoque = ({ category, list }: GrupoEstoqueProps) => {
                         <tr key={p.id}>
                             <td>{p.id}</td>
                             <td>{p.name}</td>
-                            {/* Formata a quantidade para exibição com 3 casas, garantindo precisão visual */}
                             <td className={styles.quantValue}>
                                 {new Intl.NumberFormat('pt-BR', {
                                     minimumFractionDigits: 3,
                                     maximumFractionDigits: 3
-                                }).format(p.current_stock ?? 0)}
+                                }).format(p.current_stock ?? 0)} {/* <--- Mude de current_stock para quant */}
                             </td>
                         </tr>
                     ))}
