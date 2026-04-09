@@ -1,7 +1,7 @@
 /* 1. Container Principal: Divide a tela entre Sidebar e Conteúdo */
 .screen {
   display: grid;
-  grid-template-columns: 350px 1fr; /* Sidebar com largura fixa e conteúdo flexível */
+  grid-template-columns: 420px 1fr; /* Sidebar com largura fixa e conteúdo flexível */
   height: 100vh; /* Ocupa a altura total da janela */
   background-color: #f1f5f9; /* Fundo suave para contraste */
   overflow: hidden; /* Impede que a página inteira role */

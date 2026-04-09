@@ -1,17 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import styles from './page.module.css';
+
+import { useState, useMemo } from 'react';
+
 import { useInventory } from '@/hooks/useInventory';
 import { useHistory, Period } from '@/hooks/useHistory';
+
 import ProductSidebarList from './components/ProductSidebarList/ProductSidebarList';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import ProductHistoryTable from './components/ProductHistoryTable/ProductHistoryTable';
 import HistoryControls from './components/HistoryControls/HistoryControls';
 import ProductDetailHeader from './components/ProductDetailHeader/ProductDetailHeader';
+import SideFooter from '@/components/SideFooter/SideFooter';
 
 export default function DetalhesPage() {
-  const { products, loading: productsLoading } = useInventory();
+  const { products, loading: productsLoading ,refresh} = useInventory();
 
   // Estados de controle da UI
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,6 +61,10 @@ export default function DetalhesPage() {
           selectedId={selectedId}
           onSelect={setSelectedId}
         />
+
+        <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados">
+          {/* O que for colocado aqui dentro aparece acima do botão */}
+        </SideFooter>
 
       </aside>
 

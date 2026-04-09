@@ -1,0 +1,76 @@
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.clearBtn {
+  font-size: 10px;
+  font-weight: 800;
+  color: #3b82f6;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.statusList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filterBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: #f8fafc;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.filterBtnActive {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+/* Pequena bolinha indicadora opcional para dar um charme */
+.indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: all 0.2s;
+}
+
+.filterBtnActive .indicator {
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+}

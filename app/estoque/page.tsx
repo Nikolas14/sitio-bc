@@ -1,11 +1,15 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import styles from './page.module.css';
+
+import { useMemo, useState } from 'react';
+
+import { useInventory } from '@/hooks/useInventory';
+
 import GrupoEstoque from './components/GrupoEstoque/GrupoEstoque';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
-import CategoryFilter from './components/CategoryFilter/CategoryFilter';
-import { useInventory } from '@/hooks/useInventory';
+import StatusFilter from '@/components/StatusFilter/StatusFilter';
+import SideFooter from '@/components/SideFooter/SideFooter';
 
 export default function EstoqueReportPage() {
   const { products, loading, error, refresh } = useInventory();
@@ -14,18 +18,18 @@ export default function EstoqueReportPage() {
   // Agrupamento dos dados corrigido
   const groupedData = useMemo(() => {
     const groups: Record<string, any[]> = {};
-    
+
     // USAR 'products' que vem do hook, não 'inventory'
     products.forEach((item) => {
       // Como é uma View, os campos estão na raiz do objeto (item.type, item.name, etc)
       const category = item.type || 'Sem Categoria';
-      
+
       if (!groups[category]) groups[category] = [];
-      
+
       groups[category].push({
         id: item.id,
         name: item.name,
-        current_stock: Number(item.current_stock) || 0 
+        current_stock: Number(item.current_stock) || 0
       });
     });
 
@@ -53,18 +57,19 @@ export default function EstoqueReportPage() {
   return (
     <div className={styles.screen}>
       <aside className={styles.sidebar}>
-        <HeaderPadrao titulo='Estoque geral' />       
+        <HeaderPadrao titulo='Estoque geral' />
 
-        <CategoryFilter
-          categories={categories}
-          selectedGroups={selectedGroups}
+        <StatusFilter
+          label="Filtrar tipos"
+          options={categories}
+          selectedOptions={selectedGroups}
           onToggle={toggleGroup}
           onClear={() => setSelectedGroups([])}
         />
 
-        <div className={styles.sideFooter}>
-          <button onClick={() => refresh()} className={styles.secondaryBtn}>🔄 Atualizar Dados</button>
-        </div>
+        <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados">
+          <></>
+        </SideFooter>
       </aside>
 
       <main className={styles.mainContent}>

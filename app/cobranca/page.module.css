@@ -1,94 +1,88 @@
-.container {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
+/* page.module.css */
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.filterBar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 25px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-}
-
-.filterBtn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 800;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #64748b;
-  cursor: pointer;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.filterBtnActive {
-  background: #1e293b;
-  color: white;
-  border-color: #1e293b;
-}
-
-.table {
-  width: 100%;
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  border-collapse: collapse;
+.screen {
+  display: grid;
+  grid-template-columns: 420px 1fr; /* Sidebar fixa em 350px e o resto para a tabela */
+  height: 100vh;
+  background-color: #f1f5f9; /* Fundo slate suave para destacar os cards brancos */
   overflow: hidden;
 }
 
-.table th {
-  text-align: left;
-  padding: 15px 20px;
-  background: #f8fafc;
-  font-size: 10px;
-  font-weight: 900;
-  color: #94a3b8;
-  text-transform: uppercase;
-  border-bottom: 1px solid #e2e8f0;
+/* SIDEBAR */
+.sidebar {
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 35px; /* Espaço generoso entre os blocos (Busca, Filtro, Footer) */
+  height: 100vh;
 }
 
-.table td {
-  padding: 18px 20px;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 14px;
+/* ÁREA PRINCIPAL */
+.mainContent {
+  padding: 40px;
+  overflow-y: auto; /* A tabela rola, mas a sidebar fica fixa */
+  display: flex;
+  flex-direction: column;
 }
 
-.statusBadge {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-  display: inline-block;
+/* CARD DE PENDÊNCIA NO FOOTER */
+.pendenteCard {
+  background-color: #fff1f2; /* Rose 50 */
+  border: 1px solid #fecdd3; /* Rose 200 */
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 5px;
 }
 
-/* Cores por Status */
-.statusPENDENTE { background: #fef9c3; color: #854d0e; }
-.statusCOBRADO { background: #dbeafe; color: #1e40af; }
-.statusENVIADO { background: #f3e8ff; color: #6b21a8; }
-.statusCONCLUIDO { background: #dcfce7; color: #15803d; }
-
-.actionBtn {
-  background: #f1f5f9;
-  color: #1e293b;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 10px;
+.label {
+  display: block;
+  font-size: 11px;
   font-weight: 800;
-  border: none;
-  cursor: pointer;
+  color: #94a3b8; /* Slate 400 */
   text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.actionBtn:hover { background: #e2e8f0; }
+.pendenteValue {
+  font-size: 26px;
+  font-weight: 950;
+  color: #e11d48; /* Rose 600 */
+  font-family: 'Courier New', Courier, monospace; /* Estilo financeiro */
+  letter-spacing: -1px;
+}
+
+/* ESTADOS DE ERRO E LOADING */
+.error {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* AJUSTES DE SCROLLBAR (Opcional, para deixar elegante) */
+.mainContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mainContent::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.mainContent::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.mainContent::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
