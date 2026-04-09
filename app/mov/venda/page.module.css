@@ -37,6 +37,76 @@
   overflow: hidden; /* O scroll será gerenciado dentro do InventoryCart */
 }
 
+
+.screen {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  height: 100vh;
+  background-color: #f8fafc;
+}
+
+.leftPanel {
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.controlTop {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* CONTAINER DO SCANNER COM SEGURANÇA */
+.scannerContainer {
+  position: relative;
+  padding: 10px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.hasError {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.errorMsg {
+  color: #b91c1c;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-top: 8px;
+  display: block;
+  letter-spacing: 0.5px;
+}
+
+/* Animação de erro */
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+.cartWrapper {
+  padding: 40px;
+  background-color: #f1f5f9;
+  overflow-y: auto;
+}
+
+.centerInfo {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #64748b;
+}
 /* 5. Ajustes de Responsividade */
 @media (max-width: 1100px) {
   .screen {

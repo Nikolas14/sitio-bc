@@ -1,17 +1,18 @@
 'use client';
 
 import { useState, useRef, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from './page.module.css';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
+
 import BarcodeScanner from '../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../components/ButtonFinish/ButtonFinish';
 import FinancialSummary from '../components/FinancialSummary/FinancialSummary';
 import DiscountInput from '../components/DiscountInput/DiscountInput';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
+
+import styles from './page.module.css';
 
 export default function VendaSimplificadaPage() {
   const { products } = useInventory();
@@ -21,10 +22,9 @@ export default function VendaSimplificadaPage() {
   const [items, setItems] = useState<any[]>([]);
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
+  
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Itens invertidos para o último bipado aparecer no topo
-  const displayItems = useMemo(() => [...items].reverse(), [items]);
 
   // Cálculos Financeiros
   const financial = useMemo(() => {
@@ -36,7 +36,7 @@ export default function VendaSimplificadaPage() {
     return { subtotal, totalKg, discountVal, totalFinal };
   }, [items, discountPercent]);
 
-  // Atalho de teclado para finalizar (F10)
+  // Atalho F10 para finalizar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F10' && items.length > 0 && !loading) {
@@ -48,22 +48,47 @@ export default function VendaSimplificadaPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [items, loading, financial]);
 
+  // Função para feedback sonoro de erro
+  const playErrorSound = () => {
+    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+    audio.play().catch(() => {}); 
+  };
+
   const handleBarcode = (val: string) => {
     setBarcode(val);
+    setLastError(null); // Limpa erro anterior ao digitar
+
     if (val.length === 13) {
       const parsed = parseScaleBarcode(val);
-      if (parsed) {
-        const prod = products.find(p => p.id === parsed.productId);
-        if (prod) {
-          setItems(prev => [{
-            ...parsed,
-            name: prod.name,
-            price: prod.price || 0,
-            tempId: Date.now()
-          }, ...prev]);
-        }
+      
+      // Camada de Segurança 1: Código de barras é reconhecível?
+      if (!parsed) {
+        setLastError("Código de barras inválido");
+        playErrorSound();
         setBarcode('');
+        return;
       }
+
+      const prod = products.find(p => p.id === parsed.productId);
+
+      // Camada de Segurança 2: Produto existe no cadastro?
+      if (!prod) {
+        setLastError(`Produto #${parsed.productId} não encontrado`);
+        playErrorSound();
+        setBarcode('');
+        return;
+      }
+
+      // Sucesso: Adiciona ao carrinho
+      setItems(prev => [{
+        ...parsed,
+        name: prod.name,
+        price: prod.price || 0,
+        tempId: Date.now()
+      }, ...prev]);
+      
+      setBarcode('');
+      setLastError(null);
     }
   };
 
@@ -72,13 +97,13 @@ export default function VendaSimplificadaPage() {
     setLoading(true);
 
     try {
-      // 1. Criar Cabeçalho da Venda
+      // 1. Criar Cabeçalho (Transaction)
       const { data: trans, error: transError } = await supabase
         .from('ESTOQUE_transaction')
         .insert([{
           type: 'OUT',
-          customer_vendor: customer || 'LOJA_BC',
-          total_price: financial.totalFinal,
+          customer_vendor: customer || 'VENDA_AVULSA',
+          total_price: financial.subtotal, // Salvamos o BRUTO
           total_kg: financial.totalKg,
           discount_percent: discountPercent,
           status: 'PENDENTE'
@@ -88,7 +113,7 @@ export default function VendaSimplificadaPage() {
 
       if (transError) throw transError;
 
-      // 2. Criar Itens (Operações)
+      // 2. Criar Itens (Operations)
       const operations = items.map(item => ({
         transaction_id: trans.id,
         product_id: item.productId,
@@ -102,14 +127,14 @@ export default function VendaSimplificadaPage() {
 
       if (opError) throw opError;
 
-      alert("Saida enviada para o estoque!");
+      alert("Venda realizada com sucesso!");
       setItems([]);
       setCustomer('');
       setDiscountPercent(0);
       inputRef.current?.focus();
 
     } catch (err: any) {
-      alert("Erro ao salvar venda: " + err.message);
+      alert("Erro ao salvar: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -117,24 +142,25 @@ export default function VendaSimplificadaPage() {
 
   return (
     <div className={styles.screen}>
-      
       <aside className={styles.leftPanel}>
         <div className={styles.controlTop}>
-
           <HeaderInput
-            titulo="Venda"
-            labelDescricao="Nome do Cliente"
+            titulo="Venda Direta"
+            labelDescricao="Identificação do Cliente"
             valor={customer}
             setValor={setCustomer}
-            placeholder="Ex: Moshe/ Yaakov"
+            placeholder="Nome ou CPF..."
           />
 
-          <BarcodeScanner
-            ref={inputRef}
-            barcode={barcode}
-            onChange={handleBarcode}
-          />
-
+          {/* Wrapper com estado de erro visual */}
+          <div className={`${styles.scannerContainer} ${lastError ? styles.hasError : ''}`}>
+            <BarcodeScanner
+              ref={inputRef}
+              barcode={barcode}
+              onChange={handleBarcode}
+            />
+            {lastError && <span className={styles.errorMsg}>⚠️ {lastError}</span>}
+          </div>
         </div>
 
         <DiscountInput
@@ -147,21 +173,21 @@ export default function VendaSimplificadaPage() {
           discountVal={financial.discountVal}
           totalFinal={financial.totalFinal}
         />
+
         <ButtonFinish
           onClick={finalizarVenda}
           loading={loading}
           disabled={items.length === 0}
         />
-
       </aside>
 
       <main className={styles.cartWrapper}>
         <InventoryCart
-          tituloCart="Venda de Produtos"
+          tituloCart="Itens da Venda"
           items={items}
           setItems={setItems}
           totalWeight={financial.totalKg}
-          isVenda={true} // <--- Isso ativa a exibição dos preços!
+          isVenda={true}
         />
       </main>
     </div>
