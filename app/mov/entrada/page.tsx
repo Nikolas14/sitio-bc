@@ -5,7 +5,7 @@ import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
 
-import BarcodeScanner from '../components/BarcodeScanner/BarcodeScanner';
+import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../../../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../../../components/ButtonFinish/ButtonFinish';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';

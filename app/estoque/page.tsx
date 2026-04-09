@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 
 import { useInventory } from '@/hooks/useInventory';
 
-import GrupoEstoque from './components/GrupoEstoque/GrupoEstoque';
+import GrupoEstoque from '../../components/GrupoEstoque/GrupoEstoque';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import SideFooter from '@/components/SideFooter/SideFooter';
