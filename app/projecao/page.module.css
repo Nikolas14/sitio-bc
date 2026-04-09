@@ -1,0 +1,128 @@
+.screen {
+  display: grid;
+  grid-template-columns: 420px 1fr; /* Garante a barra lateral fixa à esquerda */
+  height: 100vh;
+  background-color: #f8fafc;
+}
+
+.leftPanel {
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  overflow-y: auto;
+}
+
+.controlTop {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.manualInputGrid {
+  display: grid;
+  grid-template-columns: 140px 1fr; /* ID mais curto, Quantidade maior */
+  gap: 15px;
+  margin-top: 5px;
+}
+
+.inputField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.miniLabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.field {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.field:focus {
+  border-color: #0f172a;
+}
+
+/* Feedback visual do input */
+.inputSuccess {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+}
+
+/* Estilo do Nome do Produto dinâmico */
+.previewArea {
+  min-height: 20px;
+  margin-top: 4px;
+}
+
+.foundText {
+  color: #16a34a;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.idleText {
+  color: #94a3b8;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.btnAdd {
+  margin-top: 10px;
+  padding: 14px;
+  background: #0f172a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.summaryBox {
+  margin-top: auto;
+  padding: 20px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.weightValue {
+  font-size: 36px;
+  font-weight: 950;
+  font-family: monospace;
+  color: #0f172a;
+}
+
+.cartWrapper {
+  padding: 40px;
+  background-color: #f1f5f9;
+  overflow-y: auto;
+}
+
+.alertMsg {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}

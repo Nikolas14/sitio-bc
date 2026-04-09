@@ -6,8 +6,8 @@ import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
 
 import BarcodeScanner from '../components/BarcodeScanner/BarcodeScanner';
-import InventoryCart from '../components/InventoryCart/InventoryCart';
-import ButtonFinish from '../components/ButtonFinish/ButtonFinish';
+import InventoryCart from '../../../components/InventoryCart/InventoryCart';
+import ButtonFinish from '../../../components/ButtonFinish/ButtonFinish';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 
 import styles from './page.module.css';

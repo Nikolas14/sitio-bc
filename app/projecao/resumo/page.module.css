@@ -1,0 +1,117 @@
+.container {
+  padding: 40px;
+  background-color: #fff;
+  min-height: 100vh;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.dashboard {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.mainStat {
+  background: #0f172a;
+  color: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.statLabel {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  opacity: 0.7;
+}
+
+.statValue {
+  font-size: 64px;
+  font-weight: 950;
+  margin-top: 10px;
+}
+
+.statValue small {
+  font-size: 24px;
+  opacity: 0.5;
+}
+
+.tableWrapper {
+  border: 2px solid #f1f5f9;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.summaryTable th {
+  background: #f8fafc;
+  padding: 20px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 900;
+  color: #64748b;
+  text-transform: uppercase;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.summaryTable td {
+  padding: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 16px;
+}
+
+.productName {
+  font-weight: 800;
+  color: #0f172a;
+  text-transform: uppercase;
+}
+
+.totalQuant {
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: 900;
+  color: #000;
+}
+
+.pickBadge {
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #475569;
+}
+
+.btnPrint {
+  margin-top: 40px;
+  width: 100%;
+  padding: 15px;
+  background: #fff;
+  border: 2px solid #0f172a;
+  border-radius: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.btnPrint:hover {
+  background: #f1f5f9;
+}
+
+.textRight { text-align: right; }
+.textCenter { text-align: center; }
+
+/* Ajuste para impressão */
+@media print {
+  .btnPrint { display: none; }
+  .container { padding: 0; }
+}
