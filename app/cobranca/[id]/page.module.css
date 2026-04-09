@@ -1,91 +1,80 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  padding: 40px 20px;
+.screen {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  height: 100vh;
   background-color: #f1f5f9;
-  min-height: 100vh;
+  overflow: hidden;
 }
 
-.leftPanel {
-  width: 100%;
-  max-width: 800px;
+.sidebar {
   background: white;
-  padding: 24px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-}
-
-.inputGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-.actionsColumn { display: flex; flexDirection: column; gap: 12px; }
-
-.captureContainer { display: flex; flex-direction: column; gap: 20px; }
-
-/* PROPORÇÃO A4 PARA CAPTURA */
-.receiptPaper {
-  width: 800px;
-  height: 1131px;
-  background: white;
-  padding: 60px;
+  border-right: 1px solid #e2e8f0;
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+  gap: 20px;
+  overflow-y: auto;
 }
 
-.tableArea { flex: 1; }
-
-.paidStamp {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) rotate(-15deg);
-  border: 12px solid #10b981;
-  color: #10b981;
-  font-size: 120px;
-  font-weight: 900;
-  padding: 10px 40px;
-  opacity: 0.12;
-  z-index: 100;
-  pointer-events: none;
-}
-
-.receiptHeader {
+.previewArea {
+  padding: 40px;
+  overflow-y: auto;
   display: flex;
-  justify-content: space-between;
-  border-bottom: 2px solid #0f172a;
-  padding-bottom: 10px;
-  margin-bottom: 30px;
+  justify-content: center;
+  align-items: flex-start;
+  background: #cbd5e1;
+  position: relative;
 }
 
-.brandName { font-weight: 900; font-size: 24px; text-transform: uppercase; }
+.zoomWrapper {
+  transform: scale(0.8);
+  transform-origin: top center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
 
-.itemTable { width: 100%; border-collapse: collapse; }
-.itemTable th { text-align: left; padding: 12px 5px; border-bottom: 2px solid #0f172a; font-size: 13px; text-transform: uppercase; }
-.itemTable td { padding: 10px 5px; border-bottom: 1px dashed #e2e8f0; font-size: 14px; }
+.miniSummary {
+  margin-top: auto;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
 
-.summarySection { border-top: 2px solid #0f172a; padding-top: 20px; }
-.summaryLine { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; }
-.totalRow { display: flex; justify-content: space-between; margin-top: 15px; background: #f8fafc; padding: 20px; border-radius: 4px; }
+.summaryRow {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 11px;
+}
 
-.grandTotalLabel { font-size: 12px; font-weight: 800; text-transform: uppercase; display: block; }
-.grandTotalValue { font-size: 32px; font-weight: 950; }
+.remainingVal {
+  font-size: 18px;
+  font-family: monospace;
+}
 
-.statusBadge { padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 800; text-transform: uppercase; }
-.statusPENDENTE { background: #fef9c3; color: #854d0e; }
-.statusENVIADO { background: #dcfce7; color: #166534; }
-.statusCOBRADO { background: #dbeafe; color: #1e40af; }
-.statusCONCLUIDO { background: #f0fdf4; color: #15803d; }
+.loadingScreen, .errorScreen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  background: white;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
 
-.pageFooter { margin-top: auto; padding-top: 20px; text-align: center; font-size: 10px; color: #94a3b8; text-transform: uppercase; }
-.mono { font-family: 'Courier New', monospace; font-weight: 700; }
-.textRight { text-align: right; }
-.textCenter { text-align: center; }
-
-/* Botões do Layout Anterior */
-.backBtn { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px 16px; font-weight: 800; cursor: pointer; text-transform: uppercase; border-radius: 4px; }
-.btnAction, .downloadBtn { background: #0f172a; color: white; padding: 14px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; border-radius: 4px; width: 100%; }
-.taxBtn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; font-weight: 800; cursor: pointer; border-radius: 4px; }
-.field { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; }
+.genOverlay {
+  position: absolute;
+  top: 20px;
+  background: #0f172a;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 800;
+  z-index: 100;
+  text-transform: uppercase;
+}

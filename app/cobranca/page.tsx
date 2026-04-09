@@ -34,14 +34,6 @@ export default function ListaCobrancasPage() {
     });
   }, [transactions, selectedStatus, searchTerm]);
 
-  // Resumo Financeiro
-  const stats = useMemo(() => {
-    const pendente = transactions
-      .filter(t => t.status !== 'CONCLUIDO')
-      .reduce((acc, t) => acc + (Number(t.total_price) || 0), 0);
-    return { pendente };
-  }, [transactions]);
-
   if (error) return <div className={styles.error}>Erro: {error}</div>;
 
   return (
@@ -67,10 +59,7 @@ export default function ListaCobrancasPage() {
 
 
         <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados">
-          <div className={styles.pendenteCard}>
-            <span className={styles.label}>Total Pendente</span>
-            <span className={styles.pendenteValue}>R$ {stats.pendente.toFixed(2)}</span>
-          </div>
+
         </SideFooter>
 
       </aside>

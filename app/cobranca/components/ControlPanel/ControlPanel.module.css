@@ -1,0 +1,194 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.backBtn {
+  width: fit-content;
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-weight: 800;
+  font-size: 11px;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-style: italic;
+  letter-spacing: -1px;
+  color: #1e293b;
+}
+
+.serial {
+  font-family: monospace;
+  font-weight: 700;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+  margin: 10px 0;
+}
+
+/* SEÇÕES */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.field {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+}
+
+.field:focus {
+  border-color: #0f172a;
+}
+
+/* BOTÕES E ATALHOS */
+.inputWithShortcut {
+  display: flex;
+  gap: 6px;
+}
+
+.shortcutBtn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btnSave {
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btnDownload {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btnOutline {
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+/* CARD DE PAGAMENTO */
+.paymentCard {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.paymentTitle {
+  color: #166534;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.paymentDesc {
+  font-size: 11px;
+  color: #15803d;
+  margin-bottom: 15px;
+}
+
+.paymentRow {
+  display: flex;
+  gap: 10px;
+}
+
+.btnConfirm {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 0 20px;
+  border-radius: 6px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* SUCESSO */
+.successBox {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.checkIcon { font-size: 24px; }
+.successTitle { font-weight: 900; color: #166534; font-size: 14px; text-transform: uppercase; }
+.successDesc { font-size: 11px; color: #64748b; }

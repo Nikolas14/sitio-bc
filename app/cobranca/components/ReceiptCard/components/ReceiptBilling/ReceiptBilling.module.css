@@ -1,0 +1,46 @@
+.billingSection {
+  display: flex;
+  justify-content: space-between;
+  background: #f8fafc; /* Slate 50 */
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 800;
+  color: #64748b; /* Slate 500 */
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.customerTitle {
+  font-size: 34px;
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+  color: #0f172a; /* Slate 900 */
+}
+
+.customerSub {
+  font-size: 14px;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+.pageInfo {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.metaValue {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  font-family: monospace;
+}

@@ -1,0 +1,55 @@
+.itemsSection {
+  flex: 1;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.modernTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.modernTable th {
+  font-size: 16px; /* Bem maior */
+  font-weight: 900;
+  color: #1e293b;
+  padding: 20px 0;
+  border-bottom: 4px solid #000; /* Linha de separação forte */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modernTable td {
+  padding: 25px 0; /* Mais respiro para as letras grandes */
+  border-bottom: 1px solid #cbd5e1;
+  font-size: 20px; /* Fonte robusta */
+  color: #000;
+}
+
+.itemName {
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.2;
+  padding-right: 20px;
+}
+
+.textLeft { text-align: left; }
+.textRight { text-align: right; }
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px; /* Números grandes para conferência */
+  font-weight: 700;
+}
+
+.fontBold {
+  font-weight: 950;
+}
+
+.currencySymbol {
+  font-size: 14px;
+  color: #64748b;
+  margin-right: 8px;
+  font-weight: 800;
+}

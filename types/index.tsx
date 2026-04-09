@@ -8,22 +8,21 @@ export interface IProduct {
   weightAlt?: number;
 }
 
-// 2. Definição da Transação (O "Recibo" ou "Capa" do pedido)
 export interface ITransaction {
   id: string;
-  created_at: string;
   type: 'IN' | 'OUT';
   customer_vendor: string;
-  serial_number: string;
   total_price: number;
   total_kg: number;
-  discount_percent: number;
-  tax_amount?: number;
+  created_at: string;
+  serial_number: string;
   shipping_cost?: number;
-  notes?: string;
+  tax_amount?: number;
+  discount_percent: number;
+  status: 'PENDENTE' | 'ENVIADO' | 'COBRADO' | 'CONCLUIDO'; 
+  paid_amount: number; 
 }
 
-// 3. Definição da Operação (Os itens dentro de uma transação ou extrato)
 export interface IOperation {
   id: number;
   transaction_id?: string; // ID que liga ao ITransaction
@@ -41,4 +40,18 @@ export interface IOperation {
     name: string;
     price: number;
   };
+}
+
+export interface IReceiptProduct {
+  name: string;
+  price: number;
+}
+
+export interface IReceiptItem {
+  quant: number;
+  ESTOQUE_product: IReceiptProduct | null;
+}
+
+interface ReceiptTableProps {
+  items: IReceiptItem[];
 }
