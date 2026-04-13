@@ -1,0 +1,111 @@
+.navContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* ADICIONADO: Respiro nas laterais e no topo/fundo */
+  padding: 25px 20px; 
+  box-sizing: border-box;
+}
+
+.navHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  /* Aumentado o espaço para a lista de itens */
+  margin-bottom: 15px; 
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.countBadge {
+  background: #0f172a;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.sidebarNav {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  /* Espaço entre um botão e outro */
+  gap: 10px; 
+  /* ADICIONADO: Padding lateral para o efeito de hover não colar na scrollbar */
+  padding-right: 5px; 
+}
+
+/* Customizando a scrollbar para ficar discreta */
+.sidebarNav::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebarNav::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.navItem {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Ajuste no padding interno do botão */
+  padding: 16px; 
+  border: 1px solid #f1f5f9;
+  background: #ffffff;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.navItem:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateX(4px); /* Efeito sutil de movimento */
+}
+
+.active {
+  background: #0f172a !important;
+  color: white !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+}
+
+.navInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.navRef {
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.navDate {
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.navTotal {
+  font-family: 'Inter', monospace;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+/* Quando estiver ativo, a data não deve sumir tanto */
+.active .navDate {
+  opacity: 0.7;
+}

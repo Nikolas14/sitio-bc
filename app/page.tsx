@@ -19,8 +19,8 @@ export default function Dashboard() {
     { title: 'Resumo Projeção', path: '/projecao/resumo' },
     { title: 'Saldo Projeção', path: '/projecao/saldo' },
     
-    { title: 'Funcionarios abate', path: '/abate' },
-    { title: 'Envio de avisos', path: '/avisos' },
+    // { title: 'Funcionarios abate', path: '/abate' },
+    // { title: 'Envio de avisos', path: '/avisos' },
   ];
 
   return (
