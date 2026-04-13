@@ -1,6 +1,5 @@
 .screen {
   display: grid;
-  /* Sidebar um pouco mais estreita e elegante */
   grid-template-columns: 420px 1fr;
   height: 100vh;
   background-color: #f1f5f9; /* Tom de cinza azulado mais moderno */

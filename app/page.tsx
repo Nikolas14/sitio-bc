@@ -14,8 +14,8 @@ export default function Dashboard() {
     { title: 'Histórico transações', path: '/transacoes' },
     { title: 'Cobrança', path: '/cobranca' },
     
-    { title: 'Lista de Projeção', path: '/projecao/lista' },
     { title: 'Nova Projeção', path: '/projecao' },
+    { title: 'Lista de Projeção', path: '/projecao/lista' },
     { title: 'Resumo Projeção', path: '/projecao/resumo' },
     { title: 'Saldo Projeção', path: '/projecao/saldo' },
     

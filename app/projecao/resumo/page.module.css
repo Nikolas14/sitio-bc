@@ -1,117 +1,131 @@
-.container {
-  padding: 40px;
-  background-color: #fff;
-  min-height: 100vh;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.dashboard {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.mainStat {
-  background: #0f172a;
-  color: white;
-  padding: 40px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.statLabel {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 2px;
-  opacity: 0.7;
-}
-
-.statValue {
-  font-size: 64px;
-  font-weight: 950;
-  margin-top: 10px;
-}
-
-.statValue small {
-  font-size: 24px;
-  opacity: 0.5;
-}
-
-.tableWrapper {
-  border: 2px solid #f1f5f9;
-  border-radius: 16px;
+.screen {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  height: 100vh;
+  background-color: #f1f5f9; /* Tom de cinza azulado mais moderno */
   overflow: hidden;
 }
 
-.summaryTable {
-  width: 100%;
-  border-collapse: collapse;
+.leftPanel {
+background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Header/Filtros no topo, Botão no rodapé */
+  padding: 24px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.02);
+  z-index: 10;
 }
 
-.summaryTable th {
-  background: #f8fafc;
+.statsContainer {
   padding: 20px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 900;
-  color: #64748b;
-  text-transform: uppercase;
-  border-bottom: 2px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.summaryTable td {
-  padding: 20px;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 16px;
+.statCard {
+  background: #0f172a;
+  color: white;
+  padding: 25px 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.productName {
+.statLabel {
+  font-size: 10px;
   font-weight: 800;
-  color: #0f172a;
-  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 1px;
 }
 
-.totalQuant {
+.statValue {
+  font-size: 32px;
+  font-weight: 950;
   font-family: monospace;
-  font-size: 20px;
-  font-weight: 900;
-  color: #000;
+  margin-top: 5px;
 }
 
-.pickBadge {
+.statValue small { font-size: 14px; opacity: 0.6; }
+
+.actions {
+  margin-top: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btnPrint {
+  padding: 14px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.btnPrint:hover { filter: brightness(1.2); }
+
+/* CONTEÚDO */
+.contentWrapper {
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.pickingCard {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 30px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardTitle { font-size: 18px; font-weight: 900; color: #0f172a; margin: 0; }
+
+.tag {
   background: #f1f5f9;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 10px;
   font-weight: 800;
-  color: #475569;
+  color: #64748b;
 }
 
-.btnPrint {
-  margin-top: 40px;
-  width: 100%;
-  padding: 15px;
-  background: #fff;
-  border: 2px solid #0f172a;
-  border-radius: 12px;
-  font-weight: 900;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: all 0.2s;
-}
+.pickingTable { width: 100%; border-collapse: collapse; }
+.pickingTable th { padding: 15px 30px; background: #f8fafc; text-align: left; font-size: 11px; color: #94a3b8; border-bottom: 2px solid #f1f5f9; }
+.pickingTable td { padding: 20px 30px; border-bottom: 1px solid #f8fafc; }
 
-.btnPrint:hover {
-  background: #f1f5f9;
+.prodName { font-weight: 800; color: #1e293b; text-transform: uppercase; }
+.prodTotal { font-family: monospace; font-weight: 900; text-align: right; font-size: 18px; color: #0f172a; }
+
+.checkCircle {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+  margin: 0 auto;
 }
 
 .textRight { text-align: right; }
 .textCenter { text-align: center; }
+.center { height: 100vh; display: flex; align-items: center; justify-content: center; font-weight: 800; }
 
-/* Ajuste para impressão */
+/* MEDIA QUERY PARA IMPRESSÃO */
 @media print {
-  .btnPrint { display: none; }
-  .container { padding: 0; }
+  .leftPanel, .SideFooter, .btnPrint { display: none !important; }
+  .screen { display: block; background: white; }
+  .contentWrapper { padding: 0; }
+  .pickingCard { box-shadow: none; border: 1px solid #eee; }
+  .checkCircle { border: 1px solid #000; }
 }
