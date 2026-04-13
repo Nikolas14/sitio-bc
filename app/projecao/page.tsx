@@ -3,54 +3,52 @@
 import { useState, useRef, useMemo } from 'react';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
+import { useProjections } from '@/hooks/useProjections';
+
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import ButtonFinish from '@/components/ButtonFinish/ButtonFinish';
 import InventoryCart from '@/components/InventoryCart/InventoryCart';
 
 import styles from './page.module.css';
+import { ProjectionManualForm } from './components/ProjectionManualForm/ProjectionManualForm';
 
 export default function ProjecaoEnvioPage() {
   const { products } = useInventory();
+  const { refresh } = useProjections();
 
-  // Estados principais
   const [reference, setReference] = useState('');
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // Estados de entrada manual
   const [manualId, setManualId] = useState('');
   const [manualQuant, setManualQuant] = useState('');
   const [lastError, setLastError] = useState<string | null>(null);
 
   const idInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. PREVIEW EM TEMPO REAL: Busca o produto enquanto o ID é digitado
+  // Preview do produto em tempo real
   const previewProduct = useMemo(() => {
     if (!manualId) return null;
-    // Compara convertendo ambos para Number para evitar erro de tipo
     return products.find(p => Number(p.id) === Number(manualId));
   }, [manualId, products]);
 
-  // Cálculo de peso total
-  const totalKg = useMemo(() => {
-    return items.reduce((acc, item) => acc + item.weightKg, 0);
+  // Cálculos consolidados (Peso e Preço)
+  const financial = useMemo(() => {
+    const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
+    const totalPrice = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
+    return { totalKg, totalPrice };
   }, [items]);
 
-  // Função para adicionar item à lista temporária
   const addManualItem = () => {
     setLastError(null);
-
     if (!manualId || !manualQuant) {
-      setLastError("Informe ID e Quantidade");
+      setLastError("Preencha ID e Quantidade");
       return;
     }
-
     if (!previewProduct) {
-      setLastError(`Produto #${manualId} não existe`);
+      setLastError(`ID #${manualId} não localizado`);
       return;
     }
 
-    // Adiciona o item (usando os dados do previewProduct encontrado)
     setItems(prev => [{
       productId: previewProduct.id,
       name: previewProduct.name,
@@ -59,13 +57,11 @@ export default function ProjecaoEnvioPage() {
       tempId: Date.now()
     }, ...prev]);
 
-    // Limpa campos e foca no ID para o próximo
     setManualId('');
     setManualQuant('');
     idInputRef.current?.focus();
   };
 
-  // Salva no banco de dados (Tabela ESTOQUE_projection)
   const salvarProjecao = async () => {
     if (items.length === 0) return;
     setLoading(true);
@@ -78,17 +74,14 @@ export default function ProjecaoEnvioPage() {
         status: 'ABERTO'
       }));
 
-      const { error } = await supabase
-        .from('ESTOQUE_projection')
-        .insert(payload);
-
+      const { error } = await supabase.from('ESTOQUE_projection').insert(payload);
       if (error) throw error;
 
-      alert("Projeção de envio salva com sucesso!");
+      alert("Projeção salva com sucesso!");
       setItems([]);
       setReference('');
+      refresh();
       idInputRef.current?.focus();
-
     } catch (err: any) {
       alert("Erro ao salvar: " + err.message);
     } finally {
@@ -98,10 +91,9 @@ export default function ProjecaoEnvioPage() {
 
   return (
     <div className={styles.screen}>
-      
-      {/* BARRA LATERAL (CONTROLES) */}
       <aside className={styles.leftPanel}>
-        <div className={styles.controlTop}>
+        {/* Conteúdo do Topo */}
+        <div className={styles.topContent}>
           <HeaderInput
             titulo="Nova Projeção"
             labelDescricao="Referência da Carga"
@@ -110,75 +102,39 @@ export default function ProjecaoEnvioPage() {
             placeholder="Ex: Envio para Matriz"
           />
 
-          <div className={styles.manualInputGrid}>
-            <div className={styles.inputField}>
-              <label className={styles.miniLabel}>ID Produto</label>
-              <input
-                ref={idInputRef}
-                className={`${styles.field} ${previewProduct ? styles.inputSuccess : ''}`}
-                type="text"
-                value={manualId}
-                onChange={(e) => setManualId(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && document.getElementById('qInput')?.focus()}
-                placeholder="ID"
-              />
-              
-              {/* FEEDBACK DE IDENTIFICAÇÃO */}
-              <div className={styles.previewArea}>
-                {previewProduct ? (
-                  <span className={styles.foundText}>✅ {previewProduct.name}</span>
-                ) : manualId ? (
-                  <span className={styles.errorText}>❌ Não encontrado</span>
-                ) : (
-                  <span className={styles.idleText}>Aguardando ID...</span>
-                )}
-              </div>
-            </div>
-
-            <div className={styles.inputField}>
-              <label className={styles.miniLabel}>Qtd (KG)</label>
-              <input
-                id="qInput"
-                className={styles.field}
-                type="number"
-                value={manualQuant}
-                onChange={(e) => setManualQuant(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addManualItem()}
-                placeholder="0.00"
-              />
-            </div>
-          </div>
-
-          <button className={styles.btnAdd} onClick={addManualItem}>
-            Incluir na Lista
-          </button>
-
-          {lastError && <span className={styles.alertMsg}>⚠️ {lastError}</span>}
+          <ProjectionManualForm
+            ref={idInputRef}
+            manualId={manualId}
+            setManualId={setManualId}
+            manualQuant={manualQuant}
+            setManualQuant={setManualQuant}
+            previewProduct={previewProduct}
+            addManualItem={addManualItem}
+            lastError={lastError}
+            totalKg={financial.totalKg}
+            totalPrice={financial.totalPrice}
+          />
         </div>
 
-        <div className={styles.summaryBox}>
-          <span className={styles.label}>Peso Total Projetado</span>
-          <div className={styles.weightValue}>{totalKg.toFixed(2)} KG</div>
+        {/* Este container vai "sugar" o espaço e empurrar o botão para o fim */}
+        <div className={styles.footerActions}>
+          <ButtonFinish
+            onClick={salvarProjecao}
+            loading={loading}
+            disabled={items.length === 0}
+          />
         </div>
-
-        <ButtonFinish
-          onClick={salvarProjecao}
-          loading={loading}
-          disabled={items.length === 0}
-        />
       </aside>
 
-      {/* ÁREA PRINCIPAL (CARRINHO) */}
       <main className={styles.cartWrapper}>
         <InventoryCart
           tituloCart="Lista de Conferência da Projeção"
           items={items}
           setItems={setItems}
-          totalWeight={totalKg}
-          isVenda={false}
+          totalWeight={financial.totalKg}
+          isVenda={true}
         />
       </main>
-
     </div>
   );
 }

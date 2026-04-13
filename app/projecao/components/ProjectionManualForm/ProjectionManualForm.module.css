@@ -1,0 +1,68 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.manualInputGrid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 15px;
+}
+
+.inputField { display: flex; flex-direction: column; gap: 5px; }
+
+.miniLabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.field {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-weight: 700;
+  outline: none;
+}
+
+.inputSuccess { border-color: #10b981; background-color: #f0fdf4; }
+
+.previewArea { min-height: 20px; }
+.foundText { color: #16a34a; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.errorText { color: #ef4444; font-size: 11px; font-weight: 700; }
+.idleText { color: #94a3b8; font-size: 11px; font-style: italic; }
+
+.btnAdd {
+  padding: 14px;
+  background: #0f172a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.summaryBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 20px;
+  background: #0f172a;
+  color: white;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.summaryItem { display: flex; flex-direction: column; gap: 5px; }
+.divider { width: 1px; height: 40px; background: rgba(255, 255, 255, 0.1); }
+
+.label { font-size: 10px; font-weight: 800; color: #94a3b8; letter-spacing: 1px; }
+.weightValue { font-size: 28px; color: #f8fafc; font-weight: 900; font-family: monospace; }
+.priceValue { font-size: 28px; color: #22c55e; font-weight: 900; font-family: monospace; }
+
+.unit { font-size: 14px; opacity: 0.6; }
+.alertMsg { color: #ef4444; font-size: 12px; font-weight: 800; text-align: center; }

@@ -1,6 +1,6 @@
 .screen {
   display: grid;
-  grid-template-columns: 420px 1fr; /* Garante a barra lateral fixa à esquerda */
+  grid-template-columns: 400px 1fr;
   height: 100vh;
   background-color: #f8fafc;
 }
@@ -11,27 +11,13 @@
   padding: 30px;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  overflow-y: auto;
-}
-
-.controlTop {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
 .manualInputGrid {
   display: grid;
-  grid-template-columns: 140px 1fr; /* ID mais curto, Quantidade maior */
+  grid-template-columns: 120px 1fr;
   gap: 15px;
-  margin-top: 5px;
-}
-
-.inputField {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
 }
 
 .miniLabel {
@@ -39,56 +25,45 @@
   font-weight: 800;
   color: #64748b;
   text-transform: uppercase;
+  margin-bottom: 5px;
+  display: block;
+}
+.leftPanel {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Ocupa a altura total da tela */
+  padding: 30px;
+  background: white;
+  border-right: 1px solid #e2e8f0;
 }
 
+.topContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* A mágica acontece aqui */
+.footerActions {
+  margin-top: auto; /* Empurra o container para o fim do pai flex */
+  padding-top: 20px; /* Um respiro para não colar no formulário se a tela for pequena */
+}
 .field {
   width: 100%;
   padding: 12px;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-weight: 700;
-  font-size: 16px;
   outline: none;
-  transition: all 0.2s;
 }
 
-.field:focus {
-  border-color: #0f172a;
-}
+.inputSuccess { border-color: #10b981; background: #f0fdf4; }
 
-/* Feedback visual do input */
-.inputSuccess {
-  border-color: #10b981;
-  background-color: #f0fdf4;
-}
-
-/* Estilo do Nome do Produto dinâmico */
-.previewArea {
-  min-height: 20px;
-  margin-top: 4px;
-}
-
-.foundText {
-  color: #16a34a;
-  font-size: 13px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.errorText {
-  color: #ef4444;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.idleText {
-  color: #94a3b8;
-  font-size: 11px;
-  font-style: italic;
-}
+.previewArea { min-height: 20px; margin-top: 5px; }
+.foundText { color: #16a34a; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.errorText { color: #ef4444; font-size: 11px; font-weight: 700; }
 
 .btnAdd {
-  margin-top: 10px;
   padding: 14px;
   background: #0f172a;
   color: white;
@@ -104,25 +79,9 @@
   padding: 20px;
   background: #f1f5f9;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.weightValue {
-  font-size: 36px;
-  font-weight: 950;
-  font-family: monospace;
-  color: #0f172a;
-}
-
-.cartWrapper {
-  padding: 40px;
-  background-color: #f1f5f9;
-  overflow-y: auto;
-}
-
-.alertMsg {
-  color: #ef4444;
-  font-size: 12px;
-  font-weight: 800;
   text-align: center;
 }
+
+.weightValue { font-size: 32px; font-weight: 950; font-family: monospace; }
+.cartWrapper { padding: 40px; overflow-y: auto; background: #f1f5f9; }
+.alertMsg { color: #ef4444; font-size: 12px; font-weight: 800; text-align: center; }
