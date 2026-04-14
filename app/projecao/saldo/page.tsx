@@ -1,86 +1,77 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/api/supabase';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
+import SideFooter from '@/components/SideFooter/SideFooter';
+import StatusFilter from '@/components/StatusFilter/StatusFilter';
+import { useAvailability } from '@/hooks/useAvailability';
 import styles from './page.module.css';
+import AvailabilityTable from '../components/AvailabilityTable/AvailabilityTable';
 
 export default function PainelDisponibilidadePage() {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  // O hook agora entrega as categorias prontas!
+  const { data, categories, loading, refresh } = useAvailability();
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchComparison = async () => {
-      setLoading(true);
-      const { data: result } = await supabase
-        .from('ESTOQUE_v_estoque_vs_projecao')
-        .select('*')
-        .order('saldo_previsto', { ascending: true }); // Mostra o que vai faltar primeiro
+  const filteredData = useMemo(() => {
+    if (selectedGroups.length === 0) return data;
+    return data.filter(item => selectedGroups.includes(item.type || 'Sem Categoria'));
+  }, [data, selectedGroups]);
 
-      setData(result || []);
-      setLoading(false);
-    };
-    fetchComparison();
-  }, []);
+  const toggleGroup = (group: string) => {
+    setSelectedGroups(prev =>
+      prev.includes(group) ? prev.filter(g => g !== group) : [...prev, group]
+    );
+  };
 
-  if (loading) return <div className={styles.center}>Analisando disponibilidade...</div>;
+  if (loading) return <div className={styles.center}>Sincronizando disponibilidades...</div>;
 
   return (
-    <div className={styles.container}>
-      <HeaderPadrao titulo="Disponibilidade para Envios" />
+    <div className={styles.screen}>
 
-      <div className={styles.infoBar}>
-        <p>Este painel compara o <strong>Estoque Real</strong> com as <strong>Projeções Abertas</strong>.</p>
-      </div>
+      <aside className={styles.leftPanel}>
+        <HeaderPadrao titulo="Estoque Crítico" />
 
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>PRODUTO</th>
-              <th className={styles.textRight}>ESTOQUE ATUAL</th>
-              <th className={styles.textRight}>PROJETADO (SAÍDA)</th>
-              <th className={styles.textRight}>SALDO PREVISTO</th>
-              <th className={styles.textCenter}>STATUS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item) => {
-              const estoque = Number(item.estoque_real);
-              const projecao = Number(item.total_projetado);
-              const saldo = Number(item.saldo_previsto);
+        <div className={styles.sidebarContent}>
 
-              // Lógica de Status
-              let statusClass = styles.ok;
-              let statusLabel = 'DISPONÍVEL';
+          <StatusFilter
+            label="Filtrar por Categoria"
+            options={categories}
+            selectedOptions={selectedGroups}
+            onToggle={toggleGroup}
+            onClear={() => setSelectedGroups([])}
+          />
 
-              if (saldo < 0) {
-                statusClass = styles.danger;
-                statusLabel = 'FALTANDO';
-              } else if (saldo === 0 && projecao > 0) {
-                statusClass = styles.warning;
-                statusLabel = 'LIMITE';
-              }
+          <div className={`
+            ${styles.alertBox} 
+            ${data.filter(i => i.saldo_previsto < 0).length > 0 ? styles.alertActive : ''}
+          `}>
+            <span className={styles.alertLabel}>PRODUTOS EM FALTA</span>
+            <div className={styles.alertValue}>
+              {data.filter(item => item.saldo_previsto < 0).length}
+            </div>
+            <p className={styles.alertDesc}>Itens que precisam de reposição imediata para atender as projeções.</p>
+          </div>
+        </div>
 
-              return (
-                <tr key={item.product_id} className={saldo < 0 ? styles.rowError : ''}>
-                  <td className={styles.productName}>{item.product_name}</td>
-                  <td className={styles.textRight}>{estoque.toFixed(2)} KG</td>
-                  <td className={styles.textRight}>{projecao.toFixed(2)} KG</td>
-                  <td className={`${styles.textRight} ${styles.bold}`}>
-                    {saldo.toFixed(2)} KG
-                  </td>
-                  <td className={styles.textCenter}>
-                    <span className={`${styles.badge} ${statusClass}`}>
-                      {statusLabel}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+        <SideFooter onRefresh={refresh} />
+      </aside>
+
+      <main className={styles.contentWrapper}>
+        <div className={styles.pageHeader}>
+          <div>
+            <h1>Painel de Disponibilidade</h1>
+            <p>Estoque Real X Projeções de Saída</p>
+          </div>
+          <div className={styles.countInfo}>
+            Exibindo <strong>{filteredData.length}</strong> itens
+          </div>
+        </div>
+
+        <AvailabilityTable data={filteredData} />
+      </main>
+
     </div>
   );
 }

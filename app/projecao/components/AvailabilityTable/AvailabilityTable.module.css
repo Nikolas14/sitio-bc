@@ -1,0 +1,90 @@
+.grid {
+  display: grid;
+  /* Forçando as 6 colunas que você pediu */
+  grid-template-columns: repeat(5, 1fr); 
+  gap: 8px;
+  width: 100%;
+}
+
+.card {
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid transparent;
+  transition: transform 0.1s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  z-index: 2;
+}
+
+/* --- VARIAÇÕES DE COR DO CARD INTEIRO --- */
+
+.cardOk {
+  background-color: #f0fdf4; /* Verde bem claro */
+  border-color: #dcfce7;
+}
+.cardOk .balanceValue { color: #166534; }
+
+.cardWarning {
+  background-color: #fffbeb; /* Amarelo bem claro */
+  border-color: #fef3c7;
+}
+.cardWarning .balanceValue { color: #92400e; }
+
+.cardDanger {
+  background-color: #fef2f2; /* Vermelho bem claro */
+  border-color: #fee2e2;
+}
+.cardDanger .balanceValue { color: #991b1b; }
+
+/* --- CONTEÚDO INTERNO --- */
+
+.cardName {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardStats {
+  display: flex;
+  justify-content: space-between;
+  /* Fundo semi-transparente para dar contraste independente da cor do card */
+  background: rgba(255, 255, 255, 0.4); 
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.statItem { display: flex; flex-direction: column; gap: 2px; }
+.statLabel { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+.statValue { font-family: monospace; font-size: 14px; color: #1e293b; font-weight: 700; }
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.05);
+}
+
+.footerLabel { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; }
+
+.balanceValue {
+  font-size: 18px;
+  font-weight: 950;
+  font-family: monospace;
+}
+
+.right { text-align: right; }
+
+/* Responsividade para não quebrar em telas muito pequenas */
+@media (max-width: 1400px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, 1fr); } }
