@@ -20,6 +20,57 @@
   z-index: 20;
 }
 
+.categoryHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  align-items: center;
+}
+
+.categoryPill {
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Destaque para o grupo agrupado */
+.pillHighlight {
+  border-color: #ef4444; /* Borda vermelha sutil */
+  background: #fef2f2;
+}
+
+.pillHighlight .pillLabel {
+  color: #991b1b;
+}
+
+.pillHighlight .pillValue {
+  background: #dc2626; /* Valor em fundo vermelho */
+}
+
+.pillLabel {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 10px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.pillValue {
+  background: #475569;
+  color: white;
+  padding: 5px 10px;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 /* 3. Agrupador de Inputs (Topo da Esquerda) */
 .controlTop {
   display: flex;

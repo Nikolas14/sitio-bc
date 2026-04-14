@@ -23,7 +23,7 @@ export default function VendaSimplificadaPage() {
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
-  
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Cálculos Financeiros
@@ -51,7 +51,7 @@ export default function VendaSimplificadaPage() {
   // Função para feedback sonoro de erro
   const playErrorSound = () => {
     const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-    audio.play().catch(() => {}); 
+    audio.play().catch(() => { });
   };
 
   const handleBarcode = (val: string) => {
@@ -60,7 +60,7 @@ export default function VendaSimplificadaPage() {
 
     if (val.length === 13) {
       const parsed = parseScaleBarcode(val);
-      
+
       // Camada de Segurança 1: Código de barras é reconhecível?
       if (!parsed) {
         setLastError("Código de barras inválido");
@@ -84,13 +84,33 @@ export default function VendaSimplificadaPage() {
         ...parsed,
         name: prod.name,
         price: prod.price || 0,
-        tempId: Date.now()
+        tempId: Date.now(),
+        type: prod.type || 'Outros',
       }, ...prev]);
-      
+
       setBarcode('');
       setLastError(null);
     }
   };
+
+  const categorySummary = useMemo(() => {
+    const summary: Record<string, number> = {};
+
+    // Definimos quais tipos devem ser somados juntos
+    const grupoPrincipal = ['CARNE', 'ESPECIAL', 'EXTRA'];
+
+    items.forEach(item => {
+      // Normalizamos para maiúsculo para evitar erro de digitação
+      const type = (item.type || 'OUTROS').toUpperCase();
+
+      // Se o tipo estiver na lista, agrupamos em "CARNES" (ou o nome que preferir)
+      const label = grupoPrincipal.includes(type) ? 'CARNES' : type;
+
+      summary[label] = (summary[label] || 0) + item.weightKg;
+    });
+
+    return Object.entries(summary).map(([name, total]) => ({ name, total }));
+  }, [items]);
 
   const finalizarVenda = async () => {
     if (items.length === 0) return;
@@ -182,6 +202,20 @@ export default function VendaSimplificadaPage() {
       </aside>
 
       <main className={styles.cartWrapper}>
+
+        {categorySummary.length > 0 && (
+          <div className={styles.categoryHeader}>
+            {categorySummary.map((cat, idx) => (
+              <div
+                key={idx}
+                className={`${styles.categoryPill} ${cat.name === 'CARNES' ? styles.pillHighlight : ''}`}
+              >
+                <span className={styles.pillLabel}>{cat.name}</span>
+                <span className={styles.pillValue}>{cat.total.toFixed(2)} kg</span>
+              </div>
+            ))}
+          </div>
+        )}
         <InventoryCart
           tituloCart="Itens da Venda"
           items={items}
