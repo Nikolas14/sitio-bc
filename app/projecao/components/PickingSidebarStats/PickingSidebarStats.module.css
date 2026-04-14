@@ -1,0 +1,93 @@
+.statsContainer {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.headerArea {
+  margin-bottom: 5px;
+}
+
+.title {
+  font-size: 10px;
+  font-weight: 900;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+/* Card Principal (Escuro) */
+.statCard {
+  background: #0f172a;
+  color: white;
+  padding: 25px 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+}
+
+/* Card Secundário (Claro) */
+.statCardSecondary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 15px 20px;
+  border-radius: 16px;
+}
+
+.statLabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 950;
+  font-family: monospace;
+  margin-top: 8px;
+  color: #f8fafc;
+}
+
+.statValueSmall {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-top: 4px;
+}
+
+.unit {
+  font-size: 14px;
+  opacity: 0.5;
+  margin-left: 4px;
+}
+
+.btnPrint {
+  margin-top: 10px;
+  padding: 16px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.btnPrint:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.icon {
+  font-size: 18px;
+}
