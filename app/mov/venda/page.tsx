@@ -13,6 +13,7 @@ import DiscountInput from '../../../components/DiscountInput/DiscountInput';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 
 import styles from './page.module.css';
+import { refresh } from 'next/cache';
 
 export default function VendaSimplificadaPage() {
   const { products } = useInventory();

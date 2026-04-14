@@ -55,3 +55,5 @@ export interface IReceiptItem {
 interface ReceiptTableProps {
   items: IReceiptItem[];
 }
+
+export const STATUS_LIST_ALL = ['PENDENTE', 'ENVIADO', 'COBRADO', 'CONCLUIDO'];

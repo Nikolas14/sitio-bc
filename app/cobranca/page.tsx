@@ -9,8 +9,9 @@ import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import SideFooter from '@/components/SideFooter/SideFooter';
 import CobrancaTable from './components/CobrancaTable/CobrancaTable';
+import { STATUS_LIST_ALL } from '@/types';
 
-const STATUS_LIST = ['PENDENTE', 'ENVIADO', 'COBRADO', 'CONCLUIDO'];
+const STATUS_LIST = STATUS_LIST_ALL;
 
 export default function ListaCobrancasPage() {
   const { transactions, loading, error, refresh } = useCobrancas();

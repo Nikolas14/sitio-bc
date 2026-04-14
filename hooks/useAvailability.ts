@@ -13,7 +13,7 @@ export function useAvailability() {
 
     // Busca 1: Dados da View (Disponibilidade)
     const { data: viewResult } = await supabase
-      .from('estoque_v_estoque_vs_projecao')
+      .from('ESTOQUE_v_estoque_vs_projecao')
       .select('*')
       .order('saldo_previsto', { ascending: true });
 

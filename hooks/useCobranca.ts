@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
 import { ITransaction } from '@/types';
 
-export function useCobrancaDetalhes(id: string | string[] | undefined) {
+export function useCobranca(id: string | string[] | undefined) {
   const [trans, setTrans] = useState<ITransaction | null>(null);
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
