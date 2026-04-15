@@ -17,7 +17,7 @@ export function useCobranca(id: string | string[] | undefined) {
       setLoading(true);
       setError(null);
 
-      // 1. Busca o cabeçalho
+      // 1. Busca a transaction
       const { data: tData, error: tError } = await supabase
         .from('ESTOQUE_transaction')
         .select('*')
@@ -26,7 +26,7 @@ export function useCobranca(id: string | string[] | undefined) {
 
       if (tError) throw tError;
 
-      // 2. Busca os itens
+      // 2. Busca as operations
       const { data: iData, error: iError } = await supabase
         .from('ESTOQUE_operation')
         .select('quant, ESTOQUE_product(name, price)')
@@ -34,7 +34,6 @@ export function useCobranca(id: string | string[] | undefined) {
 
       if (iError) throw iError;
 
-      // O 'as ITransaction' resolve o erro de tipagem na atribuição
       setTrans(tData as ITransaction);
       setItems(iData || []);
     } catch (err: any) {

@@ -1,55 +1,77 @@
-.itemsSection {
-  flex: 1;
-  margin-bottom: 40px;
-  width: 100%;
+.tableWrapper {
+    width: 100%;
+    background: #ffffff;
+    /* Removemos o padding lateral aqui para a tabela encostar nas bordas se necessário */
 }
 
 .modernTable {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.modernTable thead tr {
+    background-color: #f8fafc; /* Mesma cor do fundo do Summary para continuidade */
+    border-bottom: 2px solid #e2e8f0;
 }
 
 .modernTable th {
-  font-size: 16px; /* Bem maior */
-  font-weight: 900;
-  color: #1e293b;
-  padding: 20px 0;
-  border-bottom: 4px solid #000; /* Linha de separação forte */
-  text-transform: uppercase;
-  letter-spacing: 1px;
+    padding: 12px 24px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .modernTable td {
-  padding: 25px 0; /* Mais respiro para as letras grandes */
-  border-bottom: 1px solid #cbd5e1;
-  font-size: 20px; /* Fonte robusta */
-  color: #000;
+    padding: 12px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+}
+
+/* Efeito de hover para o operador não se perder nas linhas */
+.row:hover {
+    background-color: #f1f5f9;
+    transition: background 0.2s ease;
 }
 
 .itemName {
-  font-weight: 900;
-  text-transform: uppercase;
-  line-height: 1.2;
-  padding-right: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    text-transform: uppercase;
+}
+
+.mono {
+    font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+    font-size: 12px;
+}
+
+.currency {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-right: 2px;
+}
+
+.fontBold {
+    font-weight: 800;
+    color: #0f172a;
 }
 
 .textLeft { text-align: left; }
 .textRight { text-align: right; }
 
-.mono {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 22px; /* Números grandes para conferência */
-  font-weight: 700;
+.emptyState {
+    padding: 40px;
+    text-align: center;
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 14px;
 }
 
-.fontBold {
-  font-weight: 950;
-}
-
-.currencySymbol {
-  font-size: 14px;
-  color: #64748b;
-  margin-right: 8px;
-  font-weight: 800;
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+    .modernTable th, .modernTable td {
+        padding: 10px 15px;
+    }
 }

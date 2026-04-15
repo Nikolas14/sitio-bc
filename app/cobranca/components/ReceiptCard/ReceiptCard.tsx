@@ -3,6 +3,7 @@
 import { forwardRef } from 'react';
 import { IReceiptItem, ITransaction } from '@/types';
 import styles from './ReceiptCard.module.css';
+
 import { ReceiptHeader } from './components/ReceiptHeader/ReceiptHeader';
 import { ReceiptBilling } from './components/ReceiptBilling/ReceiptBilling';
 import { ReceiptTable } from './components/ReceiptTable/ReceiptTable';
@@ -34,13 +35,6 @@ export const ReceiptCard = forwardRef<HTMLDivElement, ReceiptCardProps>(
 
           return (
             <div key={index} className={styles.receiptPaper}>
-              {/* Selo de Pago */}
-              {isLastPage && trans.status === 'CONCLUIDO' && (
-                <div className={styles.modernPaidBadge}>
-                  <div className={styles.badgeCircle}>✓</div>
-                  <span>PAGAMENTO CONFIRMADO</span>
-                </div>
-              )}
 
               <ReceiptHeader
                 trans={trans}
@@ -56,7 +50,6 @@ export const ReceiptCard = forwardRef<HTMLDivElement, ReceiptCardProps>(
                   totalPages={totalPages}
                 />
               )}
-
 
               {/* Tabela */}
               <main className={styles.itemsSection}>

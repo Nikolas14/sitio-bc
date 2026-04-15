@@ -9,9 +9,9 @@ import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import SideFooter from '@/components/SideFooter/SideFooter';
 import CobrancaTable from './components/CobrancaTable/CobrancaTable';
-import { STATUS_LIST_ALL } from '@/types';
+import { STATUS_COBRANCA } from '@/types';
 
-const STATUS_LIST = STATUS_LIST_ALL;
+const STATUS_LIST = STATUS_COBRANCA;
 
 export default function ListaCobrancasPage() {
   const { transactions, loading, error, refresh } = useCobrancas();
@@ -26,7 +26,6 @@ export default function ListaCobrancasPage() {
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter(t => {
-      // Se o array de status estiver vazio, mostra todos. Se não, checa se o status da transação está no array.
       const matchStatus = selectedStatus.length === 0 || selectedStatus.includes(t.status || 'PENDENTE');
       const matchSearch = t.customer_vendor?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.serial_number?.toString().includes(searchTerm);
@@ -39,7 +38,7 @@ export default function ListaCobrancasPage() {
 
   return (
     <div className={styles.screen}>
-      {/* BARRA LATERAL (SIDEBAR) */}
+      
       <aside className={styles.sidebar}>
 
         <HeaderInput
@@ -58,14 +57,10 @@ export default function ListaCobrancasPage() {
           onClear={() => setSelectedStatus([])}
         />
 
-
-        <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados">
-
-        </SideFooter>
+        <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados"/>
 
       </aside>
 
-      {/* ÁREA PRINCIPAL (MAIN CONTENT) */}
       <main className={styles.mainContent}>
 
         <CobrancaTable 

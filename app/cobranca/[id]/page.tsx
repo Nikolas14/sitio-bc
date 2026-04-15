@@ -10,6 +10,9 @@ import { ReceiptCard } from '../components/ReceiptCard/ReceiptCard';
 import { StatusStepper } from '../components/StatusStepper/StatusStepper';
 
 import styles from './page.module.css';
+import { PrintTemplate } from '../components/PrintTemplate/PrintTemplate';
+import SumaryCobranca from '../components/SumaryCobranca/SumaryCobranca';
+import { ReceiptTable } from '../components/ReceiptCard/components/ReceiptTable/ReceiptTable';
 
 export default function CobrancaDetalhadaPage() {
   const { id } = useParams();
@@ -36,33 +39,42 @@ export default function CobrancaDetalhadaPage() {
 
         <ControlPanel
           trans={trans}
-          shipping={shipping} 
+          shipping={shipping}
           setShipping={setShipping}
-          tax={tax} 
+          tax={tax}
           setTax={setTax}
-          // Se não for editável, o ControlPanel deve desabilitar os inputs
           isEditable={!isLocked}
           onUpdateStatus={updateStatus}
           onGerarImagem={() => gerarImagem(cardRef.current)} // Passando o .current puro
           onRegistrarPagamento={registrarPagamento}
           setNewPayment={setNewPayment}
+          financial={financial}
+          loading={loading}
         />
+
       </aside>
 
       <main className={styles.previewArea}>
-        {/* Marca d'água de pagamento se estiver concluído */}
-        {trans.status === 'CONCLUIDO' && <div className={styles.paidBadge}>PAGO</div>}
-        
-        <div className={styles.zoomWrapper}>
-          <ReceiptCard
+        {/* <ReceiptCard
             ref={cardRef}
             trans={trans}
             items={items}
             shipping={shipping}
             tax={tax}
             financial={financial}
-          />
+            /> */}
+        <div style={{width:'100%'}}>
+          <SumaryCobranca trans={trans} />
+          <ReceiptTable items={items} />
         </div>
+        <PrintTemplate
+          ref={cardRef}
+          trans={trans}
+          items={items}
+          financial={financial}
+          shipping={shipping}
+          tax={tax}
+        />
       </main>
     </div>
   );

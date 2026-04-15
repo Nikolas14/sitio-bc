@@ -14,11 +14,14 @@ interface ControlPanelProps {
     onGerarImagem: () => void;
     onRegistrarPagamento: () => void;
     setNewPayment: (val: number) => void;
+    loading: boolean;
+    financial: any;
+
 }
 
 export const ControlPanel = ({
     trans, shipping, setShipping, tax, setTax, isEditable,
-    onUpdateStatus, onGerarImagem, onRegistrarPagamento, setNewPayment
+    onUpdateStatus, onGerarImagem, onRegistrarPagamento, setNewPayment, loading, financial
 }: ControlPanelProps) => {
 
     const handleTaxShortcut = () => {
@@ -115,6 +118,20 @@ export const ControlPanel = ({
                         <p className={styles.successTitle}>Pagamento Concluído</p>
                         <p className={styles.successDesc}>Esta transação foi totalmente liquidada.</p>
                     </div>
+                    {financial.paid > 0 && (
+                        <div className={styles.paymentStatus}>
+                            <div className={styles.sRow} style={{ color: '#166534' }}>
+                                <span>VALOR RECEBIDO</span>
+                                <span className={styles.mono}>R$ {financial.paid.toFixed(2)}</span>
+                            </div>
+                            {financial.remaining > 0 && (
+                                <div className={styles.debtRow}>
+                                    <span>SALDO DEVEDOR</span>
+                                    <span className={styles.mono}>R$ {financial.remaining.toFixed(2)}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
         </section>

@@ -26,7 +26,7 @@ export function useCobrancaManager(id: string) {
   // Trava de segurança: impede edição se o status não for PENDENTE ou ENVIADO
   const isLocked = useMemo(() => {
     if (!trans) return true;
-    return ['COBRADO', 'CONCLUIDO', 'CANCELADO'].includes(trans.status);
+    return ['ENVIADO', 'COBRADO', 'CONCLUIDO'].includes(trans.status);
   }, [trans?.status]);
 
   // Cálculos financeiros centralizados

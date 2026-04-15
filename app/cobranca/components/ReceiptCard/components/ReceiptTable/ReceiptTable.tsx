@@ -8,15 +8,17 @@ interface ReceiptTableProps {
 }
 
 export const ReceiptTable = ({ items }: ReceiptTableProps) => {
+  const formatCurrency = (val: number) => 
+    new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(val);
+
   return (
-    <main className={styles.itemsSection}>
+    <div className={styles.tableWrapper}>
       <table className={styles.modernTable}>
         <thead>
           <tr>
-            {/* O primeiro é à esquerda, os outros acompanham o dado à direita */}
-            <th className={styles.textLeft}>ITEM</th>
-            <th className={styles.textRight}>QTD/KG</th>
-            <th className={styles.textRight}>Preço UNIT</th>
+            <th className={styles.textLeft}>PRODUTO / ITEM</th>
+            <th className={styles.textRight}>QTD / KG</th>
+            <th className={styles.textRight}>UNITÁRIO</th>
             <th className={styles.textRight}>TOTAL</th>
           </tr>
         </thead>
@@ -24,9 +26,10 @@ export const ReceiptTable = ({ items }: ReceiptTableProps) => {
           {items.map((item, idx) => {
             const price = Number(item.ESTOQUE_product?.price ?? 0);
             const quant = Number(item.quant ?? 0);
+            const total = quant * price;
             
             return (
-              <tr key={idx}>
+              <tr key={idx} className={styles.row}>
                 <td className={styles.itemName}>
                   {item.ESTOQUE_product?.name || 'Produto não identificado'}
                 </td>
@@ -36,19 +39,22 @@ export const ReceiptTable = ({ items }: ReceiptTableProps) => {
                 </td>
                 
                 <td className={`${styles.textRight} ${styles.mono}`}>
-                  <span className={styles.currencySymbol}>R$</span>
-                  {price.toFixed(2)}
+                  <span className={styles.currency}>R$</span> {formatCurrency(price)}
                 </td>
                 
                 <td className={`${styles.textRight} ${styles.mono} ${styles.fontBold}`}>
-                  <span className={styles.currencySymbol}>R$</span>
-                  {(quant * price).toFixed(2)}
+                  <span className={styles.currency}>R$</span> {formatCurrency(total)}
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
-    </main>
+      {items.length === 0 && (
+        <div className={styles.emptyState}>
+          Nenhum item registrado nesta transação.
+        </div>
+      )}
+    </div>
   );
 };

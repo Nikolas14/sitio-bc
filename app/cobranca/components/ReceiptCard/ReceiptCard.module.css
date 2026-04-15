@@ -10,9 +10,8 @@
 
 .receiptPaper {
   background: white;
-  width: 900px;
-  min-height: 1150px;
-  padding: 70px;
+  width:100%;
+  padding: 20px;
   position: relative;
   display: flex;
   flex-direction: column;

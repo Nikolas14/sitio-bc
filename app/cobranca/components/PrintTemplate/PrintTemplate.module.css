@@ -1,0 +1,131 @@
+/* --- CAMADA DE SEGURANÇA (ESCONDE DA TELA) --- */
+.printWrapper {
+  position: absolute;
+  left: -9999px; /* Joga para fora da área visível */
+  top: 0;
+  pointer-events: none; /* Garante que não interfira em cliques */
+}
+
+/* --- O RECIBO EM SI (O QUE VAI NA FOTO) --- */
+.printContainer {
+  background: white;
+  width: 450px; /* Largura fixa ideal para WhatsApp */
+  padding: 40px;
+  color: #1e293b;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.companyName {
+  font-size: 22px;
+  font-weight: 900;
+  margin: 0;
+  color: #0f172a;
+}
+
+.subtitle {
+  margin: 5px 0 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #64748b;
+}
+
+/* Informações de Cliente e Data */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-size: 12px;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+/* Tabela de Itens */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 25px;
+}
+
+.table th {
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 10px 5px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.table td {
+  padding: 10px 5px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Seção de Totais */
+.summarySection {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.discount { 
+  color: #dc2626; 
+  font-weight: 600;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid #0f172a;
+  font-weight: 900;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+/* Rodapé e PIX */
+.footer {
+  text-align: center;
+}
+
+.pixBox {
+  border: 1px dashed #cbd5e1;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.pixKey {
+  font-size: 16px;
+  font-weight: 900;
+  margin: 5px 0;
+  color: #0f172a;
+}
+
+.thankYou {
+  font-size: 11px;
+  font-style: italic;
+  color: #94a3b8;
+}
+
+/* Auxiliares */
+.textRight { text-align: right; }
+.textCenter { text-align: center; }
