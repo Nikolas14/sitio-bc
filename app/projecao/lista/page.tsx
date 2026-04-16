@@ -35,16 +35,16 @@ export default function ListaProjecaoPage() {
 
       {/* DETALHES */}
       <main className={styles.contentWrapper}>
-        <ProjectionDetail 
-        selectedRef={selectedRef}
-        activeItems={activeItems}
-        onDelete={() => setShowModal(true)}
-      />
+        <ProjectionDetail
+          selectedRef={selectedRef}
+          activeItems={activeItems}
+          onDelete={() => setShowModal(true)}
+        />
       </main>
 
       {/* MODAL */}
       {showModal && (
-        <AdminPasswordModal 
+        <AdminPasswordModal
           password={password}
           setPassword={setPassword}
           onConfirm={handleDelete}
