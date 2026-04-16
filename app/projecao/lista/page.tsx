@@ -6,7 +6,7 @@ import styles from './page.module.css';
 import { ProjectionSidebarNav } from '../components/ProjectionSidebarNav/ProjectionSidebarNav';
 import SideFooter from '@/components/SideFooter/SideFooter';
 import ProjectionDetail from '../components/ProjectionDetail/ProjectionDetail';
-import AdminPasswordModal from '../components/AdminPasswordModal/AdminPasswordModal';
+import AdminPasswordModal from '../../../components/AdminPasswordModal/AdminPasswordModal';
 
 export default function ListaProjecaoPage() {
   const {

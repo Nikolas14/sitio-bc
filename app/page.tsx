@@ -13,12 +13,13 @@ export default function Dashboard() {
     { title: 'Estoque Detalhado', path: '/estoque/detalhado' },
     { title: 'Histórico transações', path: '/transacoes' },
     { title: 'Cobrança', path: '/cobranca' },
-    
     { title: 'Nova Projeção', path: '/projecao' },
     { title: 'Lista de Projeção', path: '/projecao/lista' },
     { title: 'Resumo Projeção', path: '/projecao/resumo' },
     { title: 'Saldo Projeção', path: '/projecao/saldo' },
+    { title: 'Produtos', path: '/cadastro/produto' },
     
+
     // { title: 'Funcionarios abate', path: '/abate' },
     // { title: 'Envio de avisos', path: '/avisos' },
   ];
