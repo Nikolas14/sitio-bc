@@ -19,9 +19,9 @@ export default function Dashboard() {
     { title: 'Saldo Projeção', path: '/projecao/saldo' },
     { title: 'Produtos', path: '/cadastro/produto' },
     
+    { title: 'Catálogo de Preços', path: '/lista_preco' },
+    { title: 'Envio de avisos', path: '/avisos' },
 
-    // { title: 'Funcionarios abate', path: '/abate' },
-    // { title: 'Envio de avisos', path: '/avisos' },
   ];
 
   return (

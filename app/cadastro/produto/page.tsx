@@ -95,10 +95,13 @@ export default function GerenciadorProdutos() {
                                     <option value="">Selecione...</option>
                                     <option value="FRANGO">FRANGO</option>
                                     <option value="CARNE">CARNE</option>
+                                    <option value="ESPECIAL">ESPECIAL</option>
                                     <option value="EMBUTIDOS">EMBUTIDOS</option>
-                                    <option value="SORVETE">SORVETE</option>
+                                    <option value="EXTRA">EXTRA</option>
+                                    <option value="INTERNO">INTERNO</option>
+                                    <option value="ISOPOR">ISOPOR</option>
                                     <option value="PEIXE">PEIXE</option>
-                                    <option value="OUTROS">ESPECIAL</option>
+                                    <option value="SORVETE">SORVETE</option>
                                 </select>
                             </div>
 
