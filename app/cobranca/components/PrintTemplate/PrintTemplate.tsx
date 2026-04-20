@@ -73,7 +73,7 @@ export const PrintTemplate = forwardRef<HTMLDivElement, any>(({ trans, items, fi
           )}
           {tax > 0 && (
             <div className={styles.summaryRow}>
-              <span>Taxas:</span>
+              <span>Imposto:</span>
               <span>{formatCurrency(tax)}</span>
             </div>
           )}

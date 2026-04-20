@@ -48,7 +48,7 @@ export const ReceiptSummary = ({ financial, shipping, tax, discountPercent }: Re
           
           {tax > 0 && (
             <div className={styles.sRow}>
-              <span>TAXAS ADICIONAIS</span>
+              <span>IMPOSTO</span>
               <span className={styles.mono}>+ R$ {tax.toFixed(2)}</span>
             </div>
           )}

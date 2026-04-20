@@ -40,7 +40,7 @@ export const ControlPanel = ({
                     <h2 className={styles.sectionTitle}>Custos Adicionais</h2>
                     <div className={styles.grid}>
                         <div className={styles.inputGroup}>
-                            <label className={styles.label}>Logística (Frete R$)</label>
+                            <label className={styles.label}>Frete R$:</label>
                             <input
                                 type="number"
                                 className={styles.field}
@@ -51,7 +51,7 @@ export const ControlPanel = ({
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label className={styles.label}>Taxas (R$)</label>
+                            <label className={styles.label}>Imposto: (R$)</label>
                             <div className={styles.inputWithShortcut}>
                                 <input
                                     type="number"
