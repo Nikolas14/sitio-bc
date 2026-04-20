@@ -20,7 +20,7 @@ export default function Dashboard() {
     { title: 'Produtos', path: '/cadastro/produto' },
     
     { title: 'Catálogo de Preços', path: '/lista_preco' },
-    { title: 'Envio de avisos', path: '/avisos' },
+    //{ title: 'Envio de avisos', path: '/avisos' },
 
   ];
 
