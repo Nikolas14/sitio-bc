@@ -20,7 +20,7 @@ export default function CobrancaDetalhadaPage() {
 
   const {
     trans, items, loading, error, financial, isLocked,
-    shipping, setShipping, tax, setTax,
+    shipping, discount, setShipping, tax, setTax,
     newPayment, setNewPayment,
     updateStatus, registrarPagamento, gerarImagem
   } = useCobrancaManager(id as string);
@@ -74,6 +74,7 @@ export default function CobrancaDetalhadaPage() {
           financial={financial}
           shipping={shipping}
           tax={tax}
+          discount={discount}
         />
       </main>
     </div>

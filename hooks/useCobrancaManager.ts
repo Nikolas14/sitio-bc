@@ -12,6 +12,7 @@ export function useCobrancaManager(id: string) {
 
   const [shipping, setShipping] = useState(0);
   const [tax, setTax] = useState(0);
+  const [discount, setDiscount] = useState(0);
   const [newPayment, setNewPayment] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -39,6 +40,7 @@ export function useCobrancaManager(id: string) {
     }, 0);
 
     const discountValue = sub * (Number(trans.discount_percent || 0) / 100);
+    setDiscount(discountValue); // Sincroniza o desconto calculado com o estado local
     const final = (sub - discountValue) + Number(tax) + Number(shipping);
     const paid = Number(trans.paid_amount || 0);
 
@@ -121,6 +123,7 @@ export function useCobrancaManager(id: string) {
     financial,
     isLocked,
     shipping,
+    discount,
     setShipping,
     tax,
     setTax,

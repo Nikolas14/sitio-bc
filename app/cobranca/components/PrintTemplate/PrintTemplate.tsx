@@ -17,7 +17,7 @@ type Props = {
   tax: number;
 };
 
-export const PrintTemplate = forwardRef<HTMLDivElement, any>(({ trans, items, financial, shipping, tax }, ref) => {
+export const PrintTemplate = forwardRef<HTMLDivElement, any>(({ trans, items, financial, shipping, tax, discount }, ref) => {
   const formatCurrency = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
 
   return (
@@ -35,7 +35,7 @@ export const PrintTemplate = forwardRef<HTMLDivElement, any>(({ trans, items, fi
             <p><strong>Data:</strong> {new Date(trans.created_at).toLocaleDateString('pt-BR')}</p>
           </div>
           <div className={styles.textRight}>
-            <p><strong>Ref:</strong> {trans.serial_number || trans.id.slice(0,8).toUpperCase()}</p>
+            <p><strong>Ref:</strong> {trans.serial_number || trans.id.slice(0, 8).toUpperCase()}</p>
           </div>
         </div>
 
@@ -53,7 +53,7 @@ export const PrintTemplate = forwardRef<HTMLDivElement, any>(({ trans, items, fi
                 <td>{item.ESTOQUE_product?.name}</td>
                 <td className={styles.textCenter}>{item.quant}</td>
                 <td className={styles.textRight}>
-                    {formatCurrency(item.quant * (item.ESTOQUE_product?.price || 0))}
+                  {formatCurrency(item.quant * (item.ESTOQUE_product?.price || 0))}
                 </td>
               </tr>
             ))}
@@ -65,6 +65,12 @@ export const PrintTemplate = forwardRef<HTMLDivElement, any>(({ trans, items, fi
             <span>Subtotal:</span>
             <span>{formatCurrency(financial.sub)}</span>
           </div>
+          {discount > 0 && (
+            <div className={styles.summaryRow}>
+              <span>Desconto:</span>
+              <span>{formatCurrency(discount)}</span>
+            </div>
+          )}
           {shipping > 0 && (
             <div className={styles.summaryRow}>
               <span>Frete:</span>
