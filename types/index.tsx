@@ -57,3 +57,4 @@ interface ReceiptTableProps {
 }
 
 export const STATUS_COBRANCA = ['PENDENTE', 'ENVIADO', 'COBRADO', 'CONCLUIDO'];
+export const TIPOS_PRODUTOS = ['FRANGO', 'CARNE', 'EMBUTIDOS', 'SORVETE', 'PEIXE', 'OUTROS', 'EXTRA', 'INTERNO', 'ISOPOR'];
