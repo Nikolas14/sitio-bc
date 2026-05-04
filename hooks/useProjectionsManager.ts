@@ -44,7 +44,7 @@ export function useProjectionsManager() {
 
   // Lógica de exclusão
   const handleDelete = async () => {
-    if (password !== '123') {
+    if (password !== process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
       alert("Senha incorreta!");
       return false;
     }

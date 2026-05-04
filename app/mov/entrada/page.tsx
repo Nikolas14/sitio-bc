@@ -19,18 +19,16 @@ export default function EntradaSimplificadaPage() {
   const [items, setItems] = useState<any[]>([]);
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
-  const [lastError, setLastError] = useState<string | null>(null); // Estado de erro
+  const [lastError, setLastError] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Cálculos Financeiros (Simplificados para Entrada)
   const financial = useMemo(() => {
     const subtotal = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
     return { subtotal, totalKg, totalFinal: subtotal };
   }, [items]);
 
-  // Atalho F10
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F10' && items.length > 0 && !loading) {
@@ -42,23 +40,15 @@ export default function EntradaSimplificadaPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [items, loading]);
 
-  // Função de Alarme Sonoro
-  const playErrorSound = () => {
-    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-    audio.play().catch(() => {}); 
-  };
-
   const handleBarcode = (val: string) => {
     setBarcode(val);
-    setLastError(null); // Limpa erro ao começar novo bip
+    setLastError(null);
 
     if (val.length === 13) {
       const parsed = parseScaleBarcode(val);
       
-      // Camada de Segurança 1: Formato do código
       if (!parsed) {
         setLastError("Código de barras inválido");
-        playErrorSound();
         setBarcode('');
         return;
       }
@@ -68,7 +58,6 @@ export default function EntradaSimplificadaPage() {
       // Camada de Segurança 2: Produto existe no banco?
       if (!prod) {
         setLastError(`Produto #${parsed.productId} não cadastrado`);
-        playErrorSound();
         setBarcode('');
         return;
       }
@@ -140,10 +129,9 @@ export default function EntradaSimplificadaPage() {
             labelDescricao="Referência / Abate"
             valor={customer}
             setValor={setCustomer}
-            placeholder="Ex: 50 Bois / Lote 402"
+            placeholder="Ex: 50 Bois / 600 frangos"
           />
 
-          {/* Camada Visual de Erro */}
           <div className={`${styles.scannerContainer} ${lastError ? styles.hasError : ''}`}>
             <BarcodeScanner
               ref={inputRef}

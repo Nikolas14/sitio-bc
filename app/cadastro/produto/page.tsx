@@ -20,7 +20,7 @@ export default function GerenciadorProdutos() {
             <AdminPasswordModal
                 password={adminPassword}
                 setPassword={setAdminPassword}
-                onConfirm={() => handleAdminConfirm('123')}
+                onConfirm={() => handleAdminConfirm(process.env.NEXT_PUBLIC_ADMIN_PASSWORD || '')}
                 onCancel={() => router.back()}
             />
         );

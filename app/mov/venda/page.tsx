@@ -13,7 +13,6 @@ import DiscountInput from '../../../components/DiscountInput/DiscountInput';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 
 import styles from './page.module.css';
-import { refresh } from 'next/cache';
 
 export default function VendaSimplificadaPage() {
   const { products } = useInventory();
@@ -27,7 +26,6 @@ export default function VendaSimplificadaPage() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Cálculos Financeiros
   const financial = useMemo(() => {
     const subtotal = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
@@ -37,7 +35,6 @@ export default function VendaSimplificadaPage() {
     return { subtotal, totalKg, discountVal, totalFinal };
   }, [items, discountPercent]);
 
-  // Atalho F10 para finalizar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F10' && items.length > 0 && !loading) {
@@ -49,38 +46,27 @@ export default function VendaSimplificadaPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [items, loading, financial]);
 
-  // Função para feedback sonoro de erro
-  const playErrorSound = () => {
-    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-    audio.play().catch(() => { });
-  };
-
   const handleBarcode = (val: string) => {
     setBarcode(val);
-    setLastError(null); // Limpa erro anterior ao digitar
+    setLastError(null); 
 
     if (val.length === 13) {
       const parsed = parseScaleBarcode(val);
 
-      // Camada de Segurança 1: Código de barras é reconhecível?
       if (!parsed) {
         setLastError("Código de barras inválido");
-        playErrorSound();
         setBarcode('');
         return;
       }
 
       const prod = products.find(p => p.id === parsed.productId);
 
-      // Camada de Segurança 2: Produto existe no cadastro?
       if (!prod) {
         setLastError(`Produto #${parsed.productId} não encontrado`);
-        playErrorSound();
         setBarcode('');
         return;
       }
 
-      // Sucesso: Adiciona ao carrinho
       setItems(prev => [{
         ...parsed,
         name: prod.name,
@@ -97,14 +83,11 @@ export default function VendaSimplificadaPage() {
   const categorySummary = useMemo(() => {
     const summary: Record<string, number> = {};
 
-    // Definimos quais tipos devem ser somados juntos
     const grupoPrincipal = ['CARNE', 'ESPECIAL', 'EXTRA'];
 
     items.forEach(item => {
-      // Normalizamos para maiúsculo para evitar erro de digitação
       const type = (item.type || 'OUTROS').toUpperCase();
 
-      // Se o tipo estiver na lista, agrupamos em "CARNES" (ou o nome que preferir)
       const label = grupoPrincipal.includes(type) ? 'CARNES' : type;
 
       summary[label] = (summary[label] || 0) + item.weightKg;
@@ -118,7 +101,6 @@ export default function VendaSimplificadaPage() {
     setLoading(true);
 
     try {
-      // 1. Criar Cabeçalho (Transaction)
       const { data: trans, error: transError } = await supabase
         .from('ESTOQUE_transaction')
         .insert([{
