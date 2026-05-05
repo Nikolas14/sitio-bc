@@ -116,7 +116,6 @@ export default function VendaSimplificadaPage() {
 
       if (transError) throw transError;
 
-      // 2. Criar Itens (Operations)
       const operations = items.map(item => ({
         transaction_id: trans.id,
         product_id: item.productId,
@@ -152,10 +151,9 @@ export default function VendaSimplificadaPage() {
             labelDescricao="Identificação do Cliente"
             valor={customer}
             setValor={setCustomer}
-            placeholder="Nome ou CPF..."
+            placeholder="Nome + Minuta"
           />
 
-          {/* Wrapper com estado de erro visual */}
           <div className={`${styles.scannerContainer} ${lastError ? styles.hasError : ''}`}>
             <BarcodeScanner
               ref={inputRef}
@@ -167,6 +165,7 @@ export default function VendaSimplificadaPage() {
         </div>
 
         <DiscountInput
+          key={discountPercent}
           value={discountPercent}
           onApply={(val) => setDiscountPercent(val)}
         />

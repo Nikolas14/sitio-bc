@@ -7,7 +7,7 @@ const HeaderPadrao = ({titulo}:props) => {
     const router = useRouter();
     return (
         <header className={styles.header}>
-            <button className={styles.backBtn} onClick={() => router.push('/')}>
+            <button className={styles.backBtn} onClick={() => router.back()}>
                 <span className={styles.icon}>←</span> VOLTAR
             </button>
             <h1 className={styles.mainTitle}>{titulo}</h1>

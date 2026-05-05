@@ -156,7 +156,7 @@ export default function EntradaSimplificadaPage() {
 
       <main className={styles.cartWrapper}>
         <InventoryCart
-          tituloCart="Conferência de Carga"
+          tituloCart="Conferência"
           items={items}
           setItems={setItems}
           totalWeight={financial.totalKg}

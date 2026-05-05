@@ -10,17 +10,13 @@ interface ProductHistoryTableProps {
 }
 
 const ProductHistoryTable = ({ history, loading }: ProductHistoryTableProps) => {
-  
-  // Calculamos o saldo progressivo usando useMemo para performance
   const historyWithBalance = useMemo(() => {
-    // 1. Criamos uma cópia e ordenamos da mais antiga para a mais nova para calcular o saldo
     const sortedHistory = [...history].sort(
       (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     );
 
     let runningBalance = 0;
 
-    // 2. Mapeamos calculando o saldo após cada linha
     const computed = sortedHistory.map((op) => {
       if (op.type === 'IN') {
         runningBalance += Number(op.quant);
@@ -30,7 +26,6 @@ const ProductHistoryTable = ({ history, loading }: ProductHistoryTableProps) => 
       return { ...op, balanceAfter: runningBalance };
     });
 
-    // 3. Invertemos novamente para exibir a mais recente no topo da tabela
     return computed.reverse();
   }, [history]);
 
@@ -54,7 +49,7 @@ const ProductHistoryTable = ({ history, loading }: ProductHistoryTableProps) => 
             <th>Data</th>
             <th>Tipo</th>
             <th>Qtd (KG)</th>
-            <th>Saldo</th> {/* Nova Coluna */}
+            <th>Saldo</th>
             <th>Origem / Cliente</th>
           </tr>
         </thead>
@@ -72,7 +67,6 @@ const ProductHistoryTable = ({ history, loading }: ProductHistoryTableProps) => 
               <td className={styles.quantCell}>
                 {h.type === 'IN' ? '+' : '-'}{Number(h.quant).toFixed(3)}
               </td>
-              {/* Célula de Saldo com cor condicional */}
               <td className={`${styles.balanceCell} ${h.balanceAfter < 0 ? styles.negative : ''}`}>
                 {h.balanceAfter.toFixed(3)} kg
               </td>
