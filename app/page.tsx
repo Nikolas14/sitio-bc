@@ -12,7 +12,8 @@ import {
   BarChart3, 
   Scale, 
   PlusCircle, 
-  Tags 
+  Tags, 
+  Info
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -27,6 +28,7 @@ export default function Dashboard() {
         { title: 'Caixa / Venda', path: '/mov/venda', icon: <ShoppingCart size={24} />, color: '#22c55e' },
         { title: 'Entrada de Carga', path: '/mov/entrada', icon: <Package size={24} /> },
         { title: 'Histórico', path: '/transacoes', icon: <History size={24} /> },
+        { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
       ]
     },
     {
@@ -39,11 +41,12 @@ export default function Dashboard() {
       ]
     },
     {
-      nome: 'Financeiro & Projeção',
+      nome: 'Projeção',
       itens: [
-        { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
         { title: 'Nova Projeção', path: '/projecao', icon: <TrendingUp size={24} /> },
         { title: 'Resumo / Saldo', path: '/projecao/saldo', icon: <BarChart3 size={24} /> },
+        { title: 'Lista projeção', path: '/projecao/lista', icon: <List size={24} /> },
+        { title: 'Resumo projeção', path: '/projecao/resumo', icon: <Info size={24} /> },
       ]
     }
   ];
