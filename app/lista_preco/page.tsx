@@ -124,9 +124,11 @@ export default function CatalogoEstoque() {
                 {groupedProducts[category].map(product => (
                   <div key={product.id} className={styles.itemRow}>
                     <div className={styles.imageThumb}>
+                      <h5 className={styles.itemName}>{product.details?.is_available ? 'Disponível' : 'Indisponível'}</h5>
                       {product.details?.image_filename ? (
                         <img 
-                          src={`/images/produtos/${product.details.image_filename}`} 
+                          src={`/images/produtos/${product.details.image_filename}.jpg`} 
+                          //src={`/images/produtos/1.jpg`} 
                           alt={product.name} 
                         />
                       ) : (
@@ -146,7 +148,7 @@ export default function CatalogoEstoque() {
 
                       {product.details?.package_weight_approx && (
                         <span className={styles.weightBadge}>
-                          📦 Emb: aprox. {product.details.package_weight_approx}kg
+                          Emb: aprox. {product.details.package_weight_approx}kg
                         </span>
                       )}
                     </div>
