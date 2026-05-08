@@ -1,10 +1,12 @@
 .navContainer {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  /* ADICIONADO: Respiro nas laterais e no topo/fundo */
+  /* Garante que o container ocupe a altura da tela ou do pai */
+  height: 80vh; 
   padding: 25px 20px; 
   box-sizing: border-box;
+  /* Evita que o container principal transborde */
+  overflow: hidden; 
 }
 
 .navHeader {
