@@ -3,7 +3,10 @@
   border-radius: 20px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
   width: 100%;
-  overflow: hidden;
+  max-height: 600px; /* Define o limite de altura do card */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Garante que as bordas arredondadas cortem o conteúdo */
 }
 
 .cardHeader {

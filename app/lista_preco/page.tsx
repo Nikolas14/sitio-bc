@@ -10,8 +10,12 @@ interface IProduct {
   name: string;
   type: string;
   price: number;
-  description?: string;
-  image_url?: string;
+  details?: {
+    description: string;
+    package_weight_approx: number;
+    image_filename: string;
+    is_available: boolean;
+  };
 }
 
 export default function CatalogoEstoque() {
@@ -21,24 +25,45 @@ export default function CatalogoEstoque() {
 
   useEffect(() => {
     async function loadProducts() {
-      const { data } = await supabase
+      // Realiza a busca com Join na tabela de detalhes
+      const { data, error } = await supabase
         .from('ESTOQUE_product')
-        .select('*')
+        .select(`
+          *,
+          details:ESTOQUE_product_details (
+            description,
+            package_weight_approx,
+            image_filename,
+            is_available
+          )
+        `)
         .order('name', { ascending: true });
       
-      if (data) setProducts(data);
+      if (error) {
+        console.error("Erro ao carregar catálogo:", error.message);
+      } else if (data) {
+        setProducts(data);
+      }
       setLoading(false);
     }
     loadProducts();
   }, []);
 
-  // Agrupamento por Categoria (Type)
+  // Lógica de filtragem e agrupamento
   const groupedProducts = useMemo(() => {
-    const filtered = products.filter(p =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.type?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = products.filter(p => {
+      // Filtro 1: Termo de busca (Nome ou Categoria)
+      const matchesSearch = 
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.type?.toLowerCase().includes(searchTerm.toLowerCase());
 
+      // Filtro 2: Disponibilidade (SÓ MOSTRA SE FOR DIFERENTE DE FALSE)
+      const isAvailable = p.details?.is_available !== false;
+
+      return matchesSearch && isAvailable;
+    });
+
+    // Agrupa o resultado por categoria (type)
     return filtered.reduce((acc: { [key: string]: IProduct[] }, product) => {
       const category = product.type || 'OUTROS';
       if (!acc[category]) acc[category] = [];
@@ -47,34 +72,32 @@ export default function CatalogoEstoque() {
     }, {});
   }, [products, searchTerm]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
 
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
     <div className={styles.screen}>
-      {/* SIDEBAR - Escondida na impressão via CSS */}
+      {/* SIDEBAR - Filtros e Ações */}
       <aside className={styles.sidebar}>
         <HeaderInput
           titulo="Catálogo"
           valor={searchTerm}
           setValor={setSearchTerm}
-          labelDescricao="Filtro de busca:"
-          placeholder="Nome ou tipo..."
+          labelDescricao="Buscar na lista ativa:"
+          placeholder="Nome ou tipo do produto..."
         />
         
         <div className={styles.sidebarActions}>
             <button onClick={handlePrint} className={styles.btnPrint}>
-                🖨️ Imprimir Lista
+                🖨️ Imprimir Tabela
             </button>
-            <p className={styles.tip}>Dica: O cabeçalho e a barra lateral não aparecem no papel.</p>
+            <p className={styles.tip}>Nota: Itens marcados como indisponíveis no sistema não aparecem nesta lista.</p>
         </div>
 
         <nav className={styles.categoryNav}>
-            <label className={styles.label}>ATALHOS</label>
+            <label className={styles.label}>NAVEGAÇÃO RÁPIDA</label>
             {Object.keys(groupedProducts).sort().map(cat => (
                 <a key={cat} href={`#cat-${cat}`} className={styles.navLink}>
                     {cat} <span>{groupedProducts[cat].length}</span>
@@ -83,15 +106,15 @@ export default function CatalogoEstoque() {
         </nav>
       </aside>
 
-      {/* ÁREA DE IMPRESSÃO */}
+      {/* CONTEÚDO PRINCIPAL / ÁREA DE IMPRESSÃO */}
       <main className={styles.mainContent}>
         <div className={styles.printHeader}>
-            <h1>RELATÓRIO DE PRODUTOS E PREÇOS</h1>
-            <p>Gerado em: {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
+            <h1>TABELA DE PRODUTOS E PREÇOS</h1>
+            <p>Atualizado em: {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
         </div>
 
         {loading ? (
-          <div className={styles.loader}>Buscando dados...</div>
+          <div className={styles.loader}>Sincronizando dados com o servidor...</div>
         ) : (
           Object.keys(groupedProducts).sort().map(category => (
             <section key={category} id={`cat-${category}`} className={styles.categorySection}>
@@ -101,10 +124,13 @@ export default function CatalogoEstoque() {
                 {groupedProducts[category].map(product => (
                   <div key={product.id} className={styles.itemRow}>
                     <div className={styles.imageThumb}>
-                      {product.image_url ? (
-                        <img src={product.image_url} alt={product.name} />
+                      {product.details?.image_filename ? (
+                        <img 
+                          src={`/images/produtos/${product.details.image_filename}`} 
+                          alt={product.name} 
+                        />
                       ) : (
-                        <div className={styles.noImage}>S/ IMG</div>
+                        <div className={styles.noImage}>S/ FOTO</div>
                       )}
                     </div>
 
@@ -113,17 +139,33 @@ export default function CatalogoEstoque() {
                         <span className={styles.id}>#{product.id}</span>
                         <h3 className={styles.itemName}>{product.name}</h3>
                       </div>
-                      <p className={styles.description}>{product.description}</p>
+                      
+                      <p className={styles.description}>
+                        {product.details?.description || 'Descrição não cadastrada.'}
+                      </p>
+
+                      {product.details?.package_weight_approx && (
+                        <span className={styles.weightBadge}>
+                          📦 Emb: aprox. {product.details.package_weight_approx}kg
+                        </span>
+                      )}
                     </div>
 
                     <div className={styles.priceContainer}>
-                      <span className={styles.price}>{formatCurrency(product.price)}</span>
+                      <span className={styles.priceLabel}>Preço Unit.</span>
+                      <span className={styles.priceValue}>{formatCurrency(product.price)}</span>
                     </div>
                   </div>
                 ))}
               </div>
             </section>
           ))
+        )}
+
+        {!loading && Object.keys(groupedProducts).length === 0 && (
+          <div className={styles.emptyState}>
+            <p>Nenhum produto disponível encontrado para esta busca.</p>
+          </div>
         )}
       </main>
     </div>

@@ -9,39 +9,43 @@
 .sidebar {
     background: white;
     border-right: 1px solid #e2e8f0;
-    padding: 10px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
-.sidebarActions {
-    padding: 0 10px;
-}
+.sidebarActions { padding: 0 10px; }
 
 .btnPrint {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: #0f172a;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 700;
     cursor: pointer;
+    transition: background 0.2s;
 }
 
-.tip { font-size: 11px; color: #94a3b8; margin-top: 8px; line-height: 1.4; }
+.btnPrint:hover { background: #1e293b; }
 
-.categoryNav { padding: 10px; display: flex; flex-direction: column; gap: 4px; }
-.label { font-size: 10px; font-weight: 800; color: #94a3b8; margin-bottom: 8px; }
+.tip { font-size: 11px; color: #94a3b8; margin-top: 10px; line-height: 1.5; }
+
+.categoryNav { padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+.label { font-size: 10px; font-weight: 800; color: #94a3b8; margin-bottom: 10px; letter-spacing: 0.1em; }
+
 .navLink {
     display: flex; justify-content: space-between;
-    padding: 8px 12px; border-radius: 6px;
+    padding: 10px 15px; border-radius: 8px;
     text-decoration: none; color: #475569; font-size: 13px; font-weight: 600;
 }
-.navLink:hover { background: #f8fafc; color: #0f172a; }
 
-/* MAIN CONTENT */
+.navLink:hover { background: #f8fafc; color: #0f172a; }
+.navLink span { background: #f1f5f9; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+
+/* CONTEÚDO */
 .mainContent {
     padding: 40px;
     overflow-y: auto;
@@ -49,54 +53,55 @@
 }
 
 .printHeader {
-    display: none; /* Só aparece na impressão */
-    margin-bottom: 30px;
-    border-bottom: 2px solid #000;
-    padding-bottom: 10px;
+    display: none; /* Só aparece no papel */
+    margin-bottom: 40px;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 15px;
 }
 
-.categorySection { margin-bottom: 40px; page-break-inside: avoid; }
+.categorySection { margin-bottom: 50px; }
 .categoryTitle {
-    font-size: 14px; font-weight: 900; color: #64748b;
-    text-transform: uppercase; border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 8px; margin-bottom: 15px;
+    font-size: 14px; font-weight: 900; color: #94a3b8;
+    text-transform: uppercase; border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 10px; margin-bottom: 20px;
 }
 
 .itemRow {
     display: flex; align-items: center; gap: 20px;
-    padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+    padding: 15px 0; border-bottom: 1px solid #f1f5f9;
 }
 
 .imageThumb {
-    width: 50px; height: 50px; background: #f8fafc;
-    border-radius: 4px; overflow: hidden; flex-shrink: 0;
+    width: 60px; height: 60px; background: #f8fafc;
+    border-radius: 8px; overflow: hidden; flex-shrink: 0;
 }
 .imageThumb img { width: 100%; height: 100%; object-fit: cover; }
-.noImage { font-size: 8px; color: #cbd5e1; text-align: center; line-height: 50px; }
+.noImage { font-size: 8px; color: #cbd5e1; text-align: center; line-height: 60px; font-weight: 800; }
 
 .info { flex: 1; }
-.nameRow { display: flex; align-items: center; gap: 8px; }
-.id { font-size: 11px; color: #94a3b8; font-family: monospace; }
-.itemName { font-size: 14px; font-weight: 800; color: #0f172a; text-transform: uppercase; margin: 0; }
-.description { font-size: 12px; color: #64748b; margin-top: 2px; }
+.nameRow { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.id { font-size: 11px; color: #cbd5e1; font-family: monospace; font-weight: 700; }
+.itemName { font-size: 15px; font-weight: 800; color: #0f172a; text-transform: uppercase; margin: 0; }
+.description { font-size: 12px; color: #64748b; margin: 0; line-height: 1.4; }
 
-.price { font-size: 16px; font-weight: 900; color: #0f172a; }
+.weightBadge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    color: #94a3b8; background: #f8fafc; padding: 2px 8px;
+    border-radius: 4px; margin-top: 8px;
+}
 
-/* =============================================
-   REGRAS DE IMPRESSÃO
-   ============================================= */
+.priceContainer { text-align: right; min-width: 130px; }
+.priceLabel { display: block; font-size: 9px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; }
+.priceValue { font-size: 18px; font-weight: 900; color: #0f172a; }
+
+.loader, .emptyState { text-align: center; padding: 100px; color: #94a3b8; font-weight: 600; }
+
+/* IMPRESSÃO */
 @media print {
     .sidebar { display: none !important; }
     .screen { display: block !important; }
-    .mainContent { padding: 0 !important; overflow: visible !important; }
-    
+    .mainContent { padding: 0 !important; }
     .printHeader { display: block !important; }
-    .printHeader h1 { font-size: 20px; margin: 0; }
-    
-    .itemRow { break-inside: avoid; border-bottom: 1px solid #ddd; }
-    
+    .itemRow { break-inside: avoid; }
     .categoryTitle { color: black; border-bottom-color: black; }
-    
-    /* Esconder imagens na impressão para economizar tinta (opcional) */
-    /* .imageThumb { display: none; } */
 }
