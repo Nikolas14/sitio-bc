@@ -1,26 +1,59 @@
-/* 1. Base da Tela: Ocupa 100% da visão sem scroll na página toda */
+/* Base da Tela: Bloqueia o scroll global */
 .screen {
   display: grid;
-  grid-template-columns: 420px 1fr; /* Largura fixa ideal para painéis de controle */
+  grid-template-columns: 420px 1fr;
   height: 100vh;
-  background-color: #f1f5f9; /* Cinza azulado muito leve para reduzir cansaço visual */
-  overflow: hidden;
+  background-color: #f1f5f9;
+  overflow: hidden; 
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* 2. Painel da Esquerda: Onde o operador interage */
+/* Painel da Esquerda: Scroll independente */
 .leftPanel {
   background: #ffffff;
   border-right: 1px solid #e2e8f0;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Empurra o botão de finalizar para o rodapé */
   padding: 32px 24px;
   box-shadow: 4px 0 15px rgba(0, 0, 0, 0.03);
   z-index: 20;
+  overflow-y: auto; /* Permite scroll se o conteúdo crescer */
+  box-sizing: border-box;
 }
 
+.controlTop {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  flex-grow: 1; /* Faz os controles ocuparem o espaço antes do botão final */
+}
+
+/* Container do Scanner com animação de erro */
+.scannerContainer {
+  position: relative;
+  padding: 10px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.hasError {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Área da Direita (Carrinho): Scroll independente */
+.cartWrapper {
+  padding: 40px;
+  background-color: #f8fafc;
+  height: 100vh;
+  overflow-y: auto; /* Permite scroll na lista de itens */
+  box-sizing: border-box;
+}
+
+/* Componentes de UI (Pills) */
 .categoryHeader {
   display: flex;
   flex-wrap: wrap;
@@ -29,7 +62,6 @@
   padding: 12px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  align-items: center;
 }
 
 .categoryPill {
@@ -39,20 +71,6 @@
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   overflow: hidden;
-}
-
-/* Destaque para o grupo agrupado */
-.pillHighlight {
-  border-color: #ef4444; /* Borda vermelha sutil */
-  background: #fef2f2;
-}
-
-.pillHighlight .pillLabel {
-  color: #991b1b;
-}
-
-.pillHighlight .pillValue {
-  background: #dc2626; /* Valor em fundo vermelho */
 }
 
 .pillLabel {
@@ -72,112 +90,16 @@
   font-weight: 700;
 }
 
-/* 3. Agrupador de Inputs (Topo da Esquerda) */
-.controlTop {
-  display: flex;
-  flex-direction: column;
-  gap: 28px; /* Espaçamento generoso para não clicar errado */
+/* Estilo para Impressão */
+@media print {
+  .screen { display: block; height: auto; }
+  .leftPanel { display: none !important; }
+  .cartWrapper { padding: 0; width: 100%; }
 }
 
-/* 4. Área do Carrinho (Direita) */
-.cartWrapper {
-  padding: 24px;
-  background-color: #f8fafc;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* O scroll será gerenciado dentro do InventoryCart */
-}
-
-
-.screen {
-  display: grid;
-  grid-template-columns: 420px 1fr;
-  height: 100vh;
-  background-color: #f8fafc;
-}
-
-.leftPanel {
-  background: white;
-  border-right: 1px solid #e2e8f0;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.controlTop {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* CONTAINER DO SCANNER COM SEGURANÇA */
-.scannerContainer {
-  position: relative;
-  padding: 10px;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.hasError {
-  border-color: #ef4444;
-  background-color: #fef2f2;
-  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-.errorMsg {
-  color: #b91c1c;
-  font-size: 11px;
-  font-weight: 900;
-  text-transform: uppercase;
-  margin-top: 8px;
-  display: block;
-  letter-spacing: 0.5px;
-}
-
-/* Animação de erro */
 @keyframes shake {
   10%, 90% { transform: translate3d(-1px, 0, 0); }
   20%, 80% { transform: translate3d(2px, 0, 0); }
   30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
   40%, 60% { transform: translate3d(4px, 0, 0); }
-}
-
-.cartWrapper {
-  padding: 40px;
-  background-color: #f1f5f9;
-  overflow-y: auto;
-}
-
-.centerInfo {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  color: #64748b;
-}
-/* 5. Ajustes de Responsividade */
-@media (max-width: 1100px) {
-  .screen {
-    grid-template-columns: 350px 1fr;
-  }
-}
-
-/* 6. Estilo para Impressão (Otimizado) */
-@media print {
-  .screen {
-    display: block;
-    background: white;
-    height: auto;
-  }
-  .leftPanel {
-    display: none !important; /* Esconde controles na hora de imprimir o relatório */
-  }
-  .cartWrapper {
-    padding: 0;
-    width: 100%;
-  }
 }
