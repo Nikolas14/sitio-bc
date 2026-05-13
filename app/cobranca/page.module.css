@@ -1,49 +1,53 @@
-/* page.module.css */
-
+/* 1. BASE DA TELA */
 .screen {
   display: grid;
-  grid-template-columns: 420px 1fr; /* Sidebar fixa em 350px e o resto para a tabela */
+  grid-template-columns: 420px 1fr;
   height: 100vh;
-  background-color: #f1f5f9; /* Fundo slate suave para destacar os cards brancos */
-  overflow: hidden;
+  background-color: #f1f5f9;
+  overflow: hidden; /* Trava a página principal para não ter scroll duplo */
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* SIDEBAR */
+/* 2. SIDEBAR COM SCROLL INDEPENDENTE */
 .sidebar {
   background: #ffffff;
   border-right: 1px solid #e2e8f0;
   padding: 40px 30px;
   display: flex;
   flex-direction: column;
-  gap: 35px; /* Espaço generoso entre os blocos (Busca, Filtro, Footer) */
+  gap: 35px;
   height: 100vh;
+  overflow-y: auto; /* Ativa scroll se o conteúdo crescer */
+  box-sizing: border-box; /* Garante que o padding não aumente a altura total */
 }
 
-/* ÁREA PRINCIPAL */
+/* 3. ÁREA PRINCIPAL COM SCROLL INDEPENDENTE */
 .mainContent {
   padding: 40px;
-  overflow-y: auto; /* A tabela rola, mas a sidebar fica fixa */
+  height: 100vh;
+  overflow-y: auto; /* A tabela/lista rola aqui */
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
-/* CARD DE PENDÊNCIA NO FOOTER */
+/* 4. COMPONENTES INTERNOS */
 .pendenteCard {
-  background-color: #fff1f2; /* Rose 50 */
-  border: 1px solid #fecdd3; /* Rose 200 */
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
   padding: 20px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 5px;
+  margin-top: auto; /* Empurra para o fim do conteúdo na sidebar */
 }
 
 .label {
   display: block;
   font-size: 11px;
   font-weight: 800;
-  color: #94a3b8; /* Slate 400 */
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -51,12 +55,34 @@
 .pendenteValue {
   font-size: 26px;
   font-weight: 950;
-  color: #e11d48; /* Rose 600 */
-  font-family: 'Courier New', Courier, monospace; /* Estilo financeiro */
+  color: #e11d48;
+  font-family: 'Courier New', Courier, monospace;
   letter-spacing: -1px;
 }
 
-/* ESTADOS DE ERRO E LOADING */
+/* 5. CUSTOM SCROLLBAR (ESTILO ELEGANTE) */
+.mainContent::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mainContent::-webkit-scrollbar-track,
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mainContent::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.mainContent::-webkit-scrollbar-thumb:hover,
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 6. ESTADOS */
 .error {
   height: 100vh;
   display: flex;
@@ -66,23 +92,4 @@
   color: #b91c1c;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-/* AJUSTES DE SCROLLBAR (Opcional, para deixar elegante) */
-.mainContent::-webkit-scrollbar {
-  width: 8px;
-}
-
-.mainContent::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-.mainContent::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
-}
-
-.mainContent::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
 }
