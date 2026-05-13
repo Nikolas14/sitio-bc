@@ -12,6 +12,7 @@
 .leftPanel {
   background: #ffffff;
   border-right: 1px solid #e2e8f0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Empurra o botão de finalizar para o rodapé */
