@@ -6,6 +6,7 @@ import { usePickingSummary } from '@/hooks/usePickingSummary';
 import styles from './page.module.css';
 import { PickingSidebarStats } from '../components/PickingSidebarStats/PickingSidebarStats';
 import PickingSummaryTable from '../components/PickingSummaryTable/PickingSummaryTable';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 export default function ResumoProjecaoPage() {
   const { consolidated, totalGeral, loading, refresh } = usePickingSummary();
@@ -13,8 +14,8 @@ export default function ResumoProjecaoPage() {
   if (loading) return <div className={styles.center}>Calculando Picking List...</div>;
 
   return (
-    <div className={styles.screen}>
-      <aside className={styles.leftPanel}>
+    <PageLayout>
+      <Sidebar>
         <HeaderPadrao titulo="Resumo" />
         <PickingSidebarStats
           totalKg={totalGeral}
@@ -22,11 +23,11 @@ export default function ResumoProjecaoPage() {
           onPrint={() => window.print()}
         />
         <SideFooter onRefresh={refresh} />
-      </aside>
+      </Sidebar>
 
-      <main className={styles.contentWrapper}>
+      <Main>
         <PickingSummaryTable consolidated={consolidated} />
-      </main>
-    </div>
+      </Main>
+    </PageLayout>
   );
 }

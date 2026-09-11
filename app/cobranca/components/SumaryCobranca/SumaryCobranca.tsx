@@ -5,15 +5,17 @@ import styles from './SumaryCobranca.module.css';
 
 interface Props {
     trans: ITransaction;
+    shipping?: number;
+    tax?: number;
 }
 
-const SumaryCobranca = ({ trans }: Props) => {
+const SumaryCobranca = ({ trans, shipping, tax }: Props) => {
     const formatCurrency = (val: number) => 
         new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
 
     const precoBruto = trans.total_price || 0;
-    const frete = trans.shipping_cost || 0;
-    const taxa = trans.tax_amount || 0;
+    const frete = shipping ?? trans.shipping_cost ?? 0;
+    const taxa = tax ?? trans.tax_amount ?? 0;
     const descontoReais = precoBruto * ((trans.discount_percent || 0) / 100);
     const valorFinal = (precoBruto - descontoReais) + frete + taxa;
 

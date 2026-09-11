@@ -13,6 +13,7 @@ import ProductHistoryTable from './components/ProductHistoryTable/ProductHistory
 import HistoryControls from './components/HistoryControls/HistoryControls';
 import ProductDetailHeader from './components/ProductDetailHeader/ProductDetailHeader';
 import SideFooter from '@/components/SideFooter/SideFooter';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 export default function DetalhesPage() {
   const { products, loading: productsLoading ,refresh} = useInventory();
@@ -48,9 +49,9 @@ export default function DetalhesPage() {
   }, [history]);
 
   return (
-    <div className={styles.screen}>
+    <PageLayout>
       {/* PAINEL LATERAL: LISTA DE PRODUTOS */}
-      <aside className={styles.leftPanel}>
+      <Sidebar>
         <div className={styles.searchHeader}>
           <HeaderInput setValor={setSearchTerm} titulo='Estoque detalhado' valor={searchTerm} labelDescricao='Filtro de produtos' />
         </div>
@@ -66,10 +67,10 @@ export default function DetalhesPage() {
           {/* O que for colocado aqui dentro aparece acima do botão */}
         </SideFooter>
 
-      </aside>
+      </Sidebar>
 
       {/* PAINEL PRINCIPAL: DETALHES E HISTÓRICO */}
-      <main className={styles.rightPanel}>
+      <Main>
         {selectedProduct ? (
           <div className={styles.detailCard}>
             <ProductDetailHeader
@@ -91,7 +92,7 @@ export default function DetalhesPage() {
             <p className={styles.emptyText}>Selecione um produto na lista lateral</p>
           </div>
         )}
-      </main>
-    </div>
+      </Main>
+    </PageLayout>
   );
 }

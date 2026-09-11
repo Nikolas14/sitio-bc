@@ -1,22 +1,5 @@
-/* Container Principal: Divide a tela entre Sidebar e Conteúdo */
-.screen {
-  display: grid;
-  grid-template-columns: 380px 1fr; /* Sidebar um pouco mais larga para o HeaderInput */
-  height: 100vh;
-  background-color: #f1f5f9;
-  overflow: hidden; /* Impede scroll na página inteira */
-}
-
-/* Painel Lateral (Esquerda) */
-.leftPanel {
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.03);
-  z-index: 10;
-}
+/* Estilos específicos da página de Estoque Detalhado.
+   O esqueleto (sidebar + main) é provido por PageLayout. */
 
 /* Header de busca fixo no topo da sidebar */
 .searchHeader {
@@ -24,16 +7,6 @@
   background: white;
   border-bottom: 1px solid #f1f5f9;
   flex-shrink: 0; /* Impede que o header seja esmagado */
-}
-
-/* Painel Principal (Direita) */
-.rightPanel {
-  background-color: #f8fafc;
-  height: 100vh;
-  overflow-y: auto; /* Permite scroll apenas nesta área */
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
 }
 
 /* Cartão de Detalhes (Conteúdo central) */
@@ -75,29 +48,9 @@
 
 /* Estilo para Impressão */
 @media print {
-  .leftPanel {
-    display: none !important;
-  }
-  .screen {
-    display: block;
-    height: auto;
-    background: white;
-  }
-  .rightPanel {
-    padding: 0;
-    overflow: visible;
-    background: white;
-  }
   .detailCard {
     border: none;
     box-shadow: none;
     padding: 0;
-  }
-}
-
-/* Responsividade */
-@media (max-width: 1200px) {
-  .screen {
-    grid-template-columns: 320px 1fr;
   }
 }

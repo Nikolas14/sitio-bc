@@ -11,6 +11,7 @@ import ButtonFinish from '../../../components/ButtonFinish/ButtonFinish';
 import FinancialSummary from '../components/FinancialSummary/FinancialSummary';
 import DiscountInput from '../../../components/DiscountInput/DiscountInput';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 import styles from './page.module.css';
 
@@ -143,8 +144,8 @@ export default function VendaSimplificadaPage() {
   };
 
   return (
-    <div className={styles.screen}>
-      <aside className={styles.leftPanel}>
+    <PageLayout>
+      <Sidebar>
         <div className={styles.controlTop}>
           <HeaderInput
             titulo="Venda Direta"
@@ -181,9 +182,9 @@ export default function VendaSimplificadaPage() {
           loading={loading}
           disabled={items.length === 0}
         />
-      </aside>
+      </Sidebar>
 
-      <main className={styles.cartWrapper}>
+      <Main>
 
         {categorySummary.length > 0 && (
           <div className={styles.categoryHeader}>
@@ -205,7 +206,7 @@ export default function VendaSimplificadaPage() {
           totalWeight={financial.totalKg}
           isVenda={true}
         />
-      </main>
-    </div>
+      </Main>
+    </PageLayout>
   );
 }

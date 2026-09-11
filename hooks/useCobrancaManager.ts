@@ -11,6 +11,8 @@ export function useCobrancaManager(id: string) {
   const { trans, items, loading, error, refresh } = useCobranca(id);
 
   const [shipping, setShipping] = useState(0);
+  const [latamKg, setLatamKg] = useState(0);
+  const [shippingRate, setShippingRate] = useState(0);
   const [tax, setTax] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [newPayment, setNewPayment] = useState(0);
@@ -23,6 +25,12 @@ export function useCobrancaManager(id: string) {
       setTax(Number(trans.tax_amount) || 0);
     }
   }, [trans]);
+
+  useEffect(() => {
+    if (trans?.status === 'PENDENTE') {
+      setShipping(Number(latamKg) * (Number(shippingRate) + 0.5));
+    }
+  }, [latamKg, shippingRate, trans?.status]);
 
   // Trava de segurança: impede edição se o status não for PENDENTE ou ENVIADO
   const isLocked = useMemo(() => {
@@ -123,6 +131,10 @@ export function useCobrancaManager(id: string) {
     financial,
     isLocked,
     shipping,
+    latamKg,
+    setLatamKg,
+    shippingRate,
+    setShippingRate,
     discount,
     setShipping,
     tax,

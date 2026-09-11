@@ -1,19 +1,5 @@
-.screen {
-  display: grid;
-  grid-template-columns: 420px 1fr;
-  height: 100vh;
-  background-color: #f1f5f9;
-  overflow: hidden; /* Trava a tela para o scroll ser interno */
-}
-
-/* --- PAINEL LATERAL (ESQUERDA) --- */
-.leftPanel {
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
+/* Estilos específicos da página de Histórico (Transações).
+   O esqueleto (sidebar + main) é provido por PageLayout. */
 
 .filterHeader {
   padding: 24px 20px;
@@ -45,6 +31,7 @@
 .scrollArea {
   flex: 1;
   overflow-y: auto;
+  min-height: 0; /* Permite que a lista role internamente */
   padding: 15px;
   background-color: #fcfcfd;
 }
@@ -59,17 +46,7 @@
   border-radius: 10px;
 }
 
-/* --- PAINEL PRINCIPAL (DIREITA) --- */
-.rightPanel {
-  height: 100vh;
-  overflow-y: auto;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); /* Efeito sutil de pontilhado */
-  background-size: 20px 20px;
-}
-
+/* RECIBO (PAINEL PRINCIPAL) */
 .receipt {
   background: white;
   padding: 50px;
@@ -82,7 +59,7 @@
   position: relative;
 }
 
-/* Efeito de detalhe no topo do recibo (opcional) */
+/* Efeito de detalhe no topo do recibo */
 .receipt::before {
   content: '';
   position: absolute;
@@ -127,29 +104,6 @@
   letter-spacing: 0.1em;
 }
 
-/* --- AJUSTE PARA IMPRESSÃO --- */
-@media print {
-  .leftPanel {
-    display: none !important;
-  }
-  .screen {
-    display: block;
-    background: white;
-  }
-  .rightPanel {
-    padding: 0;
-    overflow: visible;
-  }
-  .receipt {
-    box-shadow: none;
-    max-width: 100%;
-    padding: 20px;
-  }
-  .receipt::before {
-    display: none;
-  }
-}
-
 .dangerZone {
   margin-top: 40px;
   display: flex;
@@ -178,8 +132,16 @@
   transform: scale(1.05);
 }
 
-/* Responsividade de Impressão */
+/* --- AJUSTES PARA IMPRESSÃO --- */
 @media print {
+  .receipt {
+    box-shadow: none;
+    max-width: 100%;
+    padding: 20px;
+  }
+  .receipt::before {
+    display: none;
+  }
   .dangerZone {
     display: none !important;
   }

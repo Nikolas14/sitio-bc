@@ -5,6 +5,7 @@ import styles from './page.module.css';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
 import { useProductManager } from '@/hooks/useProductManager';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 export default function GerenciadorProdutos() {
     const router = useRouter();
@@ -27,8 +28,8 @@ export default function GerenciadorProdutos() {
     }
 
     return (
-        <div className={styles.screen}>
-            <aside className={styles.sidebar}>
+        <PageLayout>
+            <Sidebar>
                 <div className={styles.sidebarTop}>
                     <HeaderInput
                         titulo='Produtos'
@@ -60,9 +61,9 @@ export default function GerenciadorProdutos() {
                         + Novo Produto
                     </button>
                 </div>
-            </aside>
+            </Sidebar>
 
-            <main className={styles.mainContent}>
+            <Main className={styles.formArea}>
                 {selectedId ? (
                     <form onSubmit={handleSave} className={styles.formCard}>
                         <div className={styles.formHeader}>
@@ -137,7 +138,7 @@ export default function GerenciadorProdutos() {
                         <p>Selecione um produto na lista lateral para gerenciar.</p>
                     </div>
                 )}
-            </main>
-        </div>
+            </Main>
+        </PageLayout>
     );
 }

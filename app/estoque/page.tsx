@@ -10,6 +10,7 @@ import GrupoEstoque from '../../components/GrupoEstoque/GrupoEstoque';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import SideFooter from '@/components/SideFooter/SideFooter';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 export default function EstoqueReportPage() {
   const { products, loading, error, refresh } = useInventory();
@@ -55,8 +56,8 @@ export default function EstoqueReportPage() {
   if (error) return <div className={styles.error}>Erro: {error}</div>;
 
   return (
-    <div className={styles.screen}>
-      <aside className={styles.sidebar}>
+    <PageLayout>
+      <Sidebar>
         <HeaderPadrao titulo='Estoque geral' />
 
         <StatusFilter
@@ -70,9 +71,9 @@ export default function EstoqueReportPage() {
         <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados">
           <></>
         </SideFooter>
-      </aside>
+      </Sidebar>
 
-      <main className={styles.mainContent}>
+      <Main>
         {loading ? (
           <div className={styles.loading}>Buscando inventário...</div>
         ) : (
@@ -90,7 +91,7 @@ export default function EstoqueReportPage() {
             )}
           </div>
         )}
-      </main>
-    </div>
+      </Main>
+    </PageLayout>
   );
 }

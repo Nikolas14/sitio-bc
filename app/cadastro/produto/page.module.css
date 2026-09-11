@@ -1,19 +1,5 @@
-.screen {
-    display: grid;
-    grid-template-columns: 420px 1fr;
-    height: 100vh;
-    background-color: #f1f5f9;
-    overflow: hidden;
-}
-
-/* SIDEBAR */
-.sidebar {
-    background: white;
-    border-right: 1px solid #e2e8f0;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
+/* Estilos específicos da página de Produtos (Cadastro).
+   O esqueleto (sidebar + main) é provido por PageLayout. */
 
 .sidebarTop {
     padding: 10px;
@@ -23,6 +9,7 @@
 .productList {
     flex: 1;
     overflow-y: auto;
+    min-height: 0; /* Permite que a lista role internamente */
     padding: 15px;
     display: flex;
     flex-direction: column;
@@ -96,13 +83,9 @@
 
 .btnAdd:hover { background: #1e293b; }
 
-/* MAIN CONTENT */
-.mainContent {
-    padding: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    overflow-y: auto;
+/* ÁREA DO FORMULÁRIO (centralizada no Main) */
+.formArea {
+    align-items: center;
 }
 
 .formCard {

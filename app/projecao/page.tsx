@@ -8,6 +8,7 @@ import { useProjections } from '@/hooks/useProjections';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import ButtonFinish from '@/components/ButtonFinish/ButtonFinish';
 import InventoryCart from '@/components/InventoryCart/InventoryCart';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 import styles from './page.module.css';
 import { ProjectionManualForm } from './components/ProjectionManualForm/ProjectionManualForm';
@@ -90,8 +91,8 @@ export default function ProjecaoEnvioPage() {
   };
 
   return (
-    <div className={styles.screen}>
-      <aside className={styles.leftPanel}>
+    <PageLayout>
+      <Sidebar>
         {/* Conteúdo do Topo */}
         <div className={styles.topContent}>
           <HeaderInput
@@ -124,9 +125,9 @@ export default function ProjecaoEnvioPage() {
             disabled={items.length === 0}
           />
         </div>
-      </aside>
+      </Sidebar>
 
-      <main className={styles.cartWrapper}>
+      <Main>
         <InventoryCart
           tituloCart="Lista de Conferência da Projeção"
           items={items}
@@ -134,7 +135,7 @@ export default function ProjecaoEnvioPage() {
           totalWeight={financial.totalKg}
           isVenda={true}
         />
-      </main>
-    </div>
+      </Main>
+    </PageLayout>
   );
 }

@@ -1,19 +1,5 @@
-.screen {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    height: 100vh;
-    background-color: #f1f5f9;
-}
-
-/* SIDEBAR */
-.sidebar {
-    background: white;
-    border-right: 1px solid #e2e8f0;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
+/* Estilos específicos da página de Lista de Preços.
+   O esqueleto (sidebar + main) é provido por PageLayout. */
 
 .sidebarActions { padding: 0 10px; }
 
@@ -45,11 +31,9 @@
 .navLink:hover { background: #f8fafc; color: #0f172a; }
 .navLink span { background: #f1f5f9; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
 
-/* CONTEÚDO */
+/* CONTEÚDO (fundo branco como "papel") */
 .mainContent {
-    padding: 40px;
-    overflow-y: auto;
-    background: white;
+    background-color: #ffffff;
 }
 
 .printHeader {
@@ -98,9 +82,6 @@
 
 /* IMPRESSÃO */
 @media print {
-    .sidebar { display: none !important; }
-    .screen { display: block !important; }
-    .mainContent { padding: 0 !important; }
     .printHeader { display: block !important; }
     .itemRow { break-inside: avoid; }
     .categoryTitle { color: black; border-bottom-color: black; }

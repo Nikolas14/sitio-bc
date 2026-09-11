@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/api/supabase';
 import styles from './page.module.css';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 interface IProduct {
   id: number;
@@ -78,9 +79,9 @@ export default function CatalogoEstoque() {
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
-    <div className={styles.screen}>
+    <PageLayout>
       {/* SIDEBAR - Filtros e Ações */}
-      <aside className={styles.sidebar}>
+      <Sidebar>
         <HeaderInput
           titulo="Catálogo"
           valor={searchTerm}
@@ -88,7 +89,7 @@ export default function CatalogoEstoque() {
           labelDescricao="Buscar na lista ativa:"
           placeholder="Nome ou tipo do produto..."
         />
-        
+
         <div className={styles.sidebarActions}>
             <button onClick={handlePrint} className={styles.btnPrint}>
                 🖨️ Imprimir Tabela
@@ -104,10 +105,10 @@ export default function CatalogoEstoque() {
                 </a>
             ))}
         </nav>
-      </aside>
+      </Sidebar>
 
       {/* CONTEÚDO PRINCIPAL / ÁREA DE IMPRESSÃO */}
-      <main className={styles.mainContent}>
+      <Main className={styles.mainContent}>
         <div className={styles.printHeader}>
             <h1>TABELA DE PRODUTOS E PREÇOS</h1>
             <p>Atualizado em: {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
@@ -126,10 +127,9 @@ export default function CatalogoEstoque() {
                     <div className={styles.imageThumb}>
                       <h5 className={styles.itemName}>{product.details?.is_available ? 'Disponível' : 'Indisponível'}</h5>
                       {product.details?.image_filename ? (
-                        <img 
-                          src={`/images/produtos/${product.details.image_filename}.jpg`} 
-                          //src={`/images/produtos/1.jpg`} 
-                          alt={product.name} 
+                        <img
+                          src={`/images/produtos/${product.details.image_filename}.jpg`}
+                          alt={product.name}
                         />
                       ) : (
                         <div className={styles.noImage}>S/ FOTO</div>
@@ -141,7 +141,7 @@ export default function CatalogoEstoque() {
                         <span className={styles.id}>#{product.id}</span>
                         <h3 className={styles.itemName}>{product.name}</h3>
                       </div>
-                      
+
                       <p className={styles.description}>
                         {product.details?.description || 'Descrição não cadastrada.'}
                       </p>
@@ -169,7 +169,7 @@ export default function CatalogoEstoque() {
             <p>Nenhum produto disponível encontrado para esta busca.</p>
           </div>
         )}
-      </main>
-    </div>
+      </Main>
+    </PageLayout>
   );
 }

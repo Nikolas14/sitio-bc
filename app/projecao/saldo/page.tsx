@@ -8,6 +8,7 @@ import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import { useAvailability } from '@/hooks/useAvailability';
 import styles from './page.module.css';
 import AvailabilityTable from '../components/AvailabilityTable/AvailabilityTable';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 export default function PainelDisponibilidadePage() {
   // O hook agora entrega as categorias prontas!
@@ -28,37 +29,34 @@ export default function PainelDisponibilidadePage() {
   if (loading) return <div className={styles.center}>Sincronizando disponibilidades...</div>;
 
   return (
-    <div className={styles.screen}>
+    <PageLayout>
 
-      <aside className={styles.leftPanel}>
+      <Sidebar>
         <HeaderPadrao titulo="Estoque Crítico" />
 
-        <div className={styles.sidebarContent}>
+        <StatusFilter
+          label="Filtrar por Categoria"
+          options={categories}
+          selectedOptions={selectedGroups}
+          onToggle={toggleGroup}
+          onClear={() => setSelectedGroups([])}
+        />
 
-          <StatusFilter
-            label="Filtrar por Categoria"
-            options={categories}
-            selectedOptions={selectedGroups}
-            onToggle={toggleGroup}
-            onClear={() => setSelectedGroups([])}
-          />
-
-          <div className={`
+        <div className={`
             ${styles.alertBox} 
             ${data.filter(i => i.saldo_previsto < 0).length > 0 ? styles.alertActive : ''}
           `}>
-            <span className={styles.alertLabel}>PRODUTOS EM FALTA</span>
-            <div className={styles.alertValue}>
-              {data.filter(item => item.saldo_previsto < 0).length}
-            </div>
-            <p className={styles.alertDesc}>Itens que precisam de reposição imediata para atender as projeções.</p>
+          <span className={styles.alertLabel}>PRODUTOS EM FALTA</span>
+          <div className={styles.alertValue}>
+            {data.filter(item => item.saldo_previsto < 0).length}
           </div>
+          <p className={styles.alertDesc}>Itens que precisam de reposição imediata para atender as projeções.</p>
         </div>
 
         <SideFooter onRefresh={refresh} />
-      </aside>
+      </Sidebar>
 
-      <main className={styles.contentWrapper}>
+      <Main>
         <div className={styles.pageHeader}>
           <div>
             <h1>Painel de Disponibilidade</h1>
@@ -70,8 +68,8 @@ export default function PainelDisponibilidadePage() {
         </div>
 
         <AvailabilityTable data={filteredData} />
-      </main>
+      </Main>
 
-    </div>
+    </PageLayout>
   );
 }

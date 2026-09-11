@@ -15,6 +15,7 @@ import TransactionItemsTable from './components/TransactionItemsTable/Transactio
 import TransactionFinanceSummary from './components/TransactionFinanceSummary/TransactionFinanceSummary';
 import TransactionReceiptHeader from './components/TransactionReceiptHeader/TransactionReceiptHeader';
 import DeleteTransactionModal from './components/DeleteTransactionModal/DeleteTransactionModal';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 export default function TransacoesInterface() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -70,16 +71,16 @@ export default function TransacoesInterface() {
   };
 
   return (
-    <div className={styles.screen}>
+    <PageLayout>
       {/* PAINEL LATERAL: LISTA DE TRANSAÇÕES */}
-      <aside className={styles.leftPanel}>
+      <Sidebar>
         <div className={styles.filterHeader}>
-          <HeaderInput 
-            titulo="Histórico" 
-            valor={searchTerm} 
-            setValor={setSearchTerm} 
-            labelDescricao='Pesquisar' 
-            placeholder='Pesquisar cliente...' 
+          <HeaderInput
+            titulo="Histórico"
+            valor={searchTerm}
+            setValor={setSearchTerm}
+            labelDescricao='Pesquisar'
+            placeholder='Pesquisar cliente...'
           />
 
           <div className={styles.searchBox}>
@@ -110,10 +111,10 @@ export default function TransacoesInterface() {
             <p className={styles.statusMsg}>Nenhuma transação encontrada.</p>
           )}
         </div>
-      </aside>
+      </Sidebar>
 
       {/* PAINEL PRINCIPAL: DETALHE DO RECIBO */}
-      <main className={styles.rightPanel}>
+      <Main>
         {active && financial ? (
           <div className={styles.receipt}>
             <TransactionReceiptHeader
@@ -123,10 +124,10 @@ export default function TransacoesInterface() {
               totalKg={active.total_kg}
             />
 
-            <TransactionItemsTable 
-              items={items} 
-              loading={itemsLoading} 
-              type={active.type} 
+            <TransactionItemsTable
+              items={items}
+              loading={itemsLoading}
+              type={active.type}
             />
 
             <TransactionFinanceSummary
@@ -139,7 +140,7 @@ export default function TransacoesInterface() {
 
             {/* BOTÃO DE DELEÇÃO NO FINAL DO RECIBO */}
             <div className={styles.dangerZone}>
-              <button 
+              <button
                 className={styles.deleteBtn}
                 onClick={() => setIsModalOpen(true)}
               >
@@ -153,15 +154,15 @@ export default function TransacoesInterface() {
             <p>Selecione uma transação para ver os detalhes</p>
           </div>
         )}
-      </main>
+      </Main>
 
       {/* MODAL DE SEGURANÇA */}
-      <DeleteTransactionModal 
+      <DeleteTransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmDelete}
         isDeleting={isDeleting}
       />
-    </div>
+    </PageLayout>
   );
 }

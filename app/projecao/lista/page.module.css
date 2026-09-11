@@ -1,35 +1,7 @@
-.screen {
-  display: grid;
-  grid-template-columns: 420px 1fr;
-  height: 100vh;
-  background-color: #f1f5f9;
-  /* Tom de cinza azulado mais moderno */
-  overflow: hidden;
-}
+/* Estilos específicos da página de Lista de Projeções.
+   O esqueleto (sidebar + main) é provido por PageLayout. */
 
-.leftPanel {
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  /* Header/Filtros no topo, Botão no rodapé */
-  padding: 24px;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.02);
-  z-index: 10;
-}
-
-.contentWrapper {
-  padding: 40px;
-  width: 100%;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: radial-gradient(circle at top left, #f1f5f9, #e2e8f0);
-}
-
-/* Centralização do estado de carregamento com estilo */
+/* Centralização do estado de carregamento */
 .center {
   height: 100vh;
   display: flex;

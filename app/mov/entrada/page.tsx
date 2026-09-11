@@ -9,6 +9,7 @@ import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../../../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../../../components/ButtonFinish/ButtonFinish';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 import styles from './page.module.css';
 
@@ -121,8 +122,8 @@ export default function EntradaSimplificadaPage() {
   };
 
   return (
-    <div className={styles.screen}>
-      <aside className={styles.leftPanel}>
+    <PageLayout>
+      <Sidebar>
         <div className={styles.controlTop}>
           <HeaderInput
             titulo="Entrada de Estoque"
@@ -152,17 +153,17 @@ export default function EntradaSimplificadaPage() {
           loading={loading}
           disabled={items.length === 0}
         />
-      </aside>
+      </Sidebar>
 
-      <main className={styles.cartWrapper}>
+      <Main>
         <InventoryCart
           tituloCart="Conferência"
           items={items}
           setItems={setItems}
           totalWeight={financial.totalKg}
-          isVenda={false} 
+          isVenda={false}
         />
-      </main>
-    </div>
+      </Main>
+    </PageLayout>
   );
 }

@@ -1,60 +1,18 @@
-.screen {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  height: 100vh;
-  background-color: #f1f5f9;
-  overflow: hidden;
+/* Estilos específicos da página de Gestão de Cobrança.
+   O esqueleto (sidebar + main) é provido por PageLayout. */
+
+.stepperContainer {
+  flex-shrink: 0;
 }
 
-.sidebar {
-  background: white;
-  border-right: 1px solid #e2e8f0;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-}
-
+/* Área de pré-visualização do recibo: centraliza sobre fundo cinza */
 .previewArea {
-  padding: 40px;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
   background: #cbd5e1;
-  position: relative;
+  align-items: center;
+  gap: 24px;
 }
 
-.zoomWrapper {
-  transform: scale(0.8);
-  transform-origin: top center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
-
-.miniSummary {
-  margin-top: auto;
-  padding: 20px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.summaryRow {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: 11px;
-}
-
-.remainingVal {
-  font-size: 18px;
-  font-family: monospace;
-}
-
-.loadingScreen, .errorScreen {
+.centerInfo {
   height: 100vh;
   display: flex;
   align-items: center;
@@ -64,17 +22,4 @@
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 2px;
-}
-
-.genOverlay {
-  position: absolute;
-  top: 20px;
-  background: #0f172a;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 50px;
-  font-size: 12px;
-  font-weight: 800;
-  z-index: 100;
-  text-transform: uppercase;
 }

@@ -7,6 +7,7 @@ import { ProjectionSidebarNav } from '../components/ProjectionSidebarNav/Project
 import SideFooter from '@/components/SideFooter/SideFooter';
 import ProjectionDetail from '../components/ProjectionDetail/ProjectionDetail';
 import AdminPasswordModal from '../../../components/AdminPasswordModal/AdminPasswordModal';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 export default function ListaProjecaoPage() {
   const {
@@ -18,10 +19,10 @@ export default function ListaProjecaoPage() {
   if (loading) return <div className={styles.center}>Carregando logística...</div>;
 
   return (
-    <div className={styles.screen}>
+    <PageLayout>
 
       {/* BARRA LATERAL */}
-      <aside className={styles.leftPanel}>
+      <Sidebar>
         <HeaderPadrao titulo="Projeções" />
 
         <ProjectionSidebarNav
@@ -31,16 +32,16 @@ export default function ListaProjecaoPage() {
         />
 
         <SideFooter onRefresh={refresh} />
-      </aside>
+      </Sidebar>
 
       {/* DETALHES */}
-      <main className={styles.contentWrapper}>
+      <Main>
         <ProjectionDetail
           selectedRef={selectedRef}
           activeItems={activeItems}
           onDelete={() => setShowModal(true)}
         />
-      </main>
+      </Main>
 
       {/* MODAL */}
       {showModal && (
@@ -51,6 +52,6 @@ export default function ListaProjecaoPage() {
           onCancel={() => { setShowModal(false); setPassword(''); }}
         />
       )}
-    </div>
+    </PageLayout>
   );
 }

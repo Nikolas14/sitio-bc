@@ -1,0 +1,78 @@
+/* ============================================
+   ESQUELETO PADRÃO DE PÁGINA
+   Sidebar (30%) + Main (resto, com rolagem)
+   Todas as páginas do sistema usam este layout.
+   ============================================ */
+
+.screen {
+  display: grid;
+  grid-template-columns: minmax(280px, 30%) 1fr;
+  height: 100vh;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+/* --- BARRA LATERAL (30%) --- */
+.sidebar {
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  min-height: 0;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.02);
+  z-index: 10;
+}
+
+/* --- CONTEÚDO PRINCIPAL (70%, rolagem) --- */
+.main {
+  background-color: #f8fafc;
+  padding: 30px;
+  overflow-y: auto;
+  min-height: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar sutil padrão */
+.sidebar::-webkit-scrollbar,
+.main::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.main::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.main::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* --- IMPRESSÃO PADRÃO --- */
+@media print {
+  .sidebar {
+    display: none !important;
+  }
+  .screen {
+    display: block;
+    height: auto;
+    background: white;
+  }
+  .main {
+    padding: 0;
+    overflow: visible;
+    height: auto;
+  }
+}

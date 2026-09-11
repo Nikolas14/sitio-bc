@@ -1,0 +1,22 @@
+
+> sitio-bc@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.7 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.192:3000
+
+✓ Starting...
+✓ Ready in 3.3s
+○ Compiling / ...
+ GET / 200 in 3.9s (compile: 3.8s, render: 166ms)
+ GET /cobranca 200 in 997ms (compile: 965ms, render: 32ms)
+ GET / 200 in 68ms (compile: 8ms, render: 60ms)
+ GET /mov/entrada 200 in 490ms (compile: 453ms, render: 38ms)
+  Reload env: .env
+✓ Compiled in 627ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload when ./api/supabase.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 628ms (compile: 482ms, render: 146ms)
+ GET / 200 in 151ms (compile: 14ms, render: 138ms)

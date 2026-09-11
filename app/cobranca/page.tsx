@@ -10,6 +10,7 @@ import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import SideFooter from '@/components/SideFooter/SideFooter';
 import CobrancaTable from './components/CobrancaTable/CobrancaTable';
 import { STATUS_COBRANCA } from '@/types';
+import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 const STATUS_LIST = STATUS_COBRANCA;
 
@@ -37,10 +38,9 @@ export default function ListaCobrancasPage() {
   if (error) return <div className={styles.error}>Erro: {error}</div>;
 
   return (
-    <div className={styles.screen}>
-      
-      <aside className={styles.sidebar}>
+    <PageLayout>
 
+      <Sidebar>
         <HeaderInput
           titulo="Cobrança"
           labelDescricao="Buscar por Cliente"
@@ -57,17 +57,16 @@ export default function ListaCobrancasPage() {
           onClear={() => setSelectedStatus([])}
         />
 
-        <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados"/>
+        <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados" />
 
-      </aside>
+      </Sidebar>
 
-      <main className={styles.mainContent}>
-
-        <CobrancaTable 
-          transactions={filteredTransactions} 
-          loading={loading} 
+      <Main>
+        <CobrancaTable
+          transactions={filteredTransactions}
+          loading={loading}
         />
-      </main>
-    </div>
+      </Main>
+    </PageLayout>
   );
 }

@@ -7,6 +7,10 @@ interface ControlPanelProps {
     trans: ITransaction;
     shipping: number;
     setShipping: (val: number) => void;
+    latamKg: number;
+    setLatamKg: (val: number) => void;
+    shippingRate: number;
+    setShippingRate: (val: number) => void;
     tax: number;
     setTax: (val: number) => void;
     isEditable: boolean;
@@ -20,7 +24,7 @@ interface ControlPanelProps {
 }
 
 export const ControlPanel = ({
-    trans, shipping, setShipping, tax, setTax, isEditable,
+    trans, shipping, setShipping, latamKg, setLatamKg, shippingRate, setShippingRate, tax, setTax, isEditable,
     onUpdateStatus, onGerarImagem, onRegistrarPagamento, setNewPayment, loading, financial
 }: ControlPanelProps) => {
 
@@ -39,10 +43,42 @@ export const ControlPanel = ({
                 <div className={styles.section}>
                     <h2 className={styles.sectionTitle}>Custos Adicionais</h2>
                     <div className={styles.grid}>
+                        {trans.status === 'PENDENTE' && (
+                            <>
                         <div className={styles.inputGroup}>
-                            <label className={styles.label}>Frete R$:</label>
+                            <label className={styles.label}>Kg da LATAM:</label>
                             <input
                                 type="number"
+                                min="0"
+                                step="0.01"
+                                className={styles.field}
+                                value={latamKg}
+                                onChange={e => setLatamKg(Number(e.target.value))}
+                                disabled={!isEditable}
+                            />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>Taxa por kg (R$):</label>
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                className={styles.field}
+                                value={shippingRate}
+                                onChange={e => setShippingRate(Number(e.target.value))}
+                                disabled={!isEditable}
+                            />
+                        </div>
+                            </>
+                        )}
+
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>Frete (R$):</label>
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
                                 className={styles.field}
                                 value={shipping}
                                 onChange={e => setShipping(Number(e.target.value))}
