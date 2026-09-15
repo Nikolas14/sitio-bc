@@ -8,6 +8,24 @@ export interface IProduct {
   weightAlt?: number;
 }
 
+export interface ICustomer {
+  id: string;
+  name: string;
+  cpf: string;
+  address: string;
+  cep: string;
+  phone: string;
+  city: string;
+  airport: string;
+  pickup_person: string;
+  pickup_cpf: string;
+  alternative_pickup_person: string;
+  alternative_pickup_cpf: string;
+  notes: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface ITransaction {
   id: string;
   type: 'IN' | 'OUT';

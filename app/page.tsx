@@ -13,7 +13,9 @@ import {
   Scale, 
   PlusCircle, 
   Tags, 
-  Info
+  Info,
+  Users
+  ,ClipboardList
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -37,6 +39,8 @@ export default function Dashboard() {
         { title: 'Estoque Geral', path: '/estoque', icon: <Database size={24} /> },
         { title: 'Estoque Detalhado', path: '/estoque/detalhado', icon: <List size={24} /> },
         { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
+        { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
+        { title: 'Imprimir pedido', path: '/pedidos', icon: <ClipboardList size={24} /> },
         { title: 'Catálogo de Preços', path: '/lista_preco', icon: <Tags size={24} /> },
       ]
     },
