@@ -56,7 +56,6 @@ export function useHistory(productId: number | null, period: Period) {
       setHistory((data as unknown as IOperation[]) || []);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      console.error("Erro ao buscar histórico:", message);
       setError(message);
     } finally {
       setLoading(false);

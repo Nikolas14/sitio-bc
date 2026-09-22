@@ -27,7 +27,6 @@ export function useInventory() {
       setProducts((data as IProduct[]) || []);
 
     } catch (err: unknown) {
-      console.error('❌ Erro no Hook useInventory:', err);
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {

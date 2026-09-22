@@ -11,11 +11,13 @@ import InventoryCart from '../../../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../../../components/ButtonFinish/ButtonFinish';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { useToast } from '@/components/Toast/Toast';
 
 import styles from './page.module.css';
 
 export default function EntradaSimplificadaPage() {
   const { products } = useInventory();
+  const toast = useToast();
 
   const [customer, setCustomer] = useState('');
   const [items, setItems] = useState<CartItem[]>([]);
@@ -64,18 +66,19 @@ export default function EntradaSimplificadaPage() {
 
       if (opError) throw opError;
 
-      alert("Entrada enviada com sucesso!");
+      toast.success("Entrada enviada com sucesso!");
       setItems([]);
       setCustomer('');
       inputRef.current?.focus();
 
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      alert("Erro ao salvar Entrada: " + message);
+      setLastError(message);
+      toast.error("Erro ao salvar Entrada: " + message);
     } finally {
       setLoading(false);
     }
-  }, [items, customer, financial]);
+  }, [items, customer, financial, toast]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

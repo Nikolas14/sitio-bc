@@ -13,11 +13,13 @@ import FinancialSummary from '../components/FinancialSummary/FinancialSummary';
 import DiscountInput from '../../../components/DiscountInput/DiscountInput';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { useToast } from '@/components/Toast/Toast';
 
 import styles from './page.module.css';
 
 export default function VendaSimplificadaPage() {
   const { products } = useInventory();
+  const toast = useToast();
 
   const [customer, setCustomer] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
@@ -70,7 +72,7 @@ export default function VendaSimplificadaPage() {
 
       if (opError) throw opError;
 
-      alert("Venda realizada com sucesso!");
+      toast.success("Venda realizada com sucesso!");
       setItems([]);
       setCustomer('');
       setDiscountPercent(0);
@@ -78,11 +80,12 @@ export default function VendaSimplificadaPage() {
 
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      alert("Erro ao salvar: " + message);
+      setLastError(message);
+      toast.error("Erro ao salvar: " + message);
     } finally {
       setLoading(false);
     }
-  }, [items, customer, financial, discountPercent]);
+  }, [items, customer, financial, discountPercent, toast]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

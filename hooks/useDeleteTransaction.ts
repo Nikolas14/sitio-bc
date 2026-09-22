@@ -38,7 +38,6 @@ export function useDeleteTransaction() {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error(error);
       return { success: false, error };
     }
   };

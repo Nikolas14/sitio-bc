@@ -50,10 +50,14 @@ export function useProjectionsManager() {
     return selectedRef ? groupedProjections[selectedRef] || [] : [];
   }, [selectedRef, groupedProjections]);
 
+  const [error, setError] = useState<string | null>(null);
+
   // Lógica de exclusão
   const handleDelete = async () => {
-    if (password !== process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
-      alert("Senha incorreta!");
+    const { verifyAdminPassword } = await import('@/utils/adminAuth');
+    const ok = await verifyAdminPassword(password);
+    if (!ok) {
+      setError('Senha incorreta!');
       return false;
     }
 
@@ -63,20 +67,22 @@ export function useProjectionsManager() {
       .eq('reference', selectedRef);
 
     if (!error) {
+      setError(null);
       setShowModal(false);
       setPassword('');
       setSelectedRef(null);
       await fetchProjections();
       return true;
     }
-    
-    alert("Erro ao excluir.");
+
+    setError('Erro ao excluir.');
     return false;
   };
 
   return {
     groupedProjections,
     loading,
+    error,
     selectedRef,
     setSelectedRef,
     activeItems,

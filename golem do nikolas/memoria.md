@@ -1,7 +1,24 @@
-# Memória — Pontos a corrigir (Sitio BC)
+# Memória — Sitio BC
 
-> Análise feita em 09/09/2026. Retomar estes pontos numa próxima sessão.
+> Análise original em 09/09/2026. Sessão de trabalho em 22/09/2026 registrada abaixo.
 > Contexto completo em `golem do nikolas/AGENTS.md`.
+> NUNCA colar segredos (URLs, keys, senhas) neste arquivo nem no README — só nomes de variáveis.
+
+## Sessão 22/09/2026 — o que foi feito (concluído)
+- **Lint zerado**: de 42 errors + 14 warnings para **0/0** (`npm run lint`). `tsc --noEmit` limpo. `next build` passa.
+- **`any` eliminado**: tipados `CobrancaTable` (`ITransaction[]`), `ControlPanel`/`ReceiptCard`/`PrintTemplate` (`FinancialSummary`, `IReceiptItem[]`), `estoque/page` (`GrupoItem`), `mov/venda` + `mov/entrada` (`CartItem` exportado de `InventoryCart`), `projecao/*` (`AvailabilityItem`, `IProjection`/`IProjectionItem`, `CartItem`), hooks (`ITransaction`, `IOperation`, `IProduct`, `IReceiptItem`, payloads locais).
+- **Side effect no `useMemo` corrigido** (item 2 da análise original): `setDiscount` saiu do `useMemo` em `useCobrancaManager.ts`; sincronizado via `useEffect`. `isLocked` com deps `[trans]`.
+- **`react-hooks/set-state-in-effect`**: efeitos de fetch reescritos com padrão `.then()` (a regra do React 19 sinaliza `setState` síncrono em efeito). Arquivos: `useAvailability`, `usePickingSummary`, `useProjectionsList`, `useProjectionsManager`, `useTransactions`, `useTransactionItems`, `useProductManager`.
+- **`react-hooks/immutability`**: `ProductHistoryTable` reescrito com `reduce` sem `let` mutável.
+- **`exhaustive-deps`**: `finalizarVenda`/`finalizarEntrada` viraram `useCallback` e entraram nas deps do F10.
+- **Erros padronizados** (item 5): criado `components/Toast/` (`ToastProvider` + `useToast()`, sem deps novas), integrado em `app/layout.tsx`. Zero `alert()` e zero `console.error` ativo no código (só resta um `console.log` comentado em `useInventory.ts:24`).
+  - Hooks retornam `error: string | null` e `boolean`/`string|null` nas ações; páginas exibem toast.
+  - `gerarImagem` e `registrarPagamento` retornam `Promise<boolean>`.
+- **Senha admin fora do bundle** (parte do item 1): criado `POST /api/admin/verify/route.ts` (compara com `ADMIN_PASSWORD` server-only via `timingSafeEqual`) + `utils/adminAuth.ts` (`verifyAdminPassword()`). Migrados: `cadastro/produto`, `cadastro/cliente`, `transacoes`, `projecao/lista`.
+- **Senha para cliente** (pedido do dono): salvar e excluir cliente exigem `AdminPasswordModal` (mesma senha admin). `useCustomerManager` expõe `saveCustomer()`/`deleteCustomer()` sem `confirm()` nativo.
+- **`.env.local`**: criado com `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` e `ADMIN_PASSWORD` (server-only, SEM prefixo `NEXT_PUBLIC_`). `NEXT_PUBLIC_ADMIN_PASSWORD` removido do código e do `.env.local`. Na Vercel: apagar a var `NEXT_PUBLIC_*` de senha e cadastrar `ADMIN_PASSWORD` como server-only.
+- **Ajustes de build**: `ReceiptSummary` aceita `subWithDiscount?` (não usado); `ProjectionSidebarNav`/`ProjectionDetail` usam interfaces mínimas locais; `DeleteItem.product_id` opcional; casts de join do Supabase via `as unknown as` (o client sem tipos gerados infere joins como array).
+- **Warnings diversos**: removidos imports/vars sem uso, `<img>` → `next/image` em `lista_preco`.
 
 ## Forças do projeto (não mexer)
 - Arquitetura limpa: `app/`, `components/`, `hooks/`, `utils/`, `types/`.
@@ -43,8 +60,24 @@
 12. **Hooks quase duplicados** — `useCobranca`, `useCobrancas`, `useCobrancaManager`.
 13. **Commits sem mensagem semântica** — padronizar padrão (ex.: conventional commits).
 
+## O que FALTA — próximas sessões (por prioridade)
+1. **RLS + RPCs (segurança real, restante do item 1)**: a senha saiu do bundle, MAS as escritas ainda partem do cliente com a anon key — quem souber o endpoint escreve direto. Mapear tabelas e criar RPCs de venda/cobrança/estoque no painel Supabase + ativar RLS. Só mexer no esquema com o dono.
+2. **Escrita multi-tabela sem transação** (item 4): `finalizarVenda`/`finalizarEntrada` fazem insert em `ESTOQUE_transaction` e depois `ESTOQUE_operation` — falha no meio deixa dado órfão. Resolver junto com as RPCs.
+3. **Unificar tipos duplicados**: `FinancialSummary` repetido em `ControlPanel`, `ReceiptCard`, `PrintTemplate`; `IProjection` (hook) x `IProjectionItem` (lista); `AvailabilityRow` (hook) x `AvailabilityItem` (componente). Centralizar em `types/index.tsx`.
+4. **Higiene restante (itens 8–12)**: criar `.env.example` (só nomes, sem valores); `DiscountInput` com `key={discountPercent}` em `mov/venda`; imports relativos `../../../` → `@/`; documentar padrão do `barcodeParser`; avaliar unificar `useCobranca`/`useCobrancas`/`useCobrancaManager`.
+5. **Testes** (item 7): nenhum framework configurado.
+6. **Commits** (item 13): 36 arquivos modificados e não commitados nesta sessão — revisar `git status`/`git diff` e commitar em blocos (lint, toast, senha servidor, cliente) com conventional commits.
+
+## Decisões técnicas a lembrar
+- Toast próprio em vez de lib externa (evitar deps novas).
+- Fetch em `useEffect` usa `.then()` em vez de chamar `fetchX()` com `setLoading(true)` síncrono (exigência da regra `set-state-in-effect` do React 19).
+- Casts Supabase: `as unknown as T[]` nos joins (client sem tipos gerados). Se um dia gerar os tipos do banco (`supabase gen types`), remover esses casts.
+- `ADMIN_PASSWORD` é server-only e lida SOMENTE em `app/api/admin/verify/route.ts`. Nunca referenciar `ADMIN_PASSWORD` em código cliente nem recriar `NEXT_PUBLIC_ADMIN_PASSWORD`.
+- `.env.local` / `.env*` estão no `.gitignore` — nunca commitar.
+
 ## Checklist para a próxima sessão
-- [ ] Abrir `.env` e confirmar credenciais do Supabase
-- [ ] Mapear tabelas e criar RPCs de venda/cobrança no painel Supabase
-- [ ] Implementar item 1 (RLS + senha fora do client)
-- [ ] Rodar `npm run lint` após cada bloco de mudanças
+- [ ] Revisar `git status`/`git diff` e commitar os 36 arquivos em blocos lógicos
+- [ ] Criar `.env.example` (nomes apenas)
+- [ ] Mapear tabelas e criar RPCs de venda/cobrança no painel Supabase (com o dono)
+- [ ] Ativar RLS nas tabelas `ESTOQUE_*`
+- [ ] Rodar `npm run lint` + `npx tsc --noEmit` após cada bloco

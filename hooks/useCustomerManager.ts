@@ -25,6 +25,7 @@ export function useCustomerManager() {
     const [formData, setFormData] = useState<CustomerFormData>(emptyForm);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchCustomers = async () => {
         setLoading(true);
@@ -34,9 +35,10 @@ export function useCustomerManager() {
             .order('name', { ascending: true });
 
         if (error) {
-            alert(`Erro ao carregar clientes: ${error.message}`);
+            setError(error.message);
         } else {
-            setCustomers(data ?? []);
+            setError(null);
+            setCustomers((data as ICustomer[]) ?? []);
         }
         setLoading(false);
     };
@@ -73,8 +75,7 @@ export function useCustomerManager() {
         });
     };
 
-    const handleSave = async (event: React.FormEvent) => {
-        event.preventDefault();
+    const saveCustomer = async (): Promise<string | null> => {
         setLoading(true);
 
         const payload = Object.fromEntries(
@@ -87,27 +88,48 @@ export function useCustomerManager() {
             : await supabase.from('ESTOQUE_customer').update(payload).eq('id', selectedId);
 
         if (result.error) {
-            alert(`Erro ao salvar cliente: ${result.error.message}`);
+            setError(result.error.message);
+            setLoading(false);
+            return result.error.message;
         } else {
+            setError(null);
             await fetchCustomers();
             setSelectedId(null);
         }
         setLoading(false);
+        return null;
     };
 
-    const handleDelete = async () => {
-        if (!selectedId || selectedId === 'new') return;
-        if (!confirm(`Excluir permanentemente o cliente "${formData.name}"?`)) return;
+    const handleSave = async (event: React.FormEvent): Promise<boolean> => {
+        event.preventDefault();
+        const saveError = await saveCustomer();
+        return saveError === null;
+    };
+
+    const deleteCustomer = async (): Promise<string | null> => {
+        if (!selectedId || selectedId === 'new') return 'Nenhum cliente selecionado.';
 
         setLoading(true);
         const { error } = await supabase.from('ESTOQUE_customer').delete().eq('id', selectedId);
         if (error) {
-            alert(`Erro ao excluir cliente: ${error.message}`);
+            setError(error.message);
+            setLoading(false);
+            return error.message;
         } else {
+            setError(null);
             await fetchCustomers();
             setSelectedId(null);
         }
         setLoading(false);
+        return null;
+    };
+
+    const handleDelete = async (): Promise<boolean> => {
+        if (!selectedId || selectedId === 'new') return false;
+        if (!confirm(`Excluir permanentemente o cliente "${formData.name}"?`)) return false;
+
+        const deleteError = await deleteCustomer();
+        return deleteError === null;
     };
 
     const filteredCustomers = useMemo(() => {
@@ -120,6 +142,7 @@ export function useCustomerManager() {
 
     return {
         loading,
+        error,
         customers,
         searchTerm,
         setSearchTerm,
@@ -131,5 +154,7 @@ export function useCustomerManager() {
         handleSelect,
         handleSave,
         handleDelete,
+        saveCustomer,
+        deleteCustomer,
     };
 }

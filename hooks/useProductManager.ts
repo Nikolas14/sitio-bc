@@ -10,6 +10,7 @@ export function useProductManager() {
     const [selectedId, setSelectedId] = useState<number | 'new' | null>(null);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         id: '',
@@ -25,8 +26,8 @@ export function useProductManager() {
             .select('*')
             .order('name', { ascending: true });
 
-        if (data) setProducts(data as IProduct[]);
-        if (error) console.error("Erro ao carregar:", error);
+        if (data) setProducts(data as unknown as IProduct[]);
+        if (error) setError(error.message);
     };
 
     useEffect(() => {
@@ -36,8 +37,8 @@ export function useProductManager() {
             .select('*')
             .order('name', { ascending: true })
             .then(({ data, error }) => {
-                if (data) setProducts(data as IProduct[]);
-                if (error) console.error("Erro ao carregar:", error);
+                if (data) setProducts(data as unknown as IProduct[]);
+                if (error) setError(error.message);
             });
     }, [isAdmin]);
 
@@ -57,7 +58,7 @@ export function useProductManager() {
         }
     };
 
-    const handleSave = async (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent): Promise<boolean> => {
         e.preventDefault();
         setLoading(true);
 
@@ -87,34 +88,50 @@ export function useProductManager() {
         }
 
         if (error) {
-            alert("Erro ao salvar: " + error.message);
+            setError(error.message);
+            setLoading(false);
+            return false;
         } else {
+            setError(null);
             await fetchProducts();
             setSelectedId(null);
         }
         setLoading(false);
+        return true;
     };
 
-    const handleDelete = async () => {
-        if (selectedId === 'new' || !selectedId) return;
+    const handleDelete = async (): Promise<boolean> => {
+        if (selectedId === 'new' || !selectedId) return false;
         if (confirm(`Excluir permanentemente o produto "${formData.name.toUpperCase()}"?`)) {
             setLoading(true);
             const { error } = await supabase.from('ESTOQUE_product').delete().eq('id', selectedId);
-            if (error) alert("Erro: O produto pode estar vinculado a movimentações.");
+            if (error) {
+                setError("O produto pode estar vinculado a movimentações.");
+                setLoading(false);
+                return false;
+            }
             else {
+                setError(null);
                 await fetchProducts();
                 setSelectedId(null);
             }
             setLoading(false);
+            return true;
         }
+        return false;
     };
 
-    const handleAdminConfirm = (senhaCorreta: string) => {
-        if (adminPassword === senhaCorreta) {
+    const handleAdminConfirm = async (): Promise<boolean> => {
+        const { verifyAdminPassword } = await import('@/utils/adminAuth');
+        const ok = await verifyAdminPassword(adminPassword);
+        if (ok) {
             setIsAdmin(true);
+            setError(null);
+            return true;
         } else {
-            alert('Senha incorreta!');
+            setError('Senha incorreta!');
             setAdminPassword('');
+            return false;
         }
     };
 
@@ -131,6 +148,7 @@ export function useProductManager() {
         setAdminPassword,
         handleAdminConfirm,
         loading,
+        error,
         searchTerm,
         setSearchTerm,
         filteredProducts,

@@ -8,13 +8,21 @@ import SideFooter from '@/components/SideFooter/SideFooter';
 import ProjectionDetail from '../components/ProjectionDetail/ProjectionDetail';
 import AdminPasswordModal from '../../../components/AdminPasswordModal/AdminPasswordModal';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { useToast } from '@/components/Toast/Toast';
 
 export default function ListaProjecaoPage() {
+  const toast = useToast();
   const {
-    groupedProjections, loading, selectedRef, setSelectedRef,
+    groupedProjections, loading, error, selectedRef, setSelectedRef,
     activeItems, showModal, setShowModal, password, setPassword,
     handleDelete, refresh
   } = useProjectionsManager();
+
+  const onConfirmDelete = async () => {
+    const ok = await handleDelete();
+    if (ok) toast.success('Projeção excluída.');
+    else toast.error(error ?? 'Não foi possível excluir.');
+  };
 
   if (loading) return <div className={styles.center}>Carregando logística...</div>;
 
@@ -48,7 +56,7 @@ export default function ListaProjecaoPage() {
         <AdminPasswordModal
           password={password}
           setPassword={setPassword}
-          onConfirm={handleDelete}
+          onConfirm={onConfirmDelete}
           onCancel={() => { setShowModal(false); setPassword(''); }}
         />
       )}

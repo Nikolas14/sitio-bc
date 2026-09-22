@@ -37,7 +37,6 @@ export function useCobranca(id: string | string[] | undefined) {
       setTrans(tData as ITransaction);
       setItems((iData as unknown as IReceiptItem[]) || []);
     } catch (err: unknown) {
-      console.error("Erro ao carregar detalhes:", err);
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {

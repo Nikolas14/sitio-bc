@@ -41,7 +41,6 @@ export function useProjections() {
       setProjections((data as IProjection[]) || []);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      console.error('Erro ao buscar projeções:', message);
       setError(message);
     } finally {
       setLoading(false);

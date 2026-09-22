@@ -13,10 +13,12 @@ import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import styles from './page.module.css';
 import { ProjectionManualForm } from './components/ProjectionManualForm/ProjectionManualForm';
 import type { CartItem } from '@/components/InventoryCart/InventoryCart';
+import { useToast } from '@/components/Toast/Toast';
 
 export default function ProjecaoEnvioPage() {
   const { products } = useInventory();
   const { refresh } = useProjections();
+  const toast = useToast();
 
   const [reference, setReference] = useState('');
   const [items, setItems] = useState<CartItem[]>([]);
@@ -79,14 +81,15 @@ export default function ProjecaoEnvioPage() {
       const { error } = await supabase.from('ESTOQUE_projection').insert(payload);
       if (error) throw error;
 
-      alert("Projeção salva com sucesso!");
+      toast.success("Projeção salva com sucesso!");
       setItems([]);
       setReference('');
       refresh();
       idInputRef.current?.focus();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      alert("Erro ao salvar: " + message);
+      setLastError(message);
+      toast.error("Erro ao salvar: " + message);
     } finally {
       setLoading(false);
     }

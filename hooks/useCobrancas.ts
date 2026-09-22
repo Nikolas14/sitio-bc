@@ -20,7 +20,6 @@ export function useCobrancas() {
       setTransactions((data as ITransaction[]) || []);
       setError(null);
     } catch (err: unknown) {
-      console.error('Erro no Hook useCobrancas:', err);
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
     } finally {
