@@ -2,31 +2,29 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/api/supabase';
+import { IOperation } from '@/types';
 
 export function useTransactionItems(transactionId: string | null) {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<IOperation[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!transactionId) {
-      setItems([]);
+      Promise.resolve().then(() => setItems([]));
       return;
     }
 
-    async function fetchItems() {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('ESTOQUE_operation')
-        .select(`*, ESTOQUE_product(name, price)`)
-        .eq('transaction_id', transactionId);
+    Promise.resolve().then(() => setLoading(true));
+    supabase
+      .from('ESTOQUE_operation')
+      .select(`*, ESTOQUE_product(name, price)`)
+      .eq('transaction_id', transactionId)
+      .then(({ data, error }) => {
+        if (error) console.error('Erro ao buscar itens:', error);
 
-      if (error) console.error('Erro ao buscar itens:', error);
-      
-      setItems(data || []);
-      setLoading(false);
-    }
-
-    fetchItems();
+        setItems((data as unknown as IOperation[]) || []);
+        setLoading(false);
+      });
   }, [transactionId]);
 
   return { items, loading };

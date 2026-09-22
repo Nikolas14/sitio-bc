@@ -70,9 +70,5 @@ export interface IReceiptItem {
   ESTOQUE_product: IReceiptProduct | null;
 }
 
-interface ReceiptTableProps {
-  items: IReceiptItem[];
-}
-
 export const STATUS_COBRANCA = ['PENDENTE', 'ENVIADO', 'COBRADO', 'CONCLUIDO'];
 export const TIPOS_PRODUTOS = ['FRANGO', 'CARNE', 'EMBUTIDOS', 'SORVETE', 'PEIXE', 'OUTROS', 'EXTRA', 'INTERNO', 'ISOPOR'];

@@ -20,12 +20,21 @@ export function useTransactions() {
 
     if (error) console.error('Erro ao buscar transações:', error);
 
-    setTransactions(data || []);
+    setTransactions((data as ITransaction[]) || []);
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchTransactions();
+    supabase
+      .from('ESTOQUE_transaction')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) console.error('Erro ao buscar transações:', error);
+
+        setTransactions((data as ITransaction[]) || []);
+        setLoading(false);
+      });
   }, []);
 
   // Lógica de filtragem memoizada para performance

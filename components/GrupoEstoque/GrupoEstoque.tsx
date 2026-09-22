@@ -1,9 +1,14 @@
-import { IProduct } from '@/types';
 import styles from './GrupoEstoque.module.css'
+
+interface GrupoItem {
+    id: number;
+    name: string;
+    current_stock: number;
+}
 
 interface GrupoEstoqueProps {
     category: string;
-    list: IProduct[];
+    list: GrupoItem[];
 }
 
 const GrupoEstoque = ({ category, list }: GrupoEstoqueProps) => {

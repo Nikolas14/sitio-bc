@@ -6,7 +6,6 @@ import { useCobrancaManager } from '@/hooks/useCobrancaManager';
 
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import { ControlPanel } from '../components/ControlPanel/ControlPanel';
-import { ReceiptCard } from '../components/ReceiptCard/ReceiptCard';
 import { StatusStepper } from '../components/StatusStepper/StatusStepper';
 
 import styles from './page.module.css';
@@ -22,7 +21,7 @@ export default function CobrancaDetalhadaPage() {
   const {
     trans, items, loading, error, financial, isLocked,
     shipping, latamKg, shippingRate, discount, setShipping, setLatamKg, setShippingRate, tax, setTax,
-    newPayment, setNewPayment,
+    setNewPayment,
     updateStatus, registrarPagamento, gerarImagem
   } = useCobrancaManager(id as string);
 

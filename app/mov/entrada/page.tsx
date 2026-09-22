@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
+import type { CartItem } from '../../../components/InventoryCart/InventoryCart';
 
 import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../../../components/InventoryCart/InventoryCart';
@@ -17,7 +18,7 @@ export default function EntradaSimplificadaPage() {
   const { products } = useInventory();
 
   const [customer, setCustomer] = useState('');
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
@@ -25,58 +26,12 @@ export default function EntradaSimplificadaPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const financial = useMemo(() => {
-    const subtotal = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
+    const subtotal = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
     return { subtotal, totalKg, totalFinal: subtotal };
   }, [items]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'F10' && items.length > 0 && !loading) {
-        e.preventDefault();
-        finalizarEntrada();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [items, loading]);
-
-  const handleBarcode = (val: string) => {
-    setBarcode(val);
-    setLastError(null);
-
-    if (val.length === 13) {
-      const parsed = parseScaleBarcode(val);
-      
-      if (!parsed) {
-        setLastError("Código de barras inválido");
-        setBarcode('');
-        return;
-      }
-
-      const prod = products.find(p => p.id === parsed.productId);
-
-      // Camada de Segurança 2: Produto existe no banco?
-      if (!prod) {
-        setLastError(`Produto #${parsed.productId} não cadastrado`);
-        setBarcode('');
-        return;
-      }
-
-      // Sucesso: Adiciona o item à lista de conferência
-      setItems(prev => [{
-        ...parsed,
-        name: prod.name,
-        price: prod.price || 0,
-        tempId: Date.now()
-      }, ...prev]);
-      
-      setBarcode('');
-      setLastError(null);
-    }
-  };
-
-  const finalizarEntrada = async () => {
+  const finalizarEntrada = useCallback(async () => {
     if (items.length === 0) return;
     setLoading(true);
 
@@ -114,10 +69,57 @@ export default function EntradaSimplificadaPage() {
       setCustomer('');
       inputRef.current?.focus();
 
-    } catch (err: any) {
-      alert("Erro ao salvar Entrada: " + err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      alert("Erro ao salvar Entrada: " + message);
     } finally {
       setLoading(false);
+    }
+  }, [items, customer, financial]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F10' && items.length > 0 && !loading) {
+        e.preventDefault();
+        finalizarEntrada();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [items, loading, finalizarEntrada]);
+
+  const handleBarcode = (val: string) => {
+    setBarcode(val);
+    setLastError(null);
+
+    if (val.length === 13) {
+      const parsed = parseScaleBarcode(val);
+      
+      if (!parsed) {
+        setLastError("Código de barras inválido");
+        setBarcode('');
+        return;
+      }
+
+      const prod = products.find(p => p.id === parsed.productId);
+
+      // Camada de Segurança 2: Produto existe no banco?
+      if (!prod) {
+        setLastError(`Produto #${parsed.productId} não cadastrado`);
+        setBarcode('');
+        return;
+      }
+
+      // Sucesso: Adiciona o item à lista de conferência
+      setItems(prev => [{
+        ...parsed,
+        name: prod.name,
+        price: prod.price || 0,
+        tempId: Date.now()
+      }, ...prev]);
+      
+      setBarcode('');
+      setLastError(null);
     }
   };
 

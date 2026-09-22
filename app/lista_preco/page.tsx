@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { supabase } from '@/api/supabase';
 import styles from './page.module.css';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
@@ -127,9 +128,12 @@ export default function CatalogoEstoque() {
                     <div className={styles.imageThumb}>
                       <h5 className={styles.itemName}>{product.details?.is_available ? 'Disponível' : 'Indisponível'}</h5>
                       {product.details?.image_filename ? (
-                        <img
+                        <Image
                           src={`/images/produtos/${product.details.image_filename}.jpg`}
                           alt={product.name}
+                          width={60}
+                          height={60}
+                          style={{ objectFit: 'cover' }}
                         />
                       ) : (
                         <div className={styles.noImage}>S/ FOTO</div>

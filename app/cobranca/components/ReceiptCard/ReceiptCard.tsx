@@ -9,12 +9,20 @@ import { ReceiptBilling } from './components/ReceiptBilling/ReceiptBilling';
 import { ReceiptTable } from './components/ReceiptTable/ReceiptTable';
 import { ReceiptSummary } from './components/ReceiptSummary/ReceiptSummary';
 
+interface FinancialSummary {
+  sub: number;
+  discountValue: number;
+  final: number;
+  paid: number;
+  remaining: number;
+}
+
 interface ReceiptCardProps {
   trans: ITransaction | null;
   items: IReceiptItem[];
   shipping: number;
   tax: number;
-  financial: any;
+  financial: FinancialSummary;
 }
 
 export const ReceiptCard = forwardRef<HTMLDivElement, ReceiptCardProps>(

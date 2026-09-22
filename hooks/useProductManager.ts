@@ -25,12 +25,20 @@ export function useProductManager() {
             .select('*')
             .order('name', { ascending: true });
 
-        if (data) setProducts(data);
+        if (data) setProducts(data as IProduct[]);
         if (error) console.error("Erro ao carregar:", error);
     };
 
     useEffect(() => {
-        if (isAdmin) fetchProducts();
+        if (!isAdmin) return;
+        supabase
+            .from('ESTOQUE_product')
+            .select('*')
+            .order('name', { ascending: true })
+            .then(({ data, error }) => {
+                if (data) setProducts(data as IProduct[]);
+                if (error) console.error("Erro ao carregar:", error);
+            });
     }, [isAdmin]);
 
     const handleSelect = (prod: IProduct | 'new') => {
@@ -53,7 +61,15 @@ export function useProductManager() {
         e.preventDefault();
         setLoading(true);
 
-        const payload: any = {
+        interface ProductPayload {
+            name: string;
+            type: string;
+            price: number;
+            weightAlt: number;
+            id?: number;
+        }
+
+        const payload: ProductPayload = {
             name: formData.name.toUpperCase().trim(),
             type: formData.type,
             price: parseFloat(formData.price) || 0,

@@ -2,9 +2,15 @@
 
 import styles from './ProjectionDetail.module.css';
 
+interface DetailProjectionItem {
+  id: string | number;
+  quant: number;
+  ESTOQUE_product?: { name: string } | null;
+}
+
 interface ProjectionDetailProps {
   selectedRef: string | null;
-  activeItems: any[];
+  activeItems: DetailProjectionItem[];
   onDelete: () => void;
 }
 
@@ -42,7 +48,7 @@ export default function ProjectionDetail({
             </tr>
           </thead>
           <tbody>
-            {activeItems.map((item: any) => (
+            {activeItems.map((item) => (
               <tr key={item.id}>
                 <td className={styles.prodName}>{item.ESTOQUE_product?.name}</td>
                 <td className={styles.prodQuant}>{item.quant.toFixed(2)} KG</td>

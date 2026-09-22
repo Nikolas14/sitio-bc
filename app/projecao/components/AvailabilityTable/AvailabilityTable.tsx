@@ -2,7 +2,15 @@
 
 import styles from './AvailabilityTable.module.css';
 
-export default function AvailabilityTable({ data }: { data: any[] }) {
+interface AvailabilityItem {
+  product_id: number | string;
+  product_name: string;
+  estoque_real: number;
+  total_projetado: number;
+  saldo_previsto: number;
+}
+
+export default function AvailabilityTable({ data }: { data: AvailabilityItem[] }) {
   return (
     <div className={styles.grid}>
       {data.map((item) => {

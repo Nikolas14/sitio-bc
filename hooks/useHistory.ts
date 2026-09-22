@@ -1,23 +1,26 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
+import { IOperation } from '@/types';
 
 export type Period = 'yesterday' | '3d' | '7d'  | '15d' | '30d' | 'all';
 
 export function useHistory(productId: number | null, period: Period) {
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<IOperation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchHistory = useCallback(async () => {
     if (!productId) {
+      await Promise.resolve();
       setHistory([]);
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
     try {
+      await Promise.resolve();
+      setLoading(true);
+      setError(null);
+
       let query = supabase
         .from('ESTOQUE_operation')
         .select(`
@@ -50,10 +53,11 @@ export function useHistory(productId: number | null, period: Period) {
 
       if (supabaseError) throw supabaseError;
 
-      setHistory(data || []);
-    } catch (err: any) {
-      console.error("Erro ao buscar histórico:", err.message);
-      setError(err.message);
+      setHistory((data as unknown as IOperation[]) || []);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("Erro ao buscar histórico:", message);
+      setError(message);
     } finally {
       setLoading(false);
     }

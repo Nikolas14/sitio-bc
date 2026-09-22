@@ -18,7 +18,8 @@ export default function EstoqueReportPage() {
 
   // Agrupamento dos dados corrigido
   const groupedData = useMemo(() => {
-    const groups: Record<string, any[]> = {};
+    type GrupoItem = { id: number; name: string; current_stock: number };
+    const groups: Record<string, GrupoItem[]> = {};
 
     // USAR 'products' que vem do hook, não 'inventory'
     products.forEach((item) => {

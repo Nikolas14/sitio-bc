@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
+import type { IProjectionItem } from './useProjectionsList';
 
 export function useProjectionsManager() {
-  const [projections, setProjections] = useState<any[]>([]);
+  const [projections, setProjections] = useState<IProjectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRef, setSelectedRef] = useState<string | null>(null);
   
@@ -19,17 +20,24 @@ export function useProjectionsManager() {
       .select(`*, ESTOQUE_product ( name )`)
       .order('created_at', { ascending: false });
 
-    if (!error) setProjections(data || []);
+    if (!error) setProjections((data as IProjectionItem[]) || []);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchProjections();
-  }, [fetchProjections]);
+    supabase
+      .from('ESTOQUE_projection')
+      .select(`*, ESTOQUE_product ( name )`)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (!error) setProjections((data as IProjectionItem[]) || []);
+        setLoading(false);
+      });
+  }, []);
 
   // Agrupamento automático
   const groupedProjections = useMemo(() => {
-    return projections.reduce((acc: any, item) => {
+    return projections.reduce((acc: Record<string, IProjectionItem[]>, item) => {
       const ref = item.reference || 'Sem Referência';
       if (!acc[ref]) acc[ref] = [];
       acc[ref].push(item);

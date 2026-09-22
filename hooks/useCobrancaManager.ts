@@ -36,7 +36,7 @@ export function useCobrancaManager(id: string) {
   const isLocked = useMemo(() => {
     if (!trans) return true;
     return ['ENVIADO', 'COBRADO', 'CONCLUIDO'].includes(trans.status);
-  }, [trans?.status]);
+  }, [trans]);
 
   // Cálculos financeiros centralizados
   const financial = useMemo(() => {
@@ -48,7 +48,6 @@ export function useCobrancaManager(id: string) {
     }, 0);
 
     const discountValue = sub * (Number(trans.discount_percent || 0) / 100);
-    setDiscount(discountValue); // Sincroniza o desconto calculado com o estado local
     const final = (sub - discountValue) + Number(tax) + Number(shipping);
     const paid = Number(trans.paid_amount || 0);
 
@@ -60,6 +59,10 @@ export function useCobrancaManager(id: string) {
       remaining: Math.max(0, final - paid)
     };
   }, [trans, items, tax, shipping]);
+
+  useEffect(() => {
+    setDiscount(financial.discountValue);
+  }, [financial.discountValue]);
 
   // Atualiza status e taxas (Força refresh para travar a tela se necessário)
   const updateStatus = async (newStatus: ITransaction['status']) => {

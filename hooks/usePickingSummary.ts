@@ -3,8 +3,18 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
 
+interface PickingProjection {
+  quant: number | string;
+  ESTOQUE_product?: { id: number | string; name: string } | null;
+}
+
+interface ConsolidatedItem {
+  name: string;
+  total: number;
+}
+
 export function usePickingSummary() {
-  const [projections, setProjections] = useState<any[]>([]);
+  const [projections, setProjections] = useState<PickingProjection[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -14,21 +24,28 @@ export function usePickingSummary() {
       .select(`quant, ESTOQUE_product ( id, name )`)
       .eq('status', 'ABERTO');
 
-    setProjections(data || []);
+    setProjections((data as unknown as PickingProjection[]) || []);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    supabase
+      .from('ESTOQUE_projection')
+      .select(`quant, ESTOQUE_product ( id, name )`)
+      .eq('status', 'ABERTO')
+      .then(({ data }) => {
+        setProjections((data as unknown as PickingProjection[]) || []);
+        setLoading(false);
+      });
+  }, []);
 
   const consolidated = useMemo(() => {
-    const map = new Map();
+    const map = new Map<number | string | undefined, ConsolidatedItem>();
     projections.forEach(item => {
       const prodId = item.ESTOQUE_product?.id;
-      const name = item.ESTOQUE_product?.name;
+      const name = item.ESTOQUE_product?.name ?? 'Desconhecido';
       const current = map.get(prodId) || { name, total: 0 };
-      
+
       map.set(prodId, {
         name,
         total: current.total + Number(item.quant)

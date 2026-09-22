@@ -3,14 +3,15 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './CobrancaTable.module.css';
+import { ITransaction } from '@/types';
 
 interface CobrancaTableProps {
-  transactions: any[];
+  transactions: ITransaction[];
   loading: boolean;
 }
 
 type SortConfig = {
-  key: string;
+  key: keyof ITransaction;
   direction: 'asc' | 'desc';
 } | null;
 
@@ -26,10 +27,17 @@ export default function CobrancaTable({ transactions, loading }: CobrancaTablePr
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
 
-        if (aValue < bValue) {
+        if (aValue == null && bValue == null) return 0;
+        if (aValue == null) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (bValue == null) return sortConfig.direction === 'asc' ? 1 : -1;
+
+        const aStr = String(aValue);
+        const bStr = String(bValue);
+
+        if (aStr < bStr) {
           return sortConfig.direction === 'asc' ? -1 : 1;
         }
-        if (aValue > bValue) {
+        if (aStr > bStr) {
           return sortConfig.direction === 'asc' ? 1 : -1;
         }
         return 0;
@@ -38,7 +46,7 @@ export default function CobrancaTable({ transactions, loading }: CobrancaTablePr
     return sortableItems;
   }, [transactions, sortConfig]);
 
-  const requestSort = (key: string) => {
+  const requestSort = (key: keyof ITransaction) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -47,7 +55,7 @@ export default function CobrancaTable({ transactions, loading }: CobrancaTablePr
   };
 
   // Função auxiliar para renderizar o ícone de ordenação
-  const getSortIcon = (key: string) => {
+  const getSortIcon = (key: keyof ITransaction) => {
     if (sortConfig?.key !== key) return '↕️';
     return sortConfig.direction === 'asc' ? '🔼' : '🔽';
   };

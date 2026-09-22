@@ -15,16 +15,14 @@ const ProductHistoryTable = ({ history, loading }: ProductHistoryTableProps) => 
       (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     );
 
-    let runningBalance = 0;
+    type HistoryWithBalance = IOperation & { balanceAfter: number };
 
-    const computed = sortedHistory.map((op) => {
-      if (op.type === 'IN') {
-        runningBalance += Number(op.quant);
-      } else {
-        runningBalance -= Number(op.quant);
-      }
-      return { ...op, balanceAfter: runningBalance };
-    });
+    const computed = sortedHistory.reduce<HistoryWithBalance[]>((acc, op) => {
+      const prevBalance = acc.length > 0 ? acc[acc.length - 1].balanceAfter : 0;
+      const delta = Number(op.quant);
+      const balanceAfter = op.type === 'IN' ? prevBalance + delta : prevBalance - delta;
+      return [...acc, { ...op, balanceAfter }];
+    }, []);
 
     return computed.reverse();
   }, [history]);

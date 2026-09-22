@@ -1,18 +1,17 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { 
-  Package, 
-  ShoppingCart, 
-  Database, 
-  History, 
-  FileText, 
-  TrendingUp, 
-  List, 
-  BarChart3, 
-  Scale, 
-  PlusCircle, 
-  Tags, 
+import {
+  Package,
+  ShoppingCart,
+  Database,
+  History,
+  FileText,
+  TrendingUp,
+  List,
+  BarChart3,
+  PlusCircle,
+  Tags,
   Info,
   Users
   ,ClipboardList

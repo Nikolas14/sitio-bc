@@ -6,7 +6,7 @@ interface ReceiptSummaryProps {
   financial: {
     sub: number;
     discountValue: number;
-    subWithDiscount: number;
+    subWithDiscount?: number;
     final: number;
     paid: number;
     remaining: number;

@@ -2,8 +2,13 @@
 
 import { supabase } from '@/api/supabase';
 
+interface DeleteItem {
+  quant: number | string;
+  product_id?: number | string | null;
+}
+
 export function useDeleteTransaction() {
-  const deleteTransaction = async (transactionId: string, items: any[], type: 'IN' | 'OUT') => {
+  const deleteTransaction = async (transactionId: string, items: DeleteItem[], type: 'IN' | 'OUT') => {
     try {
       // 1. Estornar o estoque para cada item
       for (const item of items) {
