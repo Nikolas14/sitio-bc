@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local spreadsheets may contain personal data
+golem do nikolas/*.xlsx
+golem do nikolas/*.xls
+
 # vercel
 .vercel
 
