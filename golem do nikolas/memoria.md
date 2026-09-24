@@ -48,3 +48,31 @@
 - [ ] Mapear tabelas e criar RPCs de venda/cobrança no painel Supabase
 - [ ] Implementar item 1 (RLS + senha fora do client)
 - [ ] Rodar `npm run lint` após cada bloco de mudanças
+
+## Registro da sessão — 15/09/2026
+
+### Clientes
+- Criada a rota `/cadastro/cliente`, seguindo o padrão `Sidebar + Main` do projeto.
+- Cadastro permite criar, editar, excluir e pesquisar clientes por nome, CPF, telefone ou cidade.
+- Campos baseados na aba `CADASTRO` da planilha: nome, CPF, endereço, CEP, telefone, cidade, aeroporto, retirada, CPF da retirada, retirada alternativa, CPF da retirada alternativa e observações.
+- Tabela Supabase prevista: `ESTOQUE_customer`. O esquema está em `supabase/customers.sql`, com `id` UUID e timestamps automáticos.
+- Nome e todos os campos textuais são convertidos para maiúsculas antes de salvar; os campos também aparecem em maiúsculas na tela.
+- Para importar clientes existentes, exportar a aba `CADASTRO` como CSV UTF-8 e mapear para os campos snake_case da tabela. Não importar `id`, `created_at` ou `updated_at`.
+
+### Impressão de pedidos
+- Criada a rota `/pedidos`, disponível no dashboard como `Imprimir pedido`.
+- Fluxo: selecionar um cliente, colar o texto recebido em um campo livre e imprimir uma prévia com os dados do cliente e os itens linha a linha.
+- O texto do pedido não é salvo no Supabase nesta primeira versão.
+- Produtos podem ser livres/diferentes do cadastro de produtos; não fazer parsing rígido do texto.
+- Depois que a janela de impressão é encerrada (`afterprint`), o cliente, a busca e o texto do pedido são limpos.
+
+### Próximo módulo: funcionários e folha de pagamento
+- Cadastro de funcionários com os campos: `NOME` (obrigatório), `ABATE 01`, `ABATE 02`, `TELEFONE`, `CPF`, `RG`, `TIPO PIX`, `CHAVE PIX`, `BANCO`, `OBS`, `APELIDO` e `SEXO`.
+- `ABATE 01` é o grupo de WhatsApp do frango; `ABATE 02` é o grupo de WhatsApp do boi.
+- Frango e boi acontecem em dias diferentes; o funcionário pode trabalhar em apenas um ou nos dois.
+- Diária padrão para ambos: R$ 150,00.
+- No dia do frango, se o funcionário receber um frango, descontar R$ 10,00 da diária.
+- Frequência deve registrar somente se trabalhou ou não.
+- Fechamento semanal, com possibilidade de valor extra para mais ou menos.
+- Saída desejada: folha de pagamento para impressão.
+- Ainda confirmar: se extra é manual positivo/negativo, se terá justificativa, se deve registrar o recebimento do frango por dia, colunas exatas da folha e se os funcionários existentes serão importados.
