@@ -1,16 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
+import { ITransaction } from '@/types';
 
 export function useCobrancas() {
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchCobrancas = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
-
       const { data, error: supabaseError } = await supabase
         .from('ESTOQUE_transaction')
         .select('*')
@@ -19,12 +17,11 @@ export function useCobrancas() {
 
       if (supabaseError) throw supabaseError;
 
-    //   console.log("💰 Cobranças carregadas:", data);
-      setTransactions(data || []);
-      
-    } catch (err: any) {
-      console.error('Erro no Hook useCobrancas:', err);
-      setError(err.message);
+      setTransactions((data as ITransaction[]) || []);
+      setError(null);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -34,10 +31,10 @@ export function useCobrancas() {
     fetchCobrancas();
   }, [fetchCobrancas]);
 
-  return { 
-    transactions, 
-    loading, 
-    error, 
-    refresh: fetchCobrancas 
+  return {
+    transactions,
+    loading,
+    error,
+    refresh: fetchCobrancas
   };
-}''
+}

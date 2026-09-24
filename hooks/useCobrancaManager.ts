@@ -36,7 +36,7 @@ export function useCobrancaManager(id: string) {
   const isLocked = useMemo(() => {
     if (!trans) return true;
     return ['ENVIADO', 'COBRADO', 'CONCLUIDO'].includes(trans.status);
-  }, [trans?.status]);
+  }, [trans]);
 
   // Cálculos financeiros centralizados
   const financial = useMemo(() => {
@@ -48,7 +48,6 @@ export function useCobrancaManager(id: string) {
     }, 0);
 
     const discountValue = sub * (Number(trans.discount_percent || 0) / 100);
-    setDiscount(discountValue); // Sincroniza o desconto calculado com o estado local
     const final = (sub - discountValue) + Number(tax) + Number(shipping);
     const paid = Number(trans.paid_amount || 0);
 
@@ -60,6 +59,10 @@ export function useCobrancaManager(id: string) {
       remaining: Math.max(0, final - paid)
     };
   }, [trans, items, tax, shipping]);
+
+  useEffect(() => {
+    setDiscount(financial.discountValue);
+  }, [financial.discountValue]);
 
   // Atualiza status e taxas (Força refresh para travar a tela se necessário)
   const updateStatus = async (newStatus: ITransaction['status']) => {
@@ -77,8 +80,8 @@ export function useCobrancaManager(id: string) {
     setIsProcessing(false);
   };
 
-  const registrarPagamento = async () => {
-    if (newPayment <= 0 || !trans) return;
+  const registrarPagamento = async (): Promise<boolean> => {
+    if (newPayment <= 0 || !trans) return false;
     setIsProcessing(true);
 
     const totalPago = (Number(trans.paid_amount) || 0) + newPayment;
@@ -92,21 +95,24 @@ export function useCobrancaManager(id: string) {
     if (!payError) {
       setNewPayment(0);
       await refresh();
+      setIsProcessing(false);
+      return true;
     }
     setIsProcessing(false);
+    return false;
   };
 
   // Geração de Imagem (Recebe o elemento HTML puro para evitar erro de RefObject)
-  const gerarImagem = async (element: HTMLDivElement | null) => {
-    if (!element || !trans) return;
+  const gerarImagem = async (element: HTMLDivElement | null): Promise<boolean> => {
+    if (!element || !trans) return false;
 
     try {
       setIsProcessing(true);
-      const dataUrl = await htmlToImage.toPng(element, { 
-        backgroundColor: '#ffffff', 
-        pixelRatio: 3 
+      const dataUrl = await htmlToImage.toPng(element, {
+        backgroundColor: '#ffffff',
+        pixelRatio: 3
       });
-      
+
       const link = document.createElement('a');
       link.download = `RECIBO-${trans.customer_vendor}-${trans.serial_number || id.slice(0,5)}`.toUpperCase() + '.png';
       link.href = dataUrl;
@@ -116,8 +122,9 @@ export function useCobrancaManager(id: string) {
       if (trans.status === 'ENVIADO') {
         await updateStatus('COBRADO');
       }
-    } catch (e) {
-      console.error("Erro ao gerar imagem:", e);
+      return true;
+    } catch {
+      return false;
     } finally {
       setIsProcessing(false);
     }

@@ -16,8 +16,10 @@ import TransactionFinanceSummary from './components/TransactionFinanceSummary/Tr
 import TransactionReceiptHeader from './components/TransactionReceiptHeader/TransactionReceiptHeader';
 import DeleteTransactionModal from './components/DeleteTransactionModal/DeleteTransactionModal';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { useToast } from '@/components/Toast/Toast';
 
 export default function TransacoesInterface() {
+  const toast = useToast();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -46,23 +48,24 @@ export default function TransacoesInterface() {
 
   // Função para Deletar
   const handleConfirmDelete = async (password: string) => {
-    const MINHA_SENHA_MESTRA = process.env.NEXT_PUBLIC_ADMIN_PASSWORD
+    const { verifyAdminPassword } = await import('@/utils/adminAuth');
+    const ok = await verifyAdminPassword(password);
 
-    if (password !== MINHA_SENHA_MESTRA) {
-      alert("Senha de administrador incorreta!");
+    if (!ok) {
+      toast.error("Senha de administrador incorreta!");
       return;
     }
 
     if (active) {
       setIsDeleting(true);
       const res = await deleteTransaction(active.id, items, active.type);
-      
+
       if (res.success) {
-        alert("Sucesso! Transação removida e estoque estornado.");
+        toast.success("Sucesso! Transação removida e estoque estornado.");
         setSelectedId(null);
         refresh(); // Atualiza a lista sem recarregar a página
       } else {
-        alert("Erro técnico ao tentar deletar.");
+        toast.error("Erro técnico ao tentar deletar.");
       }
       
       setIsDeleting(false);

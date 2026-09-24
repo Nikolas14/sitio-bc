@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
-import { ITransaction } from '@/types';
+import { ITransaction, IReceiptItem } from '@/types';
 
 export function useCobranca(id: string | string[] | undefined) {
   const [trans, setTrans] = useState<ITransaction | null>(null);
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<IReceiptItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,10 +35,10 @@ export function useCobranca(id: string | string[] | undefined) {
       if (iError) throw iError;
 
       setTrans(tData as ITransaction);
-      setItems(iData || []);
-    } catch (err: any) {
-      console.error("Erro ao carregar detalhes:", err);
-      setError(err.message);
+      setItems((iData as unknown as IReceiptItem[]) || []);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setLoading(false);
     }

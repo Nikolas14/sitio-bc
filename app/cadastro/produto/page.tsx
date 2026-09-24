@@ -6,22 +6,41 @@ import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
 import { useProductManager } from '@/hooks/useProductManager';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { useToast } from '@/components/Toast/Toast';
 
 export default function GerenciadorProdutos() {
     const router = useRouter();
+    const toast = useToast();
     const {
         isAdmin, adminPassword, setAdminPassword, handleAdminConfirm,
-        loading, searchTerm, setSearchTerm, filteredProducts,
+        loading, error, searchTerm, setSearchTerm, filteredProducts,
         selectedId, setSelectedId, formData, setFormData,
         handleSelect, handleSave, handleDelete
     } = useProductManager();
+
+    const onConfirmPassword = async () => {
+        const ok = await handleAdminConfirm();
+        if (!ok) toast.error('Senha incorreta!');
+    };
+
+    const onSave = async (e: React.FormEvent) => {
+        const ok = await handleSave(e);
+        if (ok) toast.success('Produto salvo com sucesso!');
+        else toast.error(`Erro ao salvar: ${error ?? 'tente novamente.'}`);
+    };
+
+    const onDelete = async () => {
+        const ok = await handleDelete();
+        if (ok) toast.success('Produto excluído.');
+        else toast.error(`Erro ao excluir: ${error ?? 'produto pode estar vinculado a movimentações.'}`);
+    };
 
     if (!isAdmin) {
         return (
             <AdminPasswordModal
                 password={adminPassword}
                 setPassword={setAdminPassword}
-                onConfirm={() => handleAdminConfirm(process.env.NEXT_PUBLIC_ADMIN_PASSWORD || '')}
+                onConfirm={onConfirmPassword}
                 onCancel={() => router.back()}
             />
         );
@@ -65,7 +84,7 @@ export default function GerenciadorProdutos() {
 
             <Main className={styles.formArea}>
                 {selectedId ? (
-                    <form onSubmit={handleSave} className={styles.formCard}>
+                    <form onSubmit={onSave} className={styles.formCard}>
                         <div className={styles.formHeader}>
                             <h2>{selectedId === 'new' ? 'Novo Cadastro' : 'Editar Produto'}</h2>
                             <p>{selectedId === 'new' ? 'Preencha os campos para criar o item.' : `Editando ID #${selectedId}`}</p>
@@ -119,7 +138,7 @@ export default function GerenciadorProdutos() {
 
                         <div className={styles.formActions}>
                             {selectedId !== 'new' && (
-                                <button type="button" className={styles.btnDelete} onClick={handleDelete} disabled={loading}>
+                                <button type="button" className={styles.btnDelete} onClick={onDelete} disabled={loading}>
                                     Excluir Produto
                                 </button>
                             )}

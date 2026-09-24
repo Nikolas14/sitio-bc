@@ -9,6 +9,7 @@ export function useInventory() {
 
   const fetchInventory = useCallback(async () => {
     try {
+      await Promise.resolve();
       setLoading(true);
       setError(null);
 
@@ -20,14 +21,14 @@ export function useInventory() {
       if (supabaseError) throw supabaseError;
 
       // --- LOG DE DEBUG (O lado 'Fetch' do híbrido) ---
-      // console.log("📦 View Supabase:", data); 
+      // console.log("📦 View Supabase:", data);
 
       // Forçamos a tipagem para garantir que o array siga a interface IProduct
       setProducts((data as IProduct[]) || []);
-      
-    } catch (err: any) {
-      console.error('❌ Erro no Hook useInventory:', err);
-      setError(err.message);
+
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/api/supabase';
+import { useState, useMemo } from 'react';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import SideFooter from '@/components/SideFooter/SideFooter';
 import StatusFilter from '@/components/StatusFilter/StatusFilter';

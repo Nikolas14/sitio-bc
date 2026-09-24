@@ -2,13 +2,14 @@
 
 import { forwardRef } from 'react';
 import styles from './ProjectionManualForm.module.css';
+import type { IProduct } from '@/types';
 
 interface ProjectionManualFormProps {
   manualId: string;
   setManualId: (val: string) => void;
   manualQuant: string;
   setManualQuant: (val: string) => void;
-  previewProduct: any;
+  previewProduct: IProduct | null | undefined;
   addManualItem: () => void;
   lastError: string | null;
   totalKg: number;

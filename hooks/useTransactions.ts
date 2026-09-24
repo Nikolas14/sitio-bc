@@ -9,6 +9,7 @@ export function useTransactions() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDate, setFilterDate] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   // Busca inicial das transações
   const fetchTransactions = async () => {
@@ -18,14 +19,31 @@ export function useTransactions() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) console.error('Erro ao buscar transações:', error);
+    if (error) {
+      setError(error.message);
+    } else {
+      setError(null);
+    }
 
-    setTransactions(data || []);
+    setTransactions((data as unknown as ITransaction[]) || []);
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchTransactions();
+    supabase
+      .from('ESTOQUE_transaction')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) {
+          setError(error.message);
+        } else {
+          setError(null);
+        }
+
+        setTransactions((data as unknown as ITransaction[]) || []);
+        setLoading(false);
+      });
   }, []);
 
   // Lógica de filtragem memoizada para performance
@@ -40,6 +58,7 @@ export function useTransactions() {
   return {
     transactions: filteredTransactions,
     loading,
+    error,
     searchTerm,
     setSearchTerm,
     filterDate,

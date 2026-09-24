@@ -2,8 +2,13 @@
 
 import styles from './ProjectionSidebarNav.module.css';
 
+interface SidebarProjectionItem {
+  quant: number | string;
+  created_at: string;
+}
+
 interface ProjectionSidebarNavProps {
-  groupedProjections: Record<string, any[]>;
+  groupedProjections: Record<string, SidebarProjectionItem[]>;
   selectedRef: string | null;
   setSelectedRef: (ref: string) => void;
 }
@@ -27,7 +32,7 @@ export const ProjectionSidebarNav = ({
         {entries.map(([ref, items]) => {
           // Cálculo do total de cada item da lista
           const totalKg = items.reduce(
-            (acc: number, i: any) => acc + Number(i.quant), 
+            (acc: number, i: SidebarProjectionItem) => acc + Number(i.quant),
             0
           );
 

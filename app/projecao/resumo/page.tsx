@@ -19,7 +19,6 @@ export default function ResumoProjecaoPage() {
         <HeaderPadrao titulo="Resumo" />
         <PickingSidebarStats
           totalKg={totalGeral}
-          totalItems={consolidated.length}
           onPrint={() => window.print()}
         />
         <SideFooter onRefresh={refresh} />

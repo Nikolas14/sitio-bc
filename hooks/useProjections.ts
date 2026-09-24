@@ -22,6 +22,7 @@ export function useProjections() {
 
   const fetchProjections = useCallback(async () => {
     try {
+      await Promise.resolve();
       setLoading(true);
       setError(null);
 
@@ -37,10 +38,10 @@ export function useProjections() {
 
       if (sbError) throw sbError;
 
-      setProjections(data || []);
-    } catch (err: any) {
-      console.error('Erro ao buscar projeções:', err.message);
-      setError(err.message);
+      setProjections((data as IProjection[]) || []);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -1,11 +1,11 @@
 'use client';
 import React, { forwardRef } from 'react';
 import styles from './PrintTemplate.module.css';
-import { ITransaction } from '@/types';
+import { ITransaction, IReceiptItem } from '@/types';
 
 type Props = {
   trans: ITransaction;
-  items: any[];
+  items: IReceiptItem[];
   financial: {
     sub: number;
     discountValue: number;
@@ -15,9 +15,10 @@ type Props = {
   };
   shipping: number;
   tax: number;
+  discount: number;
 };
 
-export const PrintTemplate = forwardRef<HTMLDivElement, any>(({ trans, items, financial, shipping, tax, discount }, ref) => {
+export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, financial, shipping, tax, discount }, ref) => {
   const formatCurrency = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
 
   return (
@@ -48,7 +49,7 @@ export const PrintTemplate = forwardRef<HTMLDivElement, any>(({ trans, items, fi
             </tr>
           </thead>
           <tbody>
-            {items.map((item: any, i: number) => (
+            {items.map((item, i: number) => (
               <tr key={i}>
                 <td>{item.ESTOQUE_product?.name}</td>
                 <td className={styles.textCenter}>{item.quant}</td>

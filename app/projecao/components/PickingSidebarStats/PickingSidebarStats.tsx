@@ -4,14 +4,12 @@ import styles from './PickingSidebarStats.module.css';
 
 interface PickingSidebarStatsProps {
   totalKg: number;
-  totalItems: number;
   onPrint: () => void;
 }
 
-export const PickingSidebarStats = ({ 
-  totalKg, 
-  totalItems, 
-  onPrint 
+export const PickingSidebarStats = ({
+  totalKg,
+  onPrint
 }: PickingSidebarStatsProps) => {
   return (
     <div className={styles.statsContainer}>

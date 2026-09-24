@@ -27,14 +27,23 @@ export function useProjectionsList() {
       .order('created_at', { ascending: false });
 
     if (!error) {
-      setProjections(data || []);
+      setProjections((data as IProjectionItem[]) || []);
     }
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchProjections();
-  }, [fetchProjections]);
+    supabase
+      .from('ESTOQUE_projection')
+      .select(`*, ESTOQUE_product ( name )`)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (!error) {
+          setProjections((data as IProjectionItem[]) || []);
+        }
+        setLoading(false);
+      });
+  }, []);
 
   // Agrupa os itens por referência automaticamente
   const groupedProjections = useMemo(() => {

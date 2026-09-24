@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
+import type { CartItem } from '../../../components/InventoryCart/InventoryCart';
 
 import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../../../components/InventoryCart/InventoryCart';
@@ -12,15 +13,17 @@ import FinancialSummary from '../components/FinancialSummary/FinancialSummary';
 import DiscountInput from '../../../components/DiscountInput/DiscountInput';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { useToast } from '@/components/Toast/Toast';
 
 import styles from './page.module.css';
 
 export default function VendaSimplificadaPage() {
   const { products } = useInventory();
+  const toast = useToast();
 
   const [customer, setCustomer] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
@@ -28,13 +31,61 @@ export default function VendaSimplificadaPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const financial = useMemo(() => {
-    const subtotal = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
+    const subtotal = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
     const discountVal = subtotal * (discountPercent / 100);
     const totalFinal = subtotal - discountVal;
 
     return { subtotal, totalKg, discountVal, totalFinal };
   }, [items, discountPercent]);
+
+  const finalizarVenda = useCallback(async () => {
+    if (items.length === 0) return;
+    setLoading(true);
+
+    try {
+      const { data: trans, error: transError } = await supabase
+        .from('ESTOQUE_transaction')
+        .insert([{
+          type: 'OUT',
+          customer_vendor: customer || 'VENDA_AVULSA',
+          total_price: financial.subtotal, // Salvamos o BRUTO
+          total_kg: financial.totalKg,
+          discount_percent: discountPercent,
+          status: 'PENDENTE'
+        }])
+        .select()
+        .single();
+
+      if (transError) throw transError;
+
+      const operations = items.map(item => ({
+        transaction_id: trans.id,
+        product_id: item.productId,
+        type: 'OUT',
+        quant: item.weightKg
+      }));
+
+      const { error: opError } = await supabase
+        .from('ESTOQUE_operation')
+        .insert(operations);
+
+      if (opError) throw opError;
+
+      toast.success("Venda realizada com sucesso!");
+      setItems([]);
+      setCustomer('');
+      setDiscountPercent(0);
+      inputRef.current?.focus();
+
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setLastError(message);
+      toast.error("Erro ao salvar: " + message);
+    } finally {
+      setLoading(false);
+    }
+  }, [items, customer, financial, discountPercent, toast]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -45,7 +96,7 @@ export default function VendaSimplificadaPage() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [items, loading, financial]);
+  }, [items, loading, financial, finalizarVenda]);
 
   const handleBarcode = (val: string) => {
     setBarcode(val);
@@ -96,52 +147,6 @@ export default function VendaSimplificadaPage() {
 
     return Object.entries(summary).map(([name, total]) => ({ name, total }));
   }, [items]);
-
-  const finalizarVenda = async () => {
-    if (items.length === 0) return;
-    setLoading(true);
-
-    try {
-      const { data: trans, error: transError } = await supabase
-        .from('ESTOQUE_transaction')
-        .insert([{
-          type: 'OUT',
-          customer_vendor: customer || 'VENDA_AVULSA',
-          total_price: financial.subtotal, // Salvamos o BRUTO
-          total_kg: financial.totalKg,
-          discount_percent: discountPercent,
-          status: 'PENDENTE'
-        }])
-        .select()
-        .single();
-
-      if (transError) throw transError;
-
-      const operations = items.map(item => ({
-        transaction_id: trans.id,
-        product_id: item.productId,
-        type: 'OUT',
-        quant: item.weightKg
-      }));
-
-      const { error: opError } = await supabase
-        .from('ESTOQUE_operation')
-        .insert(operations);
-
-      if (opError) throw opError;
-
-      alert("Venda realizada com sucesso!");
-      setItems([]);
-      setCustomer('');
-      setDiscountPercent(0);
-      inputRef.current?.focus();
-
-    } catch (err: any) {
-      alert("Erro ao salvar: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <PageLayout>

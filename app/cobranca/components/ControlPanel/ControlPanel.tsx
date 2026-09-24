@@ -3,6 +3,14 @@
 import styles from './ControlPanel.module.css';
 import { ITransaction } from '@/types';
 
+interface FinancialSummary {
+    sub: number;
+    discountValue: number;
+    final: number;
+    paid: number;
+    remaining: number;
+}
+
 interface ControlPanelProps {
     trans: ITransaction;
     shipping: number;
@@ -19,7 +27,7 @@ interface ControlPanelProps {
     onRegistrarPagamento: () => void;
     setNewPayment: (val: number) => void;
     loading: boolean;
-    financial: any;
+    financial: FinancialSummary;
 
 }
 
@@ -106,7 +114,7 @@ export const ControlPanel = ({
                     </div>
 
                     {isEditable && (
-                        <button className={styles.btnSave} onClick={() => onUpdateStatus('ENVIADO')}>
+                        <button className={styles.btnSave} onClick={() => onUpdateStatus('ENVIADO')} disabled={loading}>
                             Salvar e Finalizar Custos
                         </button>
                     )}
@@ -120,6 +128,7 @@ export const ControlPanel = ({
                     <button
                         className={`${styles.btnDownload} ${trans.status !== 'ENVIADO' ? styles.btnOutline : ''}`}
                         onClick={onGerarImagem}
+                        disabled={loading}
                     >
                         {trans.status === 'CONCLUIDO' ? '🖼️ Baixar Recibo Final' : '🖼️ Baixar Comprovante Visual'}
                     </button>
@@ -139,7 +148,7 @@ export const ControlPanel = ({
                             placeholder="Valor R$"
                             onChange={e => setNewPayment(Number(e.target.value))}
                         />
-                        <button className={styles.btnConfirm} onClick={onRegistrarPagamento}>
+                        <button className={styles.btnConfirm} onClick={onRegistrarPagamento} disabled={loading}>
                             Confirmar
                         </button>
                     </div>

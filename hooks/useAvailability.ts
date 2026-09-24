@@ -3,8 +3,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
 
+interface AvailabilityRow {
+  product_id: number | string;
+  product_name: string;
+  estoque_real: number;
+  total_projetado: number;
+  saldo_previsto: number;
+  type?: string;
+}
+
 export function useAvailability() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<AvailabilityRow[]>([]);
   const [categories, setCategories] = useState<string[]>([]); // Nova lista aqui
   const [loading, setLoading] = useState(true);
 
@@ -22,8 +31,8 @@ export function useAvailability() {
       .from('ESTOQUE_product')
       .select('type');
 
-    if (viewResult) setData(viewResult);
-    
+    if (viewResult) setData(viewResult as AvailabilityRow[]);
+
     if (productResult) {
       const uniqueTypes = Array.from(
         new Set(productResult.map(p => p.type).filter(Boolean))
@@ -35,8 +44,24 @@ export function useAvailability() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    supabase
+      .from('ESTOQUE_v_estoque_vs_projecao')
+      .select('*')
+      .order('saldo_previsto', { ascending: true })
+      .then(({ data: viewResult }) => {
+        if (viewResult) setData(viewResult as AvailabilityRow[]);
+        return supabase.from('ESTOQUE_product').select('type');
+      })
+      .then(({ data: productResult }) => {
+        if (productResult) {
+          const uniqueTypes = Array.from(
+            new Set(productResult.map(p => p.type).filter(Boolean))
+          ) as string[];
+          setCategories(uniqueTypes.sort());
+        }
+        setLoading(false);
+      });
+  }, []);
 
   return { data, categories, loading, refresh: fetchData };
 }

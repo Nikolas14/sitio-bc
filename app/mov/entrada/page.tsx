@@ -1,23 +1,26 @@
 'use client';
 
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { parseScaleBarcode } from '@/utils/barcodeParser';
+import type { CartItem } from '../../../components/InventoryCart/InventoryCart';
 
 import BarcodeScanner from '../../../components/BarcodeScanner/BarcodeScanner';
 import InventoryCart from '../../../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../../../components/ButtonFinish/ButtonFinish';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { useToast } from '@/components/Toast/Toast';
 
 import styles from './page.module.css';
 
 export default function EntradaSimplificadaPage() {
   const { products } = useInventory();
+  const toast = useToast();
 
   const [customer, setCustomer] = useState('');
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
@@ -25,10 +28,57 @@ export default function EntradaSimplificadaPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const financial = useMemo(() => {
-    const subtotal = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
+    const subtotal = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
     return { subtotal, totalKg, totalFinal: subtotal };
   }, [items]);
+
+  const finalizarEntrada = useCallback(async () => {
+    if (items.length === 0) return;
+    setLoading(true);
+
+    try {
+      const { data: trans, error: transError } = await supabase
+        .from('ESTOQUE_transaction')
+        .insert([{
+          type: 'IN',
+          customer_vendor: customer || 'ENTRADA_AVULSA',
+          total_price: financial.totalFinal,
+          total_kg: financial.totalKg,
+          discount_percent: 0,
+          status: 'ENTRADA'
+        }])
+        .select()
+        .single();
+
+      if (transError) throw transError;
+
+      const operations = items.map(item => ({
+        transaction_id: trans.id,
+        product_id: item.productId,
+        type: 'IN',
+        quant: item.weightKg
+      }));
+
+      const { error: opError } = await supabase
+        .from('ESTOQUE_operation')
+        .insert(operations);
+
+      if (opError) throw opError;
+
+      toast.success("Entrada enviada com sucesso!");
+      setItems([]);
+      setCustomer('');
+      inputRef.current?.focus();
+
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setLastError(message);
+      toast.error("Erro ao salvar Entrada: " + message);
+    } finally {
+      setLoading(false);
+    }
+  }, [items, customer, financial, toast]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -39,7 +89,7 @@ export default function EntradaSimplificadaPage() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [items, loading]);
+  }, [items, loading, finalizarEntrada]);
 
   const handleBarcode = (val: string) => {
     setBarcode(val);
@@ -73,51 +123,6 @@ export default function EntradaSimplificadaPage() {
       
       setBarcode('');
       setLastError(null);
-    }
-  };
-
-  const finalizarEntrada = async () => {
-    if (items.length === 0) return;
-    setLoading(true);
-
-    try {
-      const { data: trans, error: transError } = await supabase
-        .from('ESTOQUE_transaction')
-        .insert([{
-          type: 'IN',
-          customer_vendor: customer || 'ENTRADA_AVULSA',
-          total_price: financial.totalFinal,
-          total_kg: financial.totalKg,
-          discount_percent: 0,
-          status: 'ENTRADA'
-        }])
-        .select()
-        .single();
-
-      if (transError) throw transError;
-
-      const operations = items.map(item => ({
-        transaction_id: trans.id,
-        product_id: item.productId,
-        type: 'IN',
-        quant: item.weightKg
-      }));
-
-      const { error: opError } = await supabase
-        .from('ESTOQUE_operation')
-        .insert(operations);
-
-      if (opError) throw opError;
-
-      alert("Entrada enviada com sucesso!");
-      setItems([]);
-      setCustomer('');
-      inputRef.current?.focus();
-
-    } catch (err: any) {
-      alert("Erro ao salvar Entrada: " + err.message);
-    } finally {
-      setLoading(false);
     }
   };
 

@@ -12,13 +12,16 @@ import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 import styles from './page.module.css';
 import { ProjectionManualForm } from './components/ProjectionManualForm/ProjectionManualForm';
+import type { CartItem } from '@/components/InventoryCart/InventoryCart';
+import { useToast } from '@/components/Toast/Toast';
 
 export default function ProjecaoEnvioPage() {
   const { products } = useInventory();
   const { refresh } = useProjections();
+  const toast = useToast();
 
   const [reference, setReference] = useState('');
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [manualId, setManualId] = useState('');
   const [manualQuant, setManualQuant] = useState('');
@@ -35,7 +38,7 @@ export default function ProjecaoEnvioPage() {
   // Cálculos consolidados (Peso e Preço)
   const financial = useMemo(() => {
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
-    const totalPrice = items.reduce((acc, item) => acc + (item.price * item.weightKg), 0);
+    const totalPrice = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
     return { totalKg, totalPrice };
   }, [items]);
 
@@ -78,13 +81,15 @@ export default function ProjecaoEnvioPage() {
       const { error } = await supabase.from('ESTOQUE_projection').insert(payload);
       if (error) throw error;
 
-      alert("Projeção salva com sucesso!");
+      toast.success("Projeção salva com sucesso!");
       setItems([]);
       setReference('');
       refresh();
       idInputRef.current?.focus();
-    } catch (err: any) {
-      alert("Erro ao salvar: " + err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setLastError(message);
+      toast.error("Erro ao salvar: " + message);
     } finally {
       setLoading(false);
     }

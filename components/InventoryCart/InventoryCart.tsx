@@ -2,18 +2,19 @@
 
 import styles from './InventoryCart.module.css';
 
-interface CartItem {
+export interface CartItem {
   tempId: string | number;
   productId: string | number;
   name: string;
   weightKg: number;
   price?: number; // Agora o preço é opcional
+  type?: string;
 }
 
 interface InventoryCartProps {
   tituloCart: string;
   items: CartItem[];
-  setItems: (items: CartItem[]) => void;
+  setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
   totalWeight: number;
   isVenda?: boolean; // Nova prop para saber se deve focar em valores
 }

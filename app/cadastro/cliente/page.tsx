@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
 import { useCustomerManager } from '@/hooks/useCustomerManager';
+import { useToast } from '@/components/Toast/Toast';
 import styles from './page.module.css';
 
 const fields = [
@@ -21,6 +24,49 @@ const fields = [
 
 export default function GerenciadorClientes() {
     const manager = useCustomerManager();
+    const toast = useToast();
+    const [password, setPassword] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [pendingAction, setPendingAction] = useState<'save' | 'delete' | null>(null);
+
+    const requestSave = (e: React.FormEvent) => {
+        e.preventDefault();
+        setPendingAction('save');
+        setShowModal(true);
+    };
+
+    const requestDelete = () => {
+        setPendingAction('delete');
+        setShowModal(true);
+    };
+
+    const cancelModal = () => {
+        setShowModal(false);
+        setPassword('');
+        setPendingAction(null);
+    };
+
+    const confirmModal = async () => {
+        const { verifyAdminPassword } = await import('@/utils/adminAuth');
+        const ok = await verifyAdminPassword(password);
+        if (!ok) {
+            toast.error('Senha de administrador incorreta!');
+            return;
+        }
+        setShowModal(false);
+        setPassword('');
+
+        if (pendingAction === 'save') {
+            const saveError = await manager.saveCustomer();
+            if (saveError === null) toast.success('Cliente salvo com sucesso!');
+            else toast.error(`Erro ao salvar cliente: ${saveError}`);
+        } else if (pendingAction === 'delete') {
+            const deleteError = await manager.deleteCustomer();
+            if (deleteError === null) toast.success('Cliente excluído.');
+            else toast.error(`Erro ao excluir cliente: ${deleteError}`);
+        }
+        setPendingAction(null);
+    };
 
     return (
         <PageLayout>
@@ -62,7 +108,7 @@ export default function GerenciadorClientes() {
 
             <Main className={styles.formArea}>
                 {manager.selectedId ? (
-                    <form onSubmit={manager.handleSave} className={styles.formCard}>
+                    <form onSubmit={requestSave} className={styles.formCard}>
                         <div className={styles.formHeader}>
                             <div>
                                 <span className={styles.eyebrow}>CADASTRO DE CLIENTES</span>
@@ -100,7 +146,7 @@ export default function GerenciadorClientes() {
                         </div>
 
                         <div className={styles.formActions}>
-                            {manager.selectedId !== 'new' && <button type="button" className={styles.btnDelete} onClick={manager.handleDelete} disabled={manager.loading}>Excluir cliente</button>}
+                            {manager.selectedId !== 'new' && <button type="button" className={styles.btnDelete} onClick={requestDelete} disabled={manager.loading}>Excluir cliente</button>}
                             <div className={styles.rightActions}>
                                 <button type="button" className={styles.btnCancel} onClick={() => manager.setSelectedId(null)}>Cancelar</button>
                                 <button type="submit" className={styles.btnSave} disabled={manager.loading}>{manager.loading ? 'Salvando...' : 'Salvar cliente'}</button>
@@ -116,6 +162,15 @@ export default function GerenciadorClientes() {
                     </div>
                 )}
             </Main>
+
+            {showModal && (
+                <AdminPasswordModal
+                    password={password}
+                    setPassword={setPassword}
+                    onConfirm={confirmModal}
+                    onCancel={cancelModal}
+                />
+            )}
         </PageLayout>
     );
 }
