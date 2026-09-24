@@ -84,6 +84,71 @@
 - [ ] Ativar RLS nas tabelas `ESTOQUE_*`
 - [ ] Rodar `npm run lint` + `npx tsc --noEmit` após cada bloco
 
+## Pendências atuais — lista de preços
+- [ ] Revisar o equilíbrio visual dos cards no catálogo
+- [ ] Ajustar a distribuição das cinco colunas no PDF vertical
+- [ ] Validar que cada seção fique separada sem espaços ou quebras ruins na impressão
+- [ ] Revisar cores, tamanhos de texto e contraste no PDF
+- [ ] Definir imagens finais dos produtos que ainda estão sem foto adequada
+
+## Próximo módulo — funcionários e folha de pagamento
+- [ ] Criar cadastro de funcionários
+- [ ] Criar ambiente do escritório para administração
+- [ ] Criar ambiente do galpão para lançamento da frequência
+- [ ] Definir vínculo do funcionário com os grupos de abate (`ABATE 01` e `ABATE 02`)
+- [ ] Criar controle de frequência por dia no galpão
+- [ ] Registrar o recebimento de frango junto à frequência do dia de abate
+- [ ] Distribuir automaticamente os frangos priorizando quem não recebeu no último abate
+- [ ] Controlar a quantidade disponível de frangos por abate
+- [ ] Criar fechamento semanal
+- [ ] Registrar extras no escritório, sem justificativa obrigatória
+- [ ] Calcular totais individuais para pagamento
+- [ ] Criar lista impressa com nome, valor a receber e Pix
+- [ ] Importar funcionários e dados existentes da planilha
+
+### Regras já definidas
+- Frequência operacional será lançada no galpão.
+- Administração, extras e fechamento semanal serão feitos no escritório.
+- Existem aproximadamente 28 funcionários e 14 frangos disponíveis para distribuição em um abate.
+- A distribuição deve priorizar quem não recebeu frango no abate anterior.
+- A distribuição considera somente os funcionários que trabalharam no dia.
+- O responsável no galpão pode aceitar ou ajustar a sugestão automática antes de confirmar.
+- Empates na prioridade serão resolvidos por sorteio.
+- Cada funcionário pode receber no máximo 1 frango por abate.
+- A quantidade de frangos será distribuída integralmente, sem sobras.
+- O recebimento do frango acontece junto com o lançamento da frequência no dia de abate de frango.
+- O fechamento deve gerar uma lista impressa com nome, valor a receber e chave Pix cadastrada.
+- Os funcionários existentes serão importados da planilha.
+- A diária será de R$ 150,00 para os dois tipos de abate.
+- O recebimento de frango gera desconto de R$ 10,00 na diária.
+- Um funcionário pode participar dos dois tipos de abate na mesma semana.
+- Extras podem ser positivos ou negativos, sem justificativa obrigatória, e podem ser lançados mais de uma vez na semana.
+- O fechamento semanal considera segunda a domingo.
+- O fechamento pode ser reaberto para ajustes.
+- O sistema registra quando o pagamento foi efetuado.
+- Escritório e galpão terão senhas diferentes.
+- O galpão pode alterar dados cadastrais dos funcionários, mas não valores financeiros.
+- A folha será uma lista única semanal, sem informar em qual abate o funcionário trabalhou.
+
+### Planilha de origem
+- Arquivo: `golem do nikolas/Funcionários Abate.xlsx`.
+- Aba `FUNCIONARIOS_DADOS`: cadastro principal com `NOME`, `ABATE 01`, `ABATE 02`, telefone, CPF, RG, tipo/chave Pix, banco, observações, apelido e sexo.
+- Aba `SHMILI`: relação de funcionários e grupos de abate, com observações operacionais.
+- Aba `FOLHA_PAGAMENTO`: modelo antigo com nome, total, Pix e tipo de Pix.
+- Aba `DIARIAS_ABATE`: histórico/modelo de cálculo com diária, frango, recebimento de frango, boi, cortes, extra e total.
+- Aba `NAO MEXER SO VER`: listas auxiliares usadas pela planilha.
+- Aba `IMPRIMIR`: lista auxiliar de presença de boi.
+- Aba `cadastro`: cadastro complementar de pessoas, incluindo observações de inclusão em grupos.
+- A importação deve priorizar `FUNCIONARIOS_DADOS`, usando as demais abas para complementar dados e validar grupos/Pix.
+
+### Ambientes de funcionários
+- `/funcionario/escritorio` usa a variável server-only `OFFICE_PASSWORD`.
+- `/funcionario/galpao` usa a variável server-only `GALPAO_PASSWORD`.
+- O escritório concentra cadastro, extras e fechamento semanal.
+- O galpão concentra frequência e sugestão/ajuste da distribuição de frangos.
+- As duas senhas ainda precisam ser cadastradas no `.env.local` e na hospedagem.
+- Temporariamente, `/funcionario/escritorio` e `/funcionario/galpao` usam `ADMIN_PASSWORD` como fallback até serem definidas senhas próprias.
+
 ## Registro da sessão — 15/09/2026
 
 ### Clientes

@@ -14,38 +14,47 @@ import {
   Tags,
   Info,
   Users
-  ,ClipboardList
+   ,ClipboardList, UserRound
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
 export default function Dashboard() {
   const router = useRouter();
 
-  // Categorizamos os atalhos para melhor navegação
+  // Categorizamos os atalhos pelo fluxo de trabalho do sistema.
   const secoes = [
     {
-      nome: 'Movimentação & Vendas',
+      nome: 'Operação do dia',
       itens: [
         { title: 'Caixa / Venda', path: '/mov/venda', icon: <ShoppingCart size={24} />, color: '#22c55e' },
         { title: 'Entrada de Carga', path: '/mov/entrada', icon: <Package size={24} /> },
-        { title: 'Histórico', path: '/transacoes', icon: <History size={24} /> },
-        { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
+        { title: 'Galpão · Frequência', path: '/funcionario/galpao', icon: <Users size={24} /> },
+        { title: 'Escritório', path: '/funcionario/escritorio', icon: <ClipboardList size={24} /> },
       ]
     },
     {
-      nome: 'Estoque & Cadastro',
+      nome: 'Cadastros',
+      itens: [
+        { title: 'Funcionários', path: '/funcionario/cadastro', icon: <UserRound size={24} /> },
+        { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
+        { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
+      ]
+    },
+    {
+      nome: 'Estoque e financeiro',
       itens: [
         { title: 'Estoque Geral', path: '/estoque', icon: <Database size={24} /> },
         { title: 'Estoque Detalhado', path: '/estoque/detalhado', icon: <List size={24} /> },
-        { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
-        { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
-        { title: 'Imprimir pedido', path: '/pedidos', icon: <ClipboardList size={24} /> },
-        { title: 'Catálogo de Preços', path: '/lista_preco', icon: <Tags size={24} /> },
+        { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
+        { title: 'Histórico', path: '/transacoes', icon: <History size={24} /> },
+        { title: 'Fechamento semanal', path: '/funcionario/escritorio/fechamento', icon: <ClipboardList size={24} /> },
       ]
     },
     {
-      nome: 'Projeção',
+      nome: 'Catálogo e planejamento',
       itens: [
+        { title: 'Catálogo de Preços', path: '/lista_preco', icon: <Tags size={24} /> },
+        { title: 'Imprimir pedido', path: '/pedidos', icon: <ClipboardList size={24} /> },
         { title: 'Nova Projeção', path: '/projecao', icon: <TrendingUp size={24} /> },
         { title: 'Resumo / Saldo', path: '/projecao/saldo', icon: <BarChart3 size={24} /> },
         { title: 'Lista projeção', path: '/projecao/lista', icon: <List size={24} /> },

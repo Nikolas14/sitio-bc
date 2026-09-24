@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import { Download } from 'lucide-react';
 import { supabase } from '@/api/supabase';
 import styles from './page.module.css';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
@@ -19,6 +20,19 @@ interface IProduct {
     is_available: boolean;
   };
 }
+
+// Open-license fallbacks for products whose database image is unavailable locally.
+const fallbackImages: Record<number, string> = {
+  202: 'https://commons.wikimedia.org/wiki/Special:FilePath/Plucked_chicken_wing.jpg',
+  4: 'https://commons.wikimedia.org/wiki/Special:FilePath/Raw_leg_chicken_quarters.jpg',
+  11: 'https://commons.wikimedia.org/wiki/Special:FilePath/Raw_chicken_thighs.jpg',
+  157: 'https://commons.wikimedia.org/wiki/Special:FilePath/Uncooked_chicken_legs.jpg',
+  12: 'https://commons.wikimedia.org/wiki/Special:FilePath/Raw_chicken_thighs.jpg',
+  16: 'https://images.unsplash.com/photo-1672787153655-0c19308dcc60?auto=format&fit=crop&w=1200&q=85',
+  18: 'https://commons.wikimedia.org/wiki/Special:FilePath/Chicken_Liver_and_Gizzard_-_Howrah_2015-04-19_8195.JPG',
+  101: 'https://commons.wikimedia.org/wiki/Special:FilePath/Minced-meat-74241_640.jpg',
+  311: 'https://commons.wikimedia.org/wiki/Special:FilePath/Uncooked_chicken_feet_at_a_Hong_Kong_market.jpg',
+};
 
 export default function CatalogoEstoque() {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -95,9 +109,10 @@ export default function CatalogoEstoque() {
 
         <div className={styles.sidebarActions}>
             <button onClick={handlePrint} className={styles.btnPrint}>
-                🖨️ Imprimir Tabela
+                <Download size={17} />
+                Salvar lista em PDF
             </button>
-            <p className={styles.tip}>Nota: Itens marcados como indisponíveis no sistema não aparecem nesta lista.</p>
+            <p className={styles.tip}>Na janela de impressão, selecione “Salvar como PDF”. A lista mostra apenas produtos disponíveis.</p>
         </div>
 
         <nav className={styles.categoryNav}>
@@ -112,9 +127,22 @@ export default function CatalogoEstoque() {
 
       {/* CONTEÚDO PRINCIPAL / ÁREA DE IMPRESSÃO */}
       <Main className={styles.mainContent}>
+        <header className={styles.catalogHeader}>
+            <div>
+              <span className={styles.eyebrow}>BEIT CHABAD BELÉM</span>
+              <h1>Lista de preços</h1>
+              <p>Escolha seus produtos com praticidade.</p>
+            </div>
+            <div className={styles.headerMeta}>
+              <span>Atualizada em</span>
+              <strong>{new Date().toLocaleDateString('pt-BR')}</strong>
+            </div>
+        </header>
+
         <div className={styles.printHeader}>
-            <h1>TABELA DE PRODUTOS E PREÇOS</h1>
-            <p>Atualizado em: {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
+            <span className={styles.eyebrow}>BEIT CHABAD BELÉM</span>
+            <h1>Lista de preços</h1>
+            <p>Atualizada em {new Date().toLocaleDateString('pt-BR')}</p>
         </div>
 
         {loading ? (
@@ -126,46 +154,42 @@ export default function CatalogoEstoque() {
             <section key={category} id={`cat-${category}`} className={styles.categorySection}>
               <h2 className={styles.categoryTitle}>{category}</h2>
 
-              <div className={styles.itemList}>
+              <div className={styles.itemGrid}>
                 {groupedProducts[category].map(product => (
-                  <div key={product.id} className={styles.itemRow}>
-                    <div className={styles.imageThumb}>
-                      <h5 className={styles.itemName}>{product.details?.is_available ? 'Disponível' : 'Indisponível'}</h5>
-                      {product.details?.image_filename ? (
+                  <article key={product.id} className={styles.productCard}>
+                    <div className={styles.imageFrame}>
+                      {(fallbackImages[product.id] || product.details?.image_filename) ? (
                         <Image
-                          src={`/images/produtos/${product.details.image_filename}.jpg`}
+                          src={fallbackImages[product.id] || `/images/produtos/${product.details?.image_filename}.jpg`}
                           alt={product.name}
-                          width={60}
-                          height={60}
+                          fill
+                          sizes="(max-width: 700px) 100vw, (max-width: 1200px) 40vw, 260px"
                           style={{ objectFit: 'cover' }}
+                          unoptimized={Boolean(fallbackImages[product.id])}
                         />
                       ) : (
-                        <div className={styles.noImage}>S/ FOTO</div>
+                        <div className={styles.noImage}>FOTO EM BREVE</div>
                       )}
                     </div>
 
-                    <div className={styles.info}>
-                      <div className={styles.nameRow}>
-                        <span className={styles.id}>#{product.id}</span>
-                        <h3 className={styles.itemName}>{product.name}</h3>
-                      </div>
+                    <div className={styles.productInfo}>
+                      <span className={styles.productCode}>PRODUTO #{product.id}</span>
+                      <h3 className={styles.itemName}>{product.name}</h3>
 
                       <p className={styles.description}>
-                        {product.details?.description || 'Descrição não cadastrada.'}
+                        {product.details?.description || 'Produto selecionado com cuidado para você.'}
                       </p>
 
                       {product.details?.package_weight_approx && (
-                        <span className={styles.weightBadge}>
-                          Emb: aprox. {product.details.package_weight_approx}kg
-                        </span>
+                        <p className={styles.packageInfo}>Embalagem aproximada: <strong>{product.details.package_weight_approx} kg</strong></p>
                       )}
-                    </div>
 
-                    <div className={styles.priceContainer}>
-                      <span className={styles.priceLabel}>Preço Unit.</span>
-                      <span className={styles.priceValue}>{formatCurrency(product.price)}</span>
+                      <div className={styles.priceContainer}>
+                        <span className={styles.priceLabel}>Preço</span>
+                        <span className={styles.priceValue}>{formatCurrency(product.price)}</span>
+                      </div>
                     </div>
-                  </div>
+                  </article>
                 ))}
               </div>
             </section>

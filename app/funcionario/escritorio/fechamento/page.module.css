@@ -1,0 +1,5 @@
+.page { min-height: 100vh; box-sizing: border-box; padding: 70px 24px; background: #f8fafc; color: #0f172a; text-align: center; }
+.page span { color: #2563eb; font-size: 10px; font-weight: 900; letter-spacing: .15em; }
+.page h1 { margin: 10px 0; font-size: 34px; }
+.page p { color: #64748b; }
+.page a { display: inline-block; margin-top: 18px; color: #2563eb; font-weight: 800; text-decoration: none; }
