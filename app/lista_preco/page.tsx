@@ -27,6 +27,11 @@ const categoryLabels: Record<string, string> = {
 };
 
 const categoryOrder = ['CARNE', 'ESPECIAL', 'FRANGO', 'EMBUTIDOS'];
+const localImageVersion = '2';
+const getLocalImagePath = (filename: string) => {
+  const normalizedFilename = /\.[a-z0-9]+$/i.test(filename) ? filename : `${filename}.jpg`;
+  return `/images/produtos/${normalizedFilename}?v=${localImageVersion}`;
+};
 
 const categoryRank = (category: string) => {
   const index = categoryOrder.indexOf(category);
@@ -38,19 +43,6 @@ const getProductCategory = (product: IProduct) => {
   if (name.match(/\b(CARNEIRO|CORDEIRO|OVINO|OVINOS)\b/)) return 'EMBUTIDOS';
   if (product.type === 'CARNE' || product.type === 'ESPECIAL' || product.type === 'FRANGO') return product.type;
   return 'EMBUTIDOS';
-};
-
-// Open-license fallbacks for products whose database image is unavailable locally.
-const fallbackImages: Record<number, string> = {
-  202: 'https://commons.wikimedia.org/wiki/Special:FilePath/Plucked_chicken_wing.jpg',
-  4: 'https://commons.wikimedia.org/wiki/Special:FilePath/Raw_leg_chicken_quarters.jpg',
-  11: 'https://commons.wikimedia.org/wiki/Special:FilePath/Raw_chicken_thighs.jpg',
-  157: 'https://commons.wikimedia.org/wiki/Special:FilePath/Uncooked_chicken_legs.jpg',
-  12: 'https://commons.wikimedia.org/wiki/Special:FilePath/Raw_chicken_thighs.jpg',
-  16: 'https://images.unsplash.com/photo-1672787153655-0c19308dcc60?auto=format&fit=crop&w=1200&q=85',
-  18: 'https://commons.wikimedia.org/wiki/Special:FilePath/Chicken_Liver_and_Gizzard_-_Howrah_2015-04-19_8195.JPG',
-  101: 'https://commons.wikimedia.org/wiki/Special:FilePath/Minced-meat-74241_640.jpg',
-  311: 'https://commons.wikimedia.org/wiki/Special:FilePath/Uncooked_chicken_feet_at_a_Hong_Kong_market.jpg',
 };
 
 export default function CatalogoEstoque() {
@@ -192,16 +184,15 @@ export default function CatalogoEstoque() {
                 {groupedProducts[category].map(product => (
                   <article key={product.id} className={styles.productCard}>
                     <div className={styles.imageFrame}>
-                      {(fallbackImages[product.id] || product.details?.image_filename) ? (
-                        <Image
-                          src={fallbackImages[product.id] || `/images/produtos/${product.details?.image_filename}.jpg`}
-                          alt={product.name}
-                          fill
-                          sizes="(max-width: 700px) 100vw, (max-width: 1200px) 40vw, 260px"
-                          style={{ objectFit: 'cover' }}
-                          loading="eager"
-                          unoptimized={Boolean(fallbackImages[product.id])}
-                        />
+                      {product.details?.image_filename ? (
+                          <Image
+                           src={getLocalImagePath(product.details.image_filename)}
+                           alt={product.name}
+                           fill
+                           sizes="(max-width: 700px) 100vw, (max-width: 1200px) 40vw, 260px"
+                           style={{ objectFit: 'cover' }}
+                           loading="eager"
+                         />
                       ) : (
                         <div className={styles.noImage}>FOTO EM BREVE</div>
                       )}
@@ -256,15 +247,14 @@ export default function CatalogoEstoque() {
                     {segment.products.map((product) => (
                       <article key={product.id} className={styles.productCard}>
                         <div className={styles.imageFrame}>
-                          {(fallbackImages[product.id] || product.details?.image_filename) ? (
+                          {product.details?.image_filename ? (
                             <Image
-                              src={fallbackImages[product.id] || `/images/produtos/${product.details?.image_filename}.jpg`}
+                              src={getLocalImagePath(product.details.image_filename)}
                               alt={product.name}
                               fill
                               sizes="200px"
                               style={{ objectFit: 'cover' }}
                               loading="eager"
-                              unoptimized={Boolean(fallbackImages[product.id])}
                             />
                           ) : <div className={styles.noImage}>FOTO EM BREVE</div>}
                         </div>
