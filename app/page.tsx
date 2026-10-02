@@ -13,8 +13,8 @@ import {
   PlusCircle,
   Tags,
   Info,
-  Users
-   ,ClipboardList, UserRound
+   Users,
+   ClipboardList
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -28,14 +28,11 @@ export default function Dashboard() {
       itens: [
         { title: 'Caixa / Venda', path: '/mov/venda', icon: <ShoppingCart size={24} />, color: '#22c55e' },
         { title: 'Entrada de Carga', path: '/mov/entrada', icon: <Package size={24} /> },
-        { title: 'Galpão · Frequência', path: '/funcionario/galpao', icon: <Users size={24} /> },
-        { title: 'Escritório', path: '/funcionario/escritorio', icon: <ClipboardList size={24} /> },
       ]
     },
     {
       nome: 'Cadastros',
       itens: [
-        { title: 'Funcionários', path: '/funcionario/cadastro', icon: <UserRound size={24} /> },
         { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
         { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
       ]
@@ -47,7 +44,6 @@ export default function Dashboard() {
         { title: 'Estoque Detalhado', path: '/estoque/detalhado', icon: <List size={24} /> },
         { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
         { title: 'Histórico', path: '/transacoes', icon: <History size={24} /> },
-        { title: 'Fechamento semanal', path: '/funcionario/escritorio/fechamento', icon: <ClipboardList size={24} /> },
       ]
     },
     {

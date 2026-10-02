@@ -1,9 +1,0 @@
-.screen { min-height: 100vh; display: grid; place-items: center; background: #f8fafc; padding: 24px; }
-.card { width: min(100%, 390px); padding: 34px; border: 1px solid #e2e8f0; border-radius: 16px; background: white; box-shadow: 0 12px 35px rgba(15, 23, 42, .08); }
-.eyebrow { color: #2563eb; font-size: 10px; font-weight: 900; letter-spacing: .15em; }
-.card h1 { margin: 9px 0 6px; color: #0f172a; font-size: 25px; }
-.card p { margin: 0 0 25px; color: #64748b; font-size: 13px; line-height: 1.5; }
-.card label { display: block; margin-bottom: 7px; color: #64748b; font-size: 10px; font-weight: 800; letter-spacing: .07em; }
-.card input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
-.card button { width: 100%; margin-top: 18px; padding: 12px; border: 0; border-radius: 8px; background: #0f172a; color: white; cursor: pointer; font-weight: 800; }
-.error { display: block; margin-top: 8px; color: #be123c; font-size: 12px; }

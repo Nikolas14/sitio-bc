@@ -84,71 +84,6 @@
 - [ ] Ativar RLS nas tabelas `ESTOQUE_*`
 - [ ] Rodar `npm run lint` + `npx tsc --noEmit` após cada bloco
 
-## Pendências atuais — lista de preços
-- [ ] Revisar o equilíbrio visual dos cards no catálogo
-- [ ] Ajustar a distribuição das cinco colunas no PDF vertical
-- [ ] Validar que cada seção fique separada sem espaços ou quebras ruins na impressão
-- [ ] Revisar cores, tamanhos de texto e contraste no PDF
-- [ ] Definir imagens finais dos produtos que ainda estão sem foto adequada
-
-## Próximo módulo — funcionários e folha de pagamento
-- [ ] Criar cadastro de funcionários
-- [ ] Criar ambiente do escritório para administração
-- [ ] Criar ambiente do galpão para lançamento da frequência
-- [ ] Definir vínculo do funcionário com os grupos de abate (`ABATE 01` e `ABATE 02`)
-- [ ] Criar controle de frequência por dia no galpão
-- [ ] Registrar o recebimento de frango junto à frequência do dia de abate
-- [ ] Distribuir automaticamente os frangos priorizando quem não recebeu no último abate
-- [ ] Controlar a quantidade disponível de frangos por abate
-- [ ] Criar fechamento semanal
-- [ ] Registrar extras no escritório, sem justificativa obrigatória
-- [ ] Calcular totais individuais para pagamento
-- [ ] Criar lista impressa com nome, valor a receber e Pix
-- [ ] Importar funcionários e dados existentes da planilha
-
-### Regras já definidas
-- Frequência operacional será lançada no galpão.
-- Administração, extras e fechamento semanal serão feitos no escritório.
-- Existem aproximadamente 28 funcionários e 14 frangos disponíveis para distribuição em um abate.
-- A distribuição deve priorizar quem não recebeu frango no abate anterior.
-- A distribuição considera somente os funcionários que trabalharam no dia.
-- O responsável no galpão pode aceitar ou ajustar a sugestão automática antes de confirmar.
-- Empates na prioridade serão resolvidos por sorteio.
-- Cada funcionário pode receber no máximo 1 frango por abate.
-- A quantidade de frangos será distribuída integralmente, sem sobras.
-- O recebimento do frango acontece junto com o lançamento da frequência no dia de abate de frango.
-- O fechamento deve gerar uma lista impressa com nome, valor a receber e chave Pix cadastrada.
-- Os funcionários existentes serão importados da planilha.
-- A diária será de R$ 150,00 para os dois tipos de abate.
-- O recebimento de frango gera desconto de R$ 10,00 na diária.
-- Um funcionário pode participar dos dois tipos de abate na mesma semana.
-- Extras podem ser positivos ou negativos, sem justificativa obrigatória, e podem ser lançados mais de uma vez na semana.
-- O fechamento semanal considera segunda a domingo.
-- O fechamento pode ser reaberto para ajustes.
-- O sistema registra quando o pagamento foi efetuado.
-- Escritório e galpão terão senhas diferentes.
-- O galpão pode alterar dados cadastrais dos funcionários, mas não valores financeiros.
-- A folha será uma lista única semanal, sem informar em qual abate o funcionário trabalhou.
-
-### Planilha de origem
-- Arquivo: `golem do nikolas/Funcionários Abate.xlsx`.
-- Aba `FUNCIONARIOS_DADOS`: cadastro principal com `NOME`, `ABATE 01`, `ABATE 02`, telefone, CPF, RG, tipo/chave Pix, banco, observações, apelido e sexo.
-- Aba `SHMILI`: relação de funcionários e grupos de abate, com observações operacionais.
-- Aba `FOLHA_PAGAMENTO`: modelo antigo com nome, total, Pix e tipo de Pix.
-- Aba `DIARIAS_ABATE`: histórico/modelo de cálculo com diária, frango, recebimento de frango, boi, cortes, extra e total.
-- Aba `NAO MEXER SO VER`: listas auxiliares usadas pela planilha.
-- Aba `IMPRIMIR`: lista auxiliar de presença de boi.
-- Aba `cadastro`: cadastro complementar de pessoas, incluindo observações de inclusão em grupos.
-- A importação deve priorizar `FUNCIONARIOS_DADOS`, usando as demais abas para complementar dados e validar grupos/Pix.
-
-### Ambientes de funcionários
-- `/funcionario/escritorio` usa a variável server-only `OFFICE_PASSWORD`.
-- `/funcionario/galpao` usa a variável server-only `GALPAO_PASSWORD`.
-- O escritório concentra cadastro, extras e fechamento semanal.
-- O galpão concentra frequência e sugestão/ajuste da distribuição de frangos.
-- As duas senhas ainda precisam ser cadastradas no `.env.local` e na hospedagem.
-- Temporariamente, `/funcionario/escritorio` e `/funcionario/galpao` usam `ADMIN_PASSWORD` como fallback até serem definidas senhas próprias.
-
 ## Registro da sessão — 15/09/2026
 
 ### Clientes
@@ -166,13 +101,18 @@
 - Produtos podem ser livres/diferentes do cadastro de produtos; não fazer parsing rígido do texto.
 - Depois que a janela de impressão é encerrada (`afterprint`), o cliente, a busca e o texto do pedido são limpos.
 
-### Próximo módulo: funcionários e folha de pagamento
-- Cadastro de funcionários com os campos: `NOME` (obrigatório), `ABATE 01`, `ABATE 02`, `TELEFONE`, `CPF`, `RG`, `TIPO PIX`, `CHAVE PIX`, `BANCO`, `OBS`, `APELIDO` e `SEXO`.
-- `ABATE 01` é o grupo de WhatsApp do frango; `ABATE 02` é o grupo de WhatsApp do boi.
-- Frango e boi acontecem em dias diferentes; o funcionário pode trabalhar em apenas um ou nos dois.
-- Diária padrão para ambos: R$ 150,00.
-- No dia do frango, se o funcionário receber um frango, descontar R$ 10,00 da diária.
-- Frequência deve registrar somente se trabalhou ou não.
-- Fechamento semanal, com possibilidade de valor extra para mais ou menos.
-- Saída desejada: folha de pagamento para impressão.
-- Ainda confirmar: se extra é manual positivo/negativo, se terá justificativa, se deve registrar o recebimento do frango por dia, colunas exatas da folha e se os funcionários existentes serão importados.
+## Pendências permanentes — lista de preços
+- [x] Corrigir o layout de impressão em PDF para usar a paginação preparada no `printCatalog`.
+- [x] Validar a distribuição das cinco colunas no PDF vertical A4.
+- [x] Garantir que títulos e seções não fiquem separados ou quebrados de forma ruim entre páginas.
+- [ ] Revisar cores, tamanhos de texto, contraste e equilíbrio visual dos cards.
+- [x] Definir imagens finais dos produtos que ainda estão sem foto adequada. O Nugget foi retirado da lista; as imagens restantes estão em `public/images/produtos`.
+- [ ] Fazer teste final em desktop, mobile, busca, disponibilidade e salvamento como PDF.
+
+### Próxima tarefa: impressão em PDF
+- `app/lista_preco/page.tsx` calcula `printPages` reservando três linhas de cinco cards por página.
+- A paginação foi ajustada para dividir uma categoria quando necessário, sem empurrar uma seção inteira para fora da página.
+- `app/lista_preco/page.tsx` já renderiza o layout paginado em `.printCatalog`.
+- `app/lista_preco/page.module.css` esconde `.screenCatalog` e exibe `.printCatalog` durante a impressão.
+- Depois, revisar `@page`, quebras de página e o grid de cinco colunas para garantir que cada página A4 comporte os 15 cards.
+
