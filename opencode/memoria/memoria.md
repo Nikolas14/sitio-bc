@@ -85,7 +85,7 @@
 - [ ] Quitação total deve ir para `FINALIZADO`, não direto para `CONCLUIDO`.
 - [ ] Nova coluna para **data de conclusão dos pagamentos** (base do CÁLCULO de 1 mês).
 - [ ] Job/cron: transação parada 1 mês após quitação vira `CONCLUIDO`.
-- [ ] Stepper com 5 passos e labels novos (remover "Isopor" do PENDENTE).
+- [ ] Stepper com 5 passos: labels **Isopor · Envio · Cobrado · Finalizado · Concluído**.
 - [ ] **WhatsApp**: integração real de envio da cobrança (hoje só gera/baixa PNG);
       transição `ENVIADO → COBRADO` deve ocorrer no envio.
 - [ ] Permitir **transição reversa** de status para correções (hoje trava de mão única).
@@ -95,8 +95,22 @@
 - [ ] Exigir **cliente vinculado** em toda venda; remover o fallback `VENDA_AVULSA`.
 - [ ] Cobrança **sem prazo/vencimento**; nota mantém o conteúdo atual (`PrintTemplate`).
 
+## Fluxo de entrada/saída de estoque — alvo (TODOs)
+
+> Rascunho aberto em `opencode/fluxos/estoque.md` (sessão de 07/10 — revisar com calma).
+
+- [ ] Colar/mapear o SQL das views `ESTOQUE_v_inventory_summary` e `ESTOQUE_v_estoque_vs_projecao`
+- [ ] Decidir a **fonte da verdade** do saldo: ledger (soma das operações) ou `current_stock`
+      materializado — hoje as duas coisas coexistem e o estorno pode estar dobrando.
+- [ ] Decidir se estorno vira **movimento** (rastreável) em vez de delete
+- [ ] Definir **tipos de movimento** (ajuste, perda/quebra, inventário, devolução, transferência)
+- [ ] Definir tratamento de **unidade** (kg × unidade: isopor, embalagem) e **custo de compra**
+- [ ] Desenhar **RPCs transacionais** de entrada/saída/estorno (com trava de saldo negativo)
+- [ ] `'ENTRADA'` não está no union `ITransaction['status']` (`types/index.tsx:40`) — dívida técnica
+
 ## Checklist para a próxima sessão
 
+- [ ] Revisar fluxo de entrada/saída de estoque (`opencode/fluxos/estoque.md`) com o dono
 - [ ] Confirmar credenciais do Supabase no `.env.local`
 - [ ] Reescrever `.env.example` com placeholders (sem valores reais)
 - [ ] Mapear tabelas e criar RPCs transacionais de venda/entrada/cobrança
