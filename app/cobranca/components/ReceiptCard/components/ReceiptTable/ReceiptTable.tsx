@@ -24,7 +24,7 @@ export const ReceiptTable = ({ items }: ReceiptTableProps) => {
         </thead>
         <tbody>
           {items.map((item, idx) => {
-            const price = Number(item.ESTOQUE_product?.price ?? 0);
+            const price = Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0);
             const quant = Number(item.quant ?? 0);
             const total = quant * price;
             

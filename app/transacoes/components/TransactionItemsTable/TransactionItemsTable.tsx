@@ -30,7 +30,7 @@ const TransactionItemsTable = ({ items, loading, type }: TransactionItemsTablePr
       </thead>
       <tbody>
         {items.map((item) => {
-          const price = Number(item.ESTOQUE_product?.price || 0);
+          const price = Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0);
           const quantity = Number(item.quant || 0);
           const totalItem = price * quantity;
 

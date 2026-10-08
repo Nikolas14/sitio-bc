@@ -63,7 +63,8 @@ export default function VendaSimplificadaPage() {
         transaction_id: trans.id,
         product_id: item.productId,
         type: 'OUT',
-        quant: item.weightKg
+        quant: item.weightKg,
+        unit_price: item.price || 0
       }));
 
       const { error: opError } = await supabase

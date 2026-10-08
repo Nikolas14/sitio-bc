@@ -103,15 +103,17 @@
 - [x] Decidir a **fonte da verdade** do saldo → **ledger** (`ESTOQUE_operation`, `IN − OUT`);
       `ESTOQUE_product.current_stock` é coluna vestigial (ninguém lê).
 - [x] Remover o ajuste manual de `current_stock` no `useDeleteTransaction` (redundante/instável).
-- [ ] Decidir se estorno vira **movimento** (rastreável) em vez de delete
+- [x] **Congelar preço no movimento** (`unit_price` em `ESTOQUE_operation` + backfill) — recibo/cobrança não mudam mais com reajuste de preço.
+- [ ] Decidir se estorno vira **movimento** (rastreável) em vez de delete (flag exige recriar as views)
 - [ ] Definir **tipos de movimento** (ajuste, perda/quebra, inventário, devolução, transferência)
-- [ ] Definir tratamento de **unidade** (kg × unidade: isopor, embalagem) e **custo de compra**
-- [ ] Desenhar **RPCs transacionais** de entrada/saída/estorno (com trava de saldo negativo)
+- [ ] Definir tratamento de **unidade** (kg × unidade: isopor, embalagem). **Custo de compra adiado pelo dono.**
+- [ ] Desenhar **RPCs transacionais** de entrada/saída/estorno (SEM trava de saldo negativo — decisão do dono)
 - [ ] `'ENTRADA'` não está no union `ITransaction['status']` (`types/index.tsx:40`) — dívida técnica
 
 ## Checklist para a próxima sessão
 
 - [ ] Revisar fluxo de entrada/saída de estoque (`opencode/fluxos/estoque.md`) com o dono
+- [ ] **Rodar `supabase/operations_unit_price.sql` no Supabase** (coluna `unit_price` + backfill)
 - [ ] Confirmar credenciais do Supabase no `.env.local`
 - [ ] Reescrever `.env.example` com placeholders (sem valores reais)
 - [ ] Mapear tabelas e criar RPCs transacionais de venda/entrada/cobrança
@@ -133,6 +135,11 @@
   Assinatura simplificada para `deleteTransaction(transactionId)`; chamador em
   `app/transacoes/page.tsx` ajustado.
 - Corrigida a nota desatualizada de "baixa no lançamento" em `venda.md`.
+- **Congelamento de preço:** criado `supabase/operations_unit_price.sql` (coluna `unit_price`
+  em `ESTOQUE_operation` + backfill). Escrita em `venda`/`entrada`; leitura com fallback em
+  `useCobrancaManager`, `ReceiptTable`, `TransactionItemsTable`, `PrintTemplate`; tipos
+  atualizados (`IOperation`, `IReceiptItem`). **Falta rodar o SQL no Supabase.**
+- Decisão do dono: **sem trava de saldo negativo** (não bloquear venda); **custo adiado**.
 - Verificado: `npm run lint` + `npx tsc --noEmit` limpos.
-- Próximo: desenhar RPCs transacionais + decidir estorno como movimento; avaliar dropar
-  a coluna `current_stock` com o dono.
+- Próximo: rodar o SQL; desenhar RPCs transacionais + decidir estorno como movimento;
+  avaliar dropar a coluna `current_stock` com o dono.

@@ -48,6 +48,8 @@ export interface IOperation {
   created_at: string;
   type: 'IN' | 'OUT';
   quant: number;
+  // Preço/kg congelado no momento do lançamento (fallback: preço atual do produto)
+  unit_price?: number | null;
   // Joins do Supabase para o Extrato Detalhado
   ESTOQUE_transaction?: {
     customer_vendor: string;
@@ -67,6 +69,7 @@ export interface IReceiptProduct {
 
 export interface IReceiptItem {
   quant: number;
+  unit_price?: number | null;
   ESTOQUE_product: IReceiptProduct | null;
 }
 

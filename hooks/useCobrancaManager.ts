@@ -43,7 +43,7 @@ export function useCobrancaManager(id: string) {
     if (!trans || !items) return { sub: 0, discountValue: 0, final: 0, paid: 0, remaining: 0 };
 
     const sub = items.reduce((acc, item) => {
-      const price = Number(item.ESTOQUE_product?.price || 0);
+      const price = Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0);
       return acc + (Number(item.quant) * price);
     }, 0);
 

@@ -54,7 +54,7 @@ export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, 
                 <td>{item.ESTOQUE_product?.name}</td>
                 <td className={styles.textCenter}>{item.quant}</td>
                 <td className={styles.textRight}>
-                  {formatCurrency(item.quant * (item.ESTOQUE_product?.price || 0))}
+                  {formatCurrency(item.quant * Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0))}
                 </td>
               </tr>
             ))}
