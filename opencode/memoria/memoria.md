@@ -91,7 +91,7 @@
 - [ ] Permitir **transição reversa** de status para correções (hoje trava de mão única).
 - [ ] Definir se cria tabela de **histórico de pagamentos** (data/valor/forma).
 - [ ] PENDENTE → ENVIADO: frete **não obrigatório** (pode zerar) — garantir na UI/validação.
-- [ ] Dar **baixa no estoque** ao lançar a venda (isopor pronto) — hoje só o delete/estorno ajusta.
+- [x] Dar **baixa no estoque** ao lançar a venda — já acontece: a venda insere `ESTOQUE_operation` (`OUT`) e o saldo é derivado do livro (ver `estoque.md`).
 - [ ] Exigir **cliente vinculado** em toda venda; remover o fallback `VENDA_AVULSA`.
 - [ ] Cobrança **sem prazo/vencimento**; nota mantém o conteúdo atual (`PrintTemplate`).
 
@@ -99,9 +99,10 @@
 
 > Rascunho aberto em `opencode/fluxos/estoque.md` (sessão de 07/10 — revisar com calma).
 
-- [ ] Colar/mapear o SQL das views `ESTOQUE_v_inventory_summary` e `ESTOQUE_v_estoque_vs_projecao`
-- [ ] Decidir a **fonte da verdade** do saldo: ledger (soma das operações) ou `current_stock`
-      materializado — hoje as duas coisas coexistem e o estorno pode estar dobrando.
+- [x] Colar/mapear o SQL das views `ESTOQUE_v_inventory_summary` e `ESTOQUE_v_estoque_vs_projecao`
+- [x] Decidir a **fonte da verdade** do saldo → **ledger** (`ESTOQUE_operation`, `IN − OUT`);
+      `ESTOQUE_product.current_stock` é coluna vestigial (ninguém lê).
+- [x] Remover o ajuste manual de `current_stock` no `useDeleteTransaction` (redundante/instável).
 - [ ] Decidir se estorno vira **movimento** (rastreável) em vez de delete
 - [ ] Definir **tipos de movimento** (ajuste, perda/quebra, inventário, devolução, transferência)
 - [ ] Definir tratamento de **unidade** (kg × unidade: isopor, embalagem) e **custo de compra**
@@ -119,3 +120,19 @@
 - [ ] Avaliar unificação de hooks duplicados
 - [ ] Rodar `npm run lint` + `npx tsc --noEmit` após cada bloco
 - [ ] Commitar em blocos lógicos com conventional commits (só quando o dono pedir)
+
+## Sessões
+
+### 08/10/2026 — Fonte da verdade do estoque resolvida
+
+- Dono colou o SQL das views `ESTOQUE_v_inventory_summary` e `ESTOQUE_v_estoque_vs_projecao`.
+- **Confirmado: o saldo é derivado do livro `ESTOQUE_operation` (`IN − OUT`)**. A coluna
+  `ESTOQUE_product.current_stock` é vestigial (nenhuma view/tela lê).
+- Removido o ajuste manual de `current_stock` em `hooks/useDeleteTransaction.ts` — agora só
+  apaga `ESTOQUE_operation` (e depois `ESTOQUE_transaction`); o saldo reverte sozinho.
+  Assinatura simplificada para `deleteTransaction(transactionId)`; chamador em
+  `app/transacoes/page.tsx` ajustado.
+- Corrigida a nota desatualizada de "baixa no lançamento" em `venda.md`.
+- Verificado: `npm run lint` + `npx tsc --noEmit` limpos.
+- Próximo: desenhar RPCs transacionais + decidir estorno como movimento; avaliar dropar
+  a coluna `current_stock` com o dono.

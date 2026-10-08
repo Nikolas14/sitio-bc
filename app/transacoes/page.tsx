@@ -58,7 +58,7 @@ export default function TransacoesInterface() {
 
     if (active) {
       setIsDeleting(true);
-      const res = await deleteTransaction(active.id, items, active.type);
+      const res = await deleteTransaction(active.id);
 
       if (res.success) {
         toast.success("Sucesso! Transação removida e estoque estornado.");

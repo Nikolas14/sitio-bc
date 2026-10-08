@@ -146,7 +146,10 @@ Ao finalizar, a venda entra no ciclo no estado **Isopor**.
 - **WhatsApp**: sem integração real; hoje só gera/baixa o PNG. A transição
   `ENVIADO → COBRADO` deve passar a ocorrer no envio.
 - **Transição reversa** de status não existe — hoje é mão única.
-- **Baixa de estoque** não acontece no lançamento; só o delete/estorno ajusta `current_stock`.
+- **Baixa de estoque**: acontece no lançamento — `finalizarVenda` insere `ESTOQUE_operation`
+  (`type: 'OUT'`) e o saldo é **derivado do livro**, então a view já reflete a baixa
+  (o antigo ajuste manual de `current_stock` no delete era redundante e foi removido).
+  Ver `opencode/fluxos/estoque.md`.
 - **Venda avulsa** ainda existe (`customer || 'VENDA_AVULSA'` em `app/mov/venda/page.tsx:51`);
   tornar o cliente obrigatório e remover o fallback.
 - **Cobrança sem prazo/vencimento**; a nota mantém o conteúdo atual (`PrintTemplate`).

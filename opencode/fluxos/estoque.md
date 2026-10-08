@@ -14,12 +14,16 @@
   `product_id`, `transaction_id`, `type` (`IN`/`OUT`), `quant` (**kg**), `created_at`.
 - **`ESTOQUE_transaction`** — cabeçalho da movimentação: `type` (`IN`/`OUT`),
   `customer_vendor`, totais (`total_price`, `total_kg`), `discount_percent`, `status`.
-- **`ESTOQUE_product.current_stock`** — coluna de saldo do produto.
+- **`ESTOQUE_product.current_stock`** — coluna **vestigial**: nenhuma view nem tela a lê.
+  O `current_stock` que o app exibe vem da **view** (alias calculado), não da coluna.
 - **`ESTOQUE_v_inventory_summary`** — view de estoque consolidado (consumida por `useInventory`).
+  `current_stock` = `SUM(IN − OUT)` por produto, direto de `ESTOQUE_operation`.
 - **`ESTOQUE_v_estoque_vs_projecao`** — view de disponibilidade (estoque real × projetado).
+  `estoque_real` = `SUM(IN − OUT)`; `total_projetado` = `SUM(quant)` das projeções
+  `ABERTO`; `saldo_previsto` = `estoque_real − total_projetado`.
 
-> ⚠️ A definição das **views não está no repositório** — só existe `supabase/customers.sql`.
-> É a maior incógnita do modelo (ver "Ponto que trava o desenho").
+> ✅ As definições das views foram confirmadas (10/2026): **ambas derivam o saldo do
+> livro `ESTOQUE_operation`** (`IN − OUT`). Ver "Fonte da verdade — resolvida".
 
 ### Entrada — `/mov/entrada`
 
@@ -38,34 +42,35 @@
 
 ### Saldo exibido
 
-- Vem da **view** `ESTOQUE_v_inventory_summary` (`hooks/useInventory.ts:17`).
-- A coluna `ESTOQUE_product.current_stock` **não é escrita** ao lançar venda/entrada —
-  só é atualizada no **estorno/exclusão**.
+- Vem da **view** `ESTOQUE_v_inventory_summary` (`hooks/useInventory.ts:17`) — ledger `IN − OUT`.
+- A coluna `ESTOQUE_product.current_stock` **não é escrita** ao lançar venda/entrada
+  e **não é lida** por nenhuma view/tela.
 
 ### Estorno / exclusão
 
-- `hooks/useDeleteTransaction.ts`: para cada item, lê `current_stock`, aplica
-  `IN → subtrai` / `OUT → devolve` e grava de volta; depois apaga `ESTOQUE_operation`
-  e `ESTOQUE_transaction`.
-- Roda no **cliente**, item a item, **sem transação** (não atômico).
+- `hooks/useDeleteTransaction.ts`: apaga as `ESTOQUE_operation` da transação e depois a
+  `ESTOQUE_transaction`. Como o saldo é **derivado do livro**, isso já reverte o estoque.
+- Roda no **cliente**, em dois deletes, **sem transação** (não atômico).
 
-## Ponto que trava o desenho (precisa resolver primeiro)
+## Fonte da verdade — resolvida (10/2026)
 
-**Onde mora o saldo de verdade?**
+As views foram coladas e confirmam a hipótese **(a)**:
 
-- **(a)** A view **soma as `ESTOQUE_operation`** (`IN − OUT`) ⇒ o saldo é **derivado**;
-  nesse caso `current_stock` é redundante e o ajuste feito no delete **pode estar dobrando**
-  o estorno (a exclusão das operations já reverteria o saldo).
-- **(b)** A view **lê `current_stock`** (mantida por trigger no banco) ⇒ o correto é ter
-  trigger e o ajuste no cliente fica frágil/duplicado.
+- `ESTOQUE_v_inventory_summary.current_stock` = `SUM(CASE IN: +quant, OUT: −quant)`
+  sobre `ESTOQUE_operation` (LEFT JOIN product).
+- `ESTOQUE_v_estoque_vs_projecao.estoque_real` = mesma soma; `saldo_previsto` subtrai o projetado.
 
-**Ação:** colar o SQL de `ESTOQUE_v_inventory_summary` e `ESTOQUE_v_estoque_vs_projecao`
-para definirmos o modelo com segurança.
+⇒ **O saldo é derivado do livro (`ESTOQUE_operation`).** `ESTOQUE_product.current_stock`
+é redundante e vestigial.
+
+**Impacto:** o ajuste manual de `current_stock` que existia no `useDeleteTransaction`
+foi **removido** — era redundante (a exclusão das operations já reverte o saldo) e podia
+divergir a coluna. Não confundir o **campo** `current_stock` do app (que vem da view)
+com a **coluna** homônima da tabela (morta).
 
 ## Decisões de desenho (a discutir)
 
-1. **Fonte da verdade:** ledger computado (soma das operações) ou saldo materializado
-   (`current_stock`)?
+1. ~~**Fonte da verdade:** ledger ou `current_stock`?~~ ✅ **Ledger** (resolvido acima).
 2. **Atomicidade:** mover venda/entrada/estorno para **RPC transacional** no Postgres,
    com trava de saldo negativo?
 3. **Estorno:** deletar a transação (hoje) ou lançar **movimento de estorno**
@@ -74,7 +79,9 @@ para definirmos o modelo com segurança.
    inventário, devolução, transferência**? (hoje só `IN`/`OUT` ligados a uma venda/entrada)
 5. **Unidade:** tudo em kg? Como ficam itens por **unidade** (isopor, embalagem)?
 6. **Custo:** a entrada precisa registrar **custo de compra** (separado do preço de venda)?
-7. **Concorrência:** evitar *lost update* no ajuste manual de `current_stock`.
+7. ~~**Concorrência:** *lost update* no `current_stock`.~~ ✅ Deixou de existir ao remover
+   o ajuste manual da coluna.
+8. **Coluna `current_stock`:** dropar `ESTOQUE_product.current_stock` (só com o dono).
 
 ## Pendências técnicas relacionadas (herdadas)
 
@@ -88,9 +95,11 @@ para definirmos o modelo com segurança.
 
 ## Próxima sessão
 
-- [ ] Colar/mapear o SQL das views `ESTOQUE_v_inventory_summary` e `ESTOQUE_v_estoque_vs_projecao`
-- [ ] Decidir a **fonte da verdade** do saldo (item "Ponto que trava o desenho")
+- [x] Colar/mapear o SQL das views `ESTOQUE_v_inventory_summary` e `ESTOQUE_v_estoque_vs_projecao`
+- [x] Decidir a **fonte da verdade** do saldo → **ledger (`ESTOQUE_operation`)**
+- [x] Remover ajuste manual de `current_stock` no `useDeleteTransaction`
 - [ ] Decidir se estorno vira **movimento** em vez de delete
 - [ ] Definir **tipos de movimento** (ajuste, perda, inventário, devolução, transferência)
 - [ ] Definir tratamento de **unidade** (kg × unidade) e **custo de compra**
 - [ ] Desenhar RPCs transacionais de entrada/saída/estorno
+- [ ] Avaliar (com o dono) **dropar** `ESTOQUE_product.current_stock`
