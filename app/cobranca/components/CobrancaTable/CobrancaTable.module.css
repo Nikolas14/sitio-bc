@@ -7,7 +7,7 @@
   
   /* AJUSTE PARA SCROLL */
   overflow: auto; 
-  max-height: calc(100vh - 50px); /* Altura máxima dinâmica */
+  max-height: calc(100vh - 130px); /* Altura máxima dinâmica (desconta o rodapé de paginação) */
   position: relative;
 }
 
@@ -100,4 +100,64 @@
 .tableWrapper::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
+}
+/* PAGINAÇÃO */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.pageControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pageInfo {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.pageBtn {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #0f172a;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pageSize {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  background: white;
 }

@@ -18,6 +18,7 @@ export default function ListaCobrancasPage() {
   const { transactions, loading, error, refresh } = useCobrancas();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [hideConcluded, setHideConcluded] = useState(true);
 
   const toggleStatus = (status: string) => {
     setSelectedStatus(prev =>
@@ -25,15 +26,25 @@ export default function ListaCobrancasPage() {
     );
   };
 
+  // Selecionar CONCLUIDO no filtro de status vence o "ocultar concluídos".
+  const concludedHidden = hideConcluded && !selectedStatus.includes('CONCLUIDO');
+
   const filteredTransactions = useMemo(() => {
     return transactions.filter(t => {
-      const matchStatus = selectedStatus.length === 0 || selectedStatus.includes(t.status || 'PENDENTE');
+      const status = t.status || 'PENDENTE';
+      const matchStatus = selectedStatus.length === 0 || selectedStatus.includes(status);
+      const matchConcluded = !concludedHidden || status !== 'CONCLUIDO';
       const matchSearch = t.customer_vendor?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.serial_number?.toString().includes(searchTerm);
 
-      return matchStatus && matchSearch;
+      return matchStatus && matchConcluded && matchSearch;
     });
-  }, [transactions, selectedStatus, searchTerm]);
+  }, [transactions, selectedStatus, searchTerm, concludedHidden]);
+
+  const concludedCount = useMemo(
+    () => transactions.filter(t => t.status === 'CONCLUIDO').length,
+    [transactions]
+  );
 
   if (error) return <div className={styles.error}>Erro: {error}</div>;
 
@@ -56,6 +67,20 @@ export default function ListaCobrancasPage() {
           onToggle={toggleStatus}
           onClear={() => setSelectedStatus([])}
         />
+
+        <label className={`${styles.hideToggle} ${!concludedHidden && hideConcluded ? styles.hideToggleOff : ''}`}>
+          <input
+            type="checkbox"
+            checked={hideConcluded}
+            onChange={(e) => setHideConcluded(e.target.checked)}
+          />
+          <span>
+            Ocultar concluídos ({concludedCount})
+            {hideConcluded && !concludedHidden && (
+              <small className={styles.hideHint}>CONCLUIDO selecionado no filtro</small>
+            )}
+          </span>
+        </label>
 
         <SideFooter onRefresh={refresh} refreshLabel="Sincronizar Dados" />
 

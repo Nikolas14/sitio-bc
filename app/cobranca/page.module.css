@@ -11,3 +11,34 @@
   font-weight: 900;
   text-transform: uppercase;
 }
+.hideToggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  font-size: 12px;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.hideToggle input {
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.hideToggleOff {
+  opacity: 0.6;
+}
+
+.hideHint {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: none;
+}
