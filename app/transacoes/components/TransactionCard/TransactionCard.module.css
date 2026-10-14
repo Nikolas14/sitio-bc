@@ -54,6 +54,11 @@
   color: #b91c1c;
 }
 
+.adjust {
+  background: #fef3c7;
+  color: #b45309;
+}
+
 .customerName {
   font-size: 13px;
   font-weight: 800;

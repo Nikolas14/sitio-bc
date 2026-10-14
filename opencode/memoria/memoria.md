@@ -125,6 +125,27 @@
 
 ## Sessões
 
+### 14/10/2026 — Conferência de estoque (`/estoque/conferencia`)
+
+- Nova tela: bipa etiquetas → soma kg por produto → compara com o saldo da view →
+  lança a diferença. **Conferência total** (decisão do dono): produto não bipado vai a
+  zero. **Sem tolerância**: qualquer diferença ajusta (arredondado a 3 casas só p/ tirar
+  ruído de float).
+- Grava até 2 transações `status: 'AJUSTE'` (`type IN` e `type OUT`), `customer_vendor`
+  = `CONFERÊNCIA dd/mm/aa hh:mm`. Recalcula com saldo fresco na hora de aplicar →
+  reaplicar após falha parcial só lança o que falta. Exige senha admin.
+- Rascunho em `localStorage` (`sitio-bc:conferencia-estoque`) para não perder a contagem.
+- Categoria **ISOPOR fica fora** da conferência (dono pediu): `TIPOS_FORA_CONFERENCIA` em
+  `utils/stockCount.ts`; saldo não é comparado/zerado e a etiqueta é recusada ao bipar.
+- Arquivos: `app/estoque/conferencia/*`, `hooks/useStockAdjustment.ts`, `utils/stockCount.ts`.
+  `useCobrancas` exclui `AJUSTE`; `TransactionCard` mostra badge AJUSTE;
+  `AdminPasswordModal` ganhou `subtitle` opcional; `ITransaction.status` inclui `ENTRADA | AJUSTE`.
+- **Migração aplicada (14/10):** `supabase/transaction_status_ajuste.sql` (adiciona `AJUSTE` ao
+  check `ESTOQUE_transaction_status_check`).
+- Verificado no banco (projeto `estoque-sitio`): `unit_price` **já existe** em
+  `ESTOQUE_operation` (SQL de 08/10 já rodado); RLS **está ativo** nas tabelas `ESTOQUE_*`
+  exceto `ESTOQUE_product_details` (advisor crítico).
+
 ### 08/10/2026 — Fonte da verdade do estoque resolvida
 
 - Dono colou o SQL das views `ESTOQUE_v_inventory_summary` e `ESTOQUE_v_estoque_vs_projecao`.

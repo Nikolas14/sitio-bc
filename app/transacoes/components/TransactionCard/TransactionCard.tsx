@@ -12,7 +12,12 @@ interface TransactionCardProps {
 }
 
 const TransactionCard = ({ transaction, isSelected, onClick }: TransactionCardProps) => {
-  const { id, serial_number, type, customer_vendor, created_at, total_price } = transaction;
+  const { id, serial_number, type, status, customer_vendor, created_at, total_price } = transaction;
+  const isAdjust = status === 'AJUSTE';
+  const badgeClass = isAdjust ? styles.adjust : type === 'IN' ? styles.in : styles.out;
+  const badgeLabel = isAdjust
+    ? (type === 'IN' ? '▲ AJUSTE' : '▼ AJUSTE')
+    : (type === 'IN' ? '▲ ENTRADA' : '▼ VENDA');
 
   return (
     <div 
@@ -21,8 +26,8 @@ const TransactionCard = ({ transaction, isSelected, onClick }: TransactionCardPr
     >
       <div className={styles.cardTop}>
         <span className={styles.serial}>#{serial_number}</span>
-        <span className={`${styles.badge} ${type === 'IN' ? styles.in : styles.out}`}>
-          {type === 'IN' ? '▲ ENTRADA' : '▼ VENDA'}
+        <span className={`${styles.badge} ${badgeClass}`}>
+          {badgeLabel}
         </span>
       </div>
 

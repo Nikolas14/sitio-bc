@@ -14,7 +14,8 @@ import {
   Tags,
   Info,
    Users,
-   ClipboardList
+   ClipboardList,
+   ScanBarcode
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -42,6 +43,7 @@ export default function Dashboard() {
       itens: [
         { title: 'Estoque Geral', path: '/estoque', icon: <Database size={24} /> },
         { title: 'Estoque Detalhado', path: '/estoque/detalhado', icon: <List size={24} /> },
+        { title: 'Conferência', path: '/estoque/conferencia', icon: <ScanBarcode size={24} /> },
         { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
         { title: 'Histórico', path: '/transacoes', icon: <History size={24} /> },
       ]

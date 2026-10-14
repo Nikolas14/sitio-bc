@@ -13,6 +13,7 @@ export function useCobrancas() {
         .from('ESTOQUE_transaction')
         .select('*')
         .eq('type', 'OUT') // Somente vendas
+        .or('status.is.null,status.neq.AJUSTE') // Ajuste de conferência não é cobrança
         .order('created_at', { ascending: false });
 
       if (supabaseError) throw supabaseError;

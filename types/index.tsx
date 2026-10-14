@@ -37,7 +37,7 @@ export interface ITransaction {
   shipping_cost?: number;
   tax_amount?: number;
   discount_percent: number;
-  status: 'PENDENTE' | 'ENVIADO' | 'COBRADO' | 'CONCLUIDO'; 
+  status: 'PENDENTE' | 'ENVIADO' | 'COBRADO' | 'CONCLUIDO' | 'ENTRADA' | 'AJUSTE';
   paid_amount: number; 
 }
 

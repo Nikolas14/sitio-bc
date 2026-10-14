@@ -7,13 +7,15 @@ interface AdminPasswordModalProps {
   setPassword: (val: string) => void;
   onConfirm: () => void;
   onCancel: () => void;
+  subtitle?: string;
 }
 
 export default function AdminPasswordModal({
   password,
   setPassword,
   onConfirm,
-  onCancel
+  onCancel,
+  subtitle = 'Confirme a senha para realizar esta exclusão'
 }: AdminPasswordModalProps) {
   
   // Função para confirmar ao apertar "Enter"
@@ -26,7 +28,7 @@ export default function AdminPasswordModal({
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <h3 className={styles.title}>Senha de Admin</h3>
-        <p className={styles.subtitle}>Confirme a senha para realizar esta exclusão</p>
+        <p className={styles.subtitle}>{subtitle}</p>
         
         <input
           type="password"

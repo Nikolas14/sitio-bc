@@ -46,6 +46,15 @@
 - A coluna `ESTOQUE_product.current_stock` **não é escrita** ao lançar venda/entrada
   e **não é lida** por nenhuma view/tela.
 
+### Conferência — `/estoque/conferencia`
+
+- Bipagem de todas as etiquetas do estoque físico → contado por produto.
+- Diferença = contado − saldo da view (todos os produtos; não bipado = 0 kg).
+- Aplicar (senha admin) insere `ESTOQUE_transaction` com `status: 'AJUSTE'`:
+  uma `type: 'IN'` com as sobras e uma `type: 'OUT'` com as faltas, cada uma com suas
+  `ESTOQUE_operation` (`unit_price` = preço atual). Fica fora da cobrança.
+- Primeiro tipo de movimento além de venda/entrada (ver decisão 4 abaixo).
+
 ### Estorno / exclusão
 
 - `hooks/useDeleteTransaction.ts`: apaga as `ESTOQUE_operation` da transação e depois a
