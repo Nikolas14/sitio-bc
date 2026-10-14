@@ -26,6 +26,14 @@
   text-transform: uppercase;
 }
 
+.labelCount {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: none;
+}
+
 .centerCol {
   text-align: center;
   color: #64748b;

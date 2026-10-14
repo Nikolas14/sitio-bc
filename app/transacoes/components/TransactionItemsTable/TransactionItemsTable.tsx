@@ -10,6 +10,40 @@ interface TransactionItemsTableProps {
   type?: 'IN' | 'OUT'; // Adicionamos o tipo para saber se é entrada ou saída
 }
 
+interface GroupedItem {
+  key: string;
+  name: string;
+  price: number;
+  quantity: number;
+  labels: number;
+}
+
+// Soma etiquetas do mesmo produto; preço diferente vira linha separada para o total bater.
+function groupItems(items: IOperation[]): GroupedItem[] {
+  const groups = new Map<string, GroupedItem>();
+
+  for (const item of items) {
+    const price = Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0);
+    const key = `${item.product_id}-${price}`;
+    const current = groups.get(key);
+
+    if (current) {
+      current.quantity += Number(item.quant || 0);
+      current.labels += 1;
+    } else {
+      groups.set(key, {
+        key,
+        name: item.ESTOQUE_product?.name || 'Produto não encontrado',
+        price,
+        quantity: Number(item.quant || 0),
+        labels: 1,
+      });
+    }
+  }
+
+  return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
 const TransactionItemsTable = ({ items, loading, type }: TransactionItemsTableProps) => {
   if (loading) {
     return <div className={styles.loading}>Carregando itens...</div>;
@@ -29,15 +63,14 @@ const TransactionItemsTable = ({ items, loading, type }: TransactionItemsTablePr
         </tr>
       </thead>
       <tbody>
-        {items.map((item) => {
-          const price = Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0);
-          const quantity = Number(item.quant || 0);
+        {groupItems(items).map(({ key, name, price, quantity, labels }) => {
           const totalItem = price * quantity;
 
           return (
-            <tr key={item.id}>
+            <tr key={key}>
               <td className={styles.productName}>
-                {item.ESTOQUE_product?.name || 'Produto não encontrado'}
+                {name}
+                {labels > 1 && <span className={styles.labelCount}>{labels} etiquetas</span>}
               </td>
               
               {/* Coluna de Preço Condicional */}
