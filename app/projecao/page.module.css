@@ -63,3 +63,75 @@
 
 .weightValue { font-size: 32px; font-weight: 950; font-family: monospace; }
 .alertMsg { color: #ef4444; font-size: 12px; font-weight: 800; text-align: center; }
+
+/* Cliente + subnome */
+.customerBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.blockLabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.textField {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-weight: 700;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.textField:focus { border-color: #0f172a; }
+
+.refPreview { font-size: 11px; color: #64748b; }
+.refPreview strong { color: #0f172a; text-transform: uppercase; }
+
+/* Tela pós-salvar: confirmação + pedido para imprimir */
+.donePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 900px;
+}
+
+.doneBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+}
+
+.doneBar div:first-child { display: flex; flex-direction: column; gap: 2px; }
+.doneBar strong { color: #166534; font-size: 15px; }
+.doneBar span { color: #475569; font-size: 12px; }
+
+.doneActions { display: flex; gap: 10px; }
+
+.btnPrint, .btnSecondary {
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btnPrint { background: #0f172a; color: white; border: none; }
+.btnSecondary { background: white; color: #0f172a; border: 1px solid #cbd5e1; }
+
+@media print {
+  .doneBar { display: none !important; }
+  .donePanel { max-width: none; }
+}

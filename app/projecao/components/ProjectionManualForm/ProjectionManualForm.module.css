@@ -4,10 +4,11 @@
   gap: 15px;
 }
 
-.manualInputGrid {
+.quantRow {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 15px;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
 }
 
 .inputField { display: flex; flex-direction: column; gap: 5px; }
@@ -28,12 +29,7 @@
   outline: none;
 }
 
-.inputSuccess { border-color: #10b981; background-color: #f0fdf4; }
 
-.previewArea { min-height: 20px; }
-.foundText { color: #16a34a; font-size: 12px; font-weight: 900; text-transform: uppercase; }
-.errorText { color: #ef4444; font-size: 11px; font-weight: 700; }
-.idleText { color: #94a3b8; font-size: 11px; font-style: italic; }
 
 .btnAdd {
   padding: 14px;

@@ -14,7 +14,6 @@ import {
   Tags,
   Info,
    Users,
-   ClipboardList,
    ScanBarcode
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
@@ -52,7 +51,6 @@ export default function Dashboard() {
       nome: 'Catálogo e planejamento',
       itens: [
         { title: 'Catálogo de Preços', path: '/lista_preco', icon: <Tags size={24} /> },
-        { title: 'Imprimir pedido', path: '/pedidos', icon: <ClipboardList size={24} /> },
         { title: 'Nova Projeção', path: '/projecao', icon: <TrendingUp size={24} /> },
         { title: 'Resumo / Saldo', path: '/projecao/saldo', icon: <BarChart3 size={24} /> },
         { title: 'Lista projeção', path: '/projecao/lista', icon: <List size={24} /> },

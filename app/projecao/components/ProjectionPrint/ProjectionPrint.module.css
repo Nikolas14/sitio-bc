@@ -1,0 +1,70 @@
+.sheet {
+  background: white;
+  color: #1e293b;
+  padding: 28px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 16px;
+}
+
+.eyebrow { font-size: 10px; font-weight: 900; letter-spacing: 0.1em; color: #94a3b8; }
+.header h2 { margin: 4px 0 0; font-size: 22px; font-weight: 950; color: #0f172a; }
+.date { font-size: 12px; color: #64748b; }
+
+.reference {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.reference span { font-size: 9px; font-weight: 900; letter-spacing: 0.06em; color: #94a3b8; }
+.reference strong { font-size: 14px; text-transform: uppercase; }
+.reference em { font-size: 13px; color: #475569; }
+
+.customerData {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.customerData div { display: flex; flex-direction: column; gap: 4px; }
+.customerData span { font-size: 9px; font-weight: 900; letter-spacing: 0.06em; color: #94a3b8; }
+.customerData strong { font-size: 12px; line-height: 1.2; text-transform: uppercase; }
+.wide { grid-column: span 2; }
+
+.items { padding-top: 20px; }
+.items h3 {
+  margin: 0 0 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+.items table { width: 100%; border-collapse: collapse; }
+.items td { padding: 5px 0; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+.idx { width: 32px; color: #94a3b8; }
+.name { font-weight: 700; text-transform: uppercase; }
+.qty { text-align: right; font-family: monospace; font-weight: 800; white-space: nowrap; }
+.items tfoot td { border-top: 2px solid #0f172a; border-bottom: none; font-weight: 900; padding-top: 8px; }
+
+@media print {
+  .sheet { border: 0; border-radius: 0; padding: 0; }
+  .header h2 { font-size: 20px; }
+  .customerData { gap: 5px 12px; padding: 9px 0; }
+  .customerData span { font-size: 8px; }
+  .customerData strong { font-size: 10px; line-height: 1.1; }
+  .wide { grid-column: span 1; }
+  .items td { font-size: 11px; padding: 3px 0; }
+}
