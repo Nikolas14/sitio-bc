@@ -30,12 +30,14 @@ export default function ListaCobrancasPage() {
   const concludedHidden = hideConcluded && !selectedStatus.includes('CONCLUIDO');
 
   const filteredTransactions = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
     return transactions.filter(t => {
       const status = t.status || 'PENDENTE';
       const matchStatus = selectedStatus.length === 0 || selectedStatus.includes(status);
       const matchConcluded = !concludedHidden || status !== 'CONCLUIDO';
-      const matchSearch = t.customer_vendor?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.serial_number?.toString().includes(searchTerm);
+      const matchSearch = !term ||
+        t.customer_vendor?.toLowerCase().includes(term) ||
+        t.serial_number?.toString().includes(term);
 
       return matchStatus && matchConcluded && matchSearch;
     });

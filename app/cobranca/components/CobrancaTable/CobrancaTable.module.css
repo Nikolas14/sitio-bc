@@ -43,9 +43,22 @@
   color: #0f172a !important;
 }
 
+.tableRow {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
 .tableRow:hover {
   background: #f8fafc;
 }
+
+.sortableHeader:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: -2px;
+}
+
+.sortActive { color: #0f172a; }
+.sortIdle { opacity: 0.4; }
 
 .table td {
   padding: 15px;
@@ -70,7 +83,7 @@
 /* ESTILIZAÇÃO DE DADOS */
 .serial { font-family: monospace; color: #94a3b8; font-weight: 700; }
 .customer { font-weight: 800; text-transform: uppercase; color: #1e293b; }
-.price { font-weight: 900; font-family: monospace; color: #0f172a; }
+.price { font-weight: 900; font-family: monospace; color: #0f172a; white-space: nowrap; }
 
 .actionBtn {
   background: #f1f5f9;
@@ -81,6 +94,11 @@
   font-weight: 800;
   text-transform: uppercase;
   cursor: pointer;
+  transition: background 0.15s;
+}
+
+.actionBtn:hover {
+  background: #e2e8f0;
 }
 
 .loading, .empty {
@@ -161,3 +179,5 @@
   color: #475569;
   background: white;
 }
+
+.netPrice { color: #166534; }
