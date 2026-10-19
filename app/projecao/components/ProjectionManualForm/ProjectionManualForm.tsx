@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import styles from './ProjectionManualForm.module.css';
 import type { IProduct } from '@/types';
-import SearchSelect, { normalize } from '../SearchSelect/SearchSelect';
+import SearchSelect, { normalize } from '@/components/SearchSelect/SearchSelect';
 
 interface ProjectionManualFormProps {
   products: IProduct[];

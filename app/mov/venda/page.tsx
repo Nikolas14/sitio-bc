@@ -11,7 +11,9 @@ import InventoryCart from '../../../components/InventoryCart/InventoryCart';
 import ButtonFinish from '../../../components/ButtonFinish/ButtonFinish';
 import FinancialSummary from '../components/FinancialSummary/FinancialSummary';
 import DiscountInput from '../../../components/DiscountInput/DiscountInput';
-import HeaderInput from '@/components/HeaderInput/HeaderInput';
+import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
+import CustomerFields from '@/components/CustomerFields/CustomerFields';
+import type { ICustomer } from '@/types';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import { useToast } from '@/components/Toast/Toast';
 
@@ -21,7 +23,8 @@ export default function VendaSimplificadaPage() {
   const { products } = useInventory();
   const toast = useToast();
 
-  const [customer, setCustomer] = useState('');
+  const [customer, setCustomer] = useState<ICustomer | null>(null);
+  const [identifier, setIdentifier] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
   const [items, setItems] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState('');
@@ -29,6 +32,9 @@ export default function VendaSimplificadaPage() {
   const [lastError, setLastError] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Cliente (principal) + identificador (minuta, pedido...) viram o nome da venda.
+  const customerLabel = [customer?.name, identifier.trim()].filter(Boolean).join(' · ') || 'VENDA_AVULSA';
 
   const financial = useMemo(() => {
     const subtotal = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
@@ -48,7 +54,7 @@ export default function VendaSimplificadaPage() {
         .from('ESTOQUE_transaction')
         .insert([{
           type: 'OUT',
-          customer_vendor: customer || 'VENDA_AVULSA',
+          customer_vendor: customerLabel,
           total_price: financial.subtotal, // Salvamos o BRUTO
           total_kg: financial.totalKg,
           discount_percent: discountPercent,
@@ -75,7 +81,8 @@ export default function VendaSimplificadaPage() {
 
       toast.success("Venda realizada com sucesso!");
       setItems([]);
-      setCustomer('');
+      setCustomer(null);
+      setIdentifier('');
       setDiscountPercent(0);
       inputRef.current?.focus();
 
@@ -86,7 +93,7 @@ export default function VendaSimplificadaPage() {
     } finally {
       setLoading(false);
     }
-  }, [items, customer, financial, discountPercent, toast]);
+  }, [items, customerLabel, financial, discountPercent, toast]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -153,12 +160,14 @@ export default function VendaSimplificadaPage() {
     <PageLayout>
       <Sidebar>
         <div className={styles.controlTop}>
-          <HeaderInput
-            titulo="Venda Direta"
-            labelDescricao="Identificação do Cliente"
-            valor={customer}
-            setValor={setCustomer}
-            placeholder="Nome + Minuta"
+          <HeaderPadrao titulo="Venda Direta" />
+
+          <CustomerFields
+            customer={customer}
+            setCustomer={setCustomer}
+            identifier={identifier}
+            setIdentifier={setIdentifier}
+            resultLabel={customerLabel}
           />
 
           <div className={`${styles.scannerContainer} ${lastError ? styles.hasError : ''}`}>

@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import { supabase } from '@/api/supabase';
 import { useInventory } from '@/hooks/useInventory';
 import { useProjections } from '@/hooks/useProjections';
-import { useCustomerManager } from '@/hooks/useCustomerManager';
 
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import ButtonFinish from '@/components/ButtonFinish/ButtonFinish';
@@ -13,29 +12,25 @@ import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 
 import styles from './page.module.css';
 import { ProjectionManualForm } from './components/ProjectionManualForm/ProjectionManualForm';
-import SearchSelect, { normalize } from './components/SearchSelect/SearchSelect';
+import CustomerFields from '@/components/CustomerFields/CustomerFields';
 import ProjectionPrint, { type PrintData } from './components/ProjectionPrint/ProjectionPrint';
 import type { CartItem } from '@/components/InventoryCart/InventoryCart';
 import type { ICustomer, IProduct } from '@/types';
 import { useToast } from '@/components/Toast/Toast';
 
-const matchesCustomer = (c: ICustomer, q: string) =>
-  [c.name, c.cpf, c.city].some(value => normalize(value || '').includes(q));
-
 export default function ProjecaoEnvioPage() {
   const { products } = useInventory();
   const { refresh } = useProjections();
-  const { customers, loading: customersLoading } = useCustomerManager();
   const toast = useToast();
 
   const [customer, setCustomer] = useState<ICustomer | null>(null);
-  const [subname, setSubname] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [printData, setPrintData] = useState<PrintData | null>(null);
 
   // A referência é montada sozinha: cliente (principal) + subnome (secundário).
-  const finalReference = [customer?.name, subname.trim()].filter(Boolean).join(' · ') || 'PROJEÇÃO_AVULSA';
+  const finalReference = [customer?.name, identifier.trim()].filter(Boolean).join(' · ') || 'PROJEÇÃO_AVULSA';
 
   // Cálculos consolidados (Peso e Preço)
   const financial = useMemo(() => {
@@ -71,7 +66,7 @@ export default function ProjecaoEnvioPage() {
         quant: item.weightKg,
         reference: finalReference,
         customer_id: customer?.id ?? null,
-        subname: subname.trim() || null,
+        subname: identifier.trim() || null,
         status: 'ABERTO'
       }));
 
@@ -81,14 +76,14 @@ export default function ProjecaoEnvioPage() {
       toast.success("Projeção salva com sucesso!");
       setPrintData({
         reference: finalReference,
-        subname: subname.trim(),
+        subname: identifier.trim(),
         customer,
         items: items.map(i => ({ name: i.name, weightKg: i.weightKg })),
         date: new Date(),
       });
       setItems([]);
       setCustomer(null);
-      setSubname('');
+      setIdentifier('');
       refresh();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
@@ -105,36 +100,13 @@ export default function ProjecaoEnvioPage() {
         <div className={styles.topContent}>
           <HeaderPadrao titulo="Nova Projeção" />
 
-          <div className={styles.customerBlock}>
-            <label className={styles.blockLabel}>Cliente</label>
-            <SearchSelect
-              items={customers}
-              selected={customer}
-              onSelect={setCustomer}
-              matches={matchesCustomer}
-              getKey={(c) => c.id}
-              getLabel={(c) => c.name}
-              renderOption={(c) => (
-                <>
-                  <span>{c.name}</span>
-                  <small>{c.cpf || 'CPF não informado'}{c.city ? ` · ${c.city}` : ''}</small>
-                </>
-              )}
-              placeholder="Buscar cliente por nome, CPF ou cidade..."
-              emptyText="Cliente não encontrado"
-              loading={customersLoading}
-            />
-
-            <label className={styles.blockLabel}>Subnome</label>
-            <input
-              className={styles.textField}
-              type="text"
-              value={subname}
-              onChange={(e) => setSubname(e.target.value)}
-              placeholder="Ex: Sábado, Pedido 2..."
-            />
-            <span className={styles.refPreview}>Será salvo como: <strong>{finalReference}</strong></span>
-          </div>
+          <CustomerFields
+            customer={customer}
+            setCustomer={setCustomer}
+            identifier={identifier}
+            setIdentifier={setIdentifier}
+            resultLabel={finalReference}
+          />
 
           <ProjectionManualForm
             products={products}
