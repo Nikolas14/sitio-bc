@@ -14,13 +14,19 @@ const PAGE_SIZES = [25, 50, 100];
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-type SortKey = keyof ITransaction | 'net_total';
+type SortKey = keyof ITransaction | 'net_total' | 'balance';
 
 // Mesma fórmula do resumo da cobrança: (bruto - desconto) + frete + imposto.
 const getNetTotal = (t: ITransaction) => {
   const gross = Number(t.total_price || 0);
   return gross - gross * ((t.discount_percent || 0) / 100) + (t.shipping_cost ?? 0) + (t.tax_amount ?? 0);
 };
+
+// Quanto falta receber: líquido - pago (nunca negativo).
+const getBalance = (t: ITransaction) => Math.max(0, getNetTotal(t) - Number(t.paid_amount || 0));
+
+const getSortValue = (t: ITransaction, key: SortKey) =>
+  key === 'net_total' ? getNetTotal(t) : key === 'balance' ? getBalance(t) : t[key];
 
 type SortConfig = {
   key: SortKey;
@@ -45,8 +51,8 @@ export default function CobrancaTable({ transactions, loading }: CobrancaTablePr
     const sortableItems = [...transactions];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const aValue = sortConfig.key === 'net_total' ? getNetTotal(a) : a[sortConfig.key];
-        const bValue = sortConfig.key === 'net_total' ? getNetTotal(b) : b[sortConfig.key];
+        const aValue = getSortValue(a, sortConfig.key);
+        const bValue = getSortValue(b, sortConfig.key);
 
         if (aValue == null && bValue == null) return 0;
         if (aValue == null) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -109,13 +115,14 @@ export default function CobrancaTable({ transactions, loading }: CobrancaTablePr
               {sortableTh('customer_vendor', 'Cliente')}
               {sortableTh('created_at', 'Data')}
               {sortableTh('net_total', 'Total Líquido')}
+              {sortableTh('balance', 'Saldo a Pagar')}
               <th>Status</th>
               <th className="text-right">Ação</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} className={styles.loading}>Carregando transações...</td></tr>
+              <tr><td colSpan={7} className={styles.loading}>Carregando transações...</td></tr>
             ) : (
               pageData.map(t => (
                 <tr
@@ -127,6 +134,9 @@ export default function CobrancaTable({ transactions, loading }: CobrancaTablePr
                   <td className={styles.customer}>{t.customer_vendor}</td>
                   <td className={styles.date}>{new Date(t.created_at).toLocaleDateString('pt-BR')}</td>
                   <td className={`${styles.price} ${styles.netPrice}`}>{brl.format(getNetTotal(t))}</td>
+                  <td className={`${styles.price} ${getBalance(t) > 0 ? styles.balanceDue : styles.balanceDone}`}>
+                    {getBalance(t) > 0 ? brl.format(getBalance(t)) : 'Quitado'}
+                  </td>
                   <td>
                     <span className={`${styles.statusBadge} ${styles['status' + (t.status || 'PENDENTE')]}`}>
                       {t.status || 'PENDENTE'}
