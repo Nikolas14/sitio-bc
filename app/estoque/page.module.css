@@ -9,28 +9,6 @@
   align-items: start; /* Impede que uma caixa estique a outra verticalmente */
 }
 
-/* Estilos de Estados (Loading/Erro) */
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-weight: 800;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.error {
-  padding: 20px;
-  background-color: #fef2f2;
-  color: #ef4444;
-  border-radius: 8px;
-  border: 1px solid #fee2e2;
-  margin: 20px;
-  font-weight: 700;
-}
-
 @media (max-width: 1100px) {
   .reportGrid {
     grid-template-columns: 1fr; /* Em telas menores, volta para 1 coluna */

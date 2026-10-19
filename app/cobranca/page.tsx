@@ -10,7 +10,7 @@ import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import SideFooter from '@/components/SideFooter/SideFooter';
 import CobrancaTable from './components/CobrancaTable/CobrancaTable';
 import { STATUS_COBRANCA } from '@/types';
-import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { PageLayout, Sidebar, Main, PageState } from '@/components/PageLayout/PageLayout';
 
 const STATUS_LIST = STATUS_COBRANCA;
 
@@ -47,8 +47,6 @@ export default function ListaCobrancasPage() {
     () => transactions.filter(t => t.status === 'CONCLUIDO').length,
     [transactions]
   );
-
-  if (error) return <div className={styles.error}>Erro: {error}</div>;
 
   return (
     <PageLayout>
@@ -89,10 +87,14 @@ export default function ListaCobrancasPage() {
       </Sidebar>
 
       <Main>
-        <CobrancaTable
-          transactions={filteredTransactions}
-          loading={loading}
-        />
+        {error ? (
+          <PageState kind="error" message={`Erro: ${error}`} />
+        ) : (
+          <CobrancaTable
+            transactions={filteredTransactions}
+            loading={loading}
+          />
+        )}
       </Main>
     </PageLayout>
   );

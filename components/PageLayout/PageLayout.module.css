@@ -60,6 +60,57 @@
   background: #94a3b8;
 }
 
+/* --- TÍTULO DA ÁREA PRINCIPAL --- */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 20px;
+}
+
+.pageHeader h1 {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.pageHeader p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+.pageHeaderAside {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+/* --- ESTADOS (CARREGANDO / ERRO / VAZIO) --- */
+.state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 24px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.stateError {
+  color: #b91c1c;
+}
+
 /* --- IMPRESSÃO PADRÃO --- */
 @media print {
   .sidebar {

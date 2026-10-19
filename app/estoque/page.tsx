@@ -10,7 +10,7 @@ import GrupoEstoque from '../../components/GrupoEstoque/GrupoEstoque';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import SideFooter from '@/components/SideFooter/SideFooter';
-import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { PageLayout, Sidebar, Main, PageState } from '@/components/PageLayout/PageLayout';
 
 export default function EstoqueReportPage() {
   const { products, loading, error, refresh } = useInventory();
@@ -54,8 +54,6 @@ export default function EstoqueReportPage() {
     return groupedData.filter(g => selectedGroups.includes(g.category));
   }, [groupedData, selectedGroups]);
 
-  if (error) return <div className={styles.error}>Erro: {error}</div>;
-
   return (
     <PageLayout>
       <Sidebar>
@@ -75,21 +73,21 @@ export default function EstoqueReportPage() {
       </Sidebar>
 
       <Main>
-        {loading ? (
-          <div className={styles.loading}>Buscando inventário...</div>
+        {error ? (
+          <PageState kind="error" message={`Erro: ${error}`} />
+        ) : loading ? (
+          <PageState kind="loading" message="Buscando inventário..." />
+        ) : visibleGroups.length === 0 ? (
+          <PageState kind="empty" message="Nenhum produto encontrado no estoque." />
         ) : (
           <div className={styles.reportGrid}>
-            {visibleGroups.length > 0 ? (
-              visibleGroups.map((group) => (
-                <GrupoEstoque
-                  key={group.category}
-                  category={group.category}
-                  list={group.items}
-                />
-              ))
-            ) : (
-              <div className={styles.empty}>Nenhum produto encontrado no estoque.</div>
-            )}
+            {visibleGroups.map((group) => (
+              <GrupoEstoque
+                key={group.category}
+                category={group.category}
+                list={group.items}
+              />
+            ))}
           </div>
         )}
       </Main>

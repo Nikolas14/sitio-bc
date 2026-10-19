@@ -12,7 +12,7 @@ import styles from './page.module.css';
 import { PrintTemplate } from '../components/PrintTemplate/PrintTemplate';
 import SumaryCobranca from '../components/SumaryCobranca/SumaryCobranca';
 import { ReceiptTable } from '../components/ReceiptCard/components/ReceiptTable/ReceiptTable';
-import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { PageLayout, Sidebar, Main, PageState } from '@/components/PageLayout/PageLayout';
 import { useToast } from '@/components/Toast/Toast';
 
 export default function CobrancaDetalhadaPage() {
@@ -39,8 +39,22 @@ export default function CobrancaDetalhadaPage() {
     else toast.error('Não foi possível registrar o pagamento.');
   };
 
-  if (loading && !trans) return <div className={styles.centerInfo}>Sincronizando...</div>;
-  if (error || !trans) return <div className={styles.centerInfo}>Erro ao carregar transação.</div>;
+  if (error || !trans) {
+    const isLoading = loading && !trans;
+    return (
+      <PageLayout>
+        <Sidebar>
+          <HeaderPadrao titulo={'Gestão de Cobrança'} />
+        </Sidebar>
+        <Main>
+          <PageState
+            kind={isLoading ? 'loading' : 'error'}
+            message={isLoading ? 'Sincronizando...' : 'Erro ao carregar transação.'}
+          />
+        </Main>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>

@@ -7,7 +7,7 @@ import StatusFilter from '@/components/StatusFilter/StatusFilter';
 import { useAvailability } from '@/hooks/useAvailability';
 import styles from './page.module.css';
 import AvailabilityTable from '../components/AvailabilityTable/AvailabilityTable';
-import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
+import { PageLayout, Sidebar, Main, PageHeader, PageState } from '@/components/PageLayout/PageLayout';
 
 export default function PainelDisponibilidadePage() {
   // O hook agora entrega as categorias prontas!
@@ -25,8 +25,6 @@ export default function PainelDisponibilidadePage() {
     );
   };
 
-  if (loading) return <div className={styles.center}>Sincronizando disponibilidades...</div>;
-
   return (
     <PageLayout>
 
@@ -41,6 +39,7 @@ export default function PainelDisponibilidadePage() {
           onClear={() => setSelectedGroups([])}
         />
 
+        {!loading && (
         <div className={`
             ${styles.alertBox} 
             ${data.filter(i => i.saldo_previsto < 0).length > 0 ? styles.alertActive : ''}
@@ -51,22 +50,23 @@ export default function PainelDisponibilidadePage() {
           </div>
           <p className={styles.alertDesc}>Itens que precisam de reposição imediata para atender as projeções.</p>
         </div>
+        )}
 
         <SideFooter onRefresh={refresh} />
       </Sidebar>
 
       <Main>
-        <div className={styles.pageHeader}>
-          <div>
-            <h1>Painel de Disponibilidade</h1>
-            <p>Estoque Real X Projeções de Saída</p>
-          </div>
-          <div className={styles.countInfo}>
-            Exibindo <strong>{filteredData.length}</strong> itens
-          </div>
-        </div>
+        <PageHeader
+          title="Painel de Disponibilidade"
+          subtitle="Estoque Real X Projeções de Saída"
+          aside={<>Exibindo <strong>{filteredData.length}</strong> itens</>}
+        />
 
-        <AvailabilityTable data={filteredData} />
+        {loading ? (
+          <PageState kind="loading" message="Sincronizando disponibilidades..." />
+        ) : (
+          <AvailabilityTable data={filteredData} />
+        )}
       </Main>
 
     </PageLayout>

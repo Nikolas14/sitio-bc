@@ -1,16 +1,6 @@
 /* Estilos específicos da página de Lista de Cobranças.
    O esqueleto (sidebar + main) é provido por PageLayout. */
 
-.error {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fef2f2;
-  color: #b91c1c;
-  font-weight: 900;
-  text-transform: uppercase;
-}
 .hideToggle {
   display: flex;
   align-items: flex-start;
