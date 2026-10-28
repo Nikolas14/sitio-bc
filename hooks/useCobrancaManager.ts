@@ -28,7 +28,8 @@ export function useCobrancaManager(id: string) {
 
   useEffect(() => {
     if (trans?.status === 'PENDENTE') {
-      setShipping(Number(latamKg) * (Number(shippingRate) + 0.5));
+      // Arredonda em 2 casas decimais para não gerar dízimas no frete
+      setShipping(Math.round(Number(latamKg) * (Number(shippingRate) + 0.5) * 100) / 100);
     }
   }, [latamKg, shippingRate, trans?.status]);
 
