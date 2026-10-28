@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import styles from './ControlPanel.module.css';
 import { ITransaction } from '@/types';
 
@@ -31,6 +32,37 @@ interface ControlPanelProps {
 
 }
 
+interface NumberFieldProps {
+    value: number;
+    onChange: (val: number) => void;
+    disabled?: boolean;
+}
+
+// Mantém o texto digitado separado do número, para o "0" não ficar colado na frente do que for digitado
+const NumberField = ({ value, onChange, disabled }: NumberFieldProps) => {
+    const [draft, setDraft] = useState(value ? String(value) : '');
+
+    useEffect(() => {
+        setDraft(prev => (Number(prev) === value ? prev : value ? String(value) : ''));
+    }, [value]);
+
+    return (
+        <input
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0"
+            className={styles.field}
+            value={draft}
+            onChange={e => {
+                setDraft(e.target.value);
+                onChange(Number(e.target.value));
+            }}
+            disabled={disabled}
+        />
+    );
+};
+
 export const ControlPanel = ({
     trans, shipping, setShipping, latamKg, setLatamKg, shippingRate, setShippingRate, tax, setTax, isEditable,
     onUpdateStatus, onGerarImagem, onRegistrarPagamento, setNewPayment, loading, financial
@@ -55,26 +87,18 @@ export const ControlPanel = ({
                             <>
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>Kg da LATAM:</label>
-                            <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                className={styles.field}
+                            <NumberField
                                 value={latamKg}
-                                onChange={e => setLatamKg(Number(e.target.value))}
+                                onChange={setLatamKg}
                                 disabled={!isEditable}
                             />
                         </div>
 
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>Taxa por kg (R$):</label>
-                            <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                className={styles.field}
+                            <NumberField
                                 value={shippingRate}
-                                onChange={e => setShippingRate(Number(e.target.value))}
+                                onChange={setShippingRate}
                                 disabled={!isEditable}
                             />
                         </div>
@@ -83,13 +107,9 @@ export const ControlPanel = ({
 
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>Frete (R$):</label>
-                            <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                className={styles.field}
+                            <NumberField
                                 value={shipping}
-                                onChange={e => setShipping(Number(e.target.value))}
+                                onChange={setShipping}
                                 disabled={!isEditable}
                             />
                         </div>
@@ -97,11 +117,9 @@ export const ControlPanel = ({
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>Imposto: (R$)</label>
                             <div className={styles.inputWithShortcut}>
-                                <input
-                                    type="number"
-                                    className={styles.field}
+                                <NumberField
                                     value={tax}
-                                    onChange={e => setTax(Number(e.target.value))}
+                                    onChange={setTax}
                                     disabled={!isEditable}
                                 />
                                 {isEditable && (
