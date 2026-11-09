@@ -28,7 +28,8 @@ export function useCobrancaManager(id: string) {
 
   useEffect(() => {
     if (trans?.status === 'PENDENTE') {
-      setShipping(Number(latamKg) * (Number(shippingRate) + 0.5));
+      // Arredonda em 2 casas decimais para não gerar dízimas no frete
+      setShipping(Math.round(Number(latamKg) * (Number(shippingRate) + 0.5) * 100) / 100);
     }
   }, [latamKg, shippingRate, trans?.status]);
 
@@ -39,16 +40,18 @@ export function useCobrancaManager(id: string) {
   }, [trans]);
 
   // Cálculos financeiros centralizados
+  // Base é o total_price gravado (mesmo valor do resumo e da listagem); a soma dos itens é só fallback
   const financial = useMemo(() => {
     if (!trans || !items) return { sub: 0, discountValue: 0, final: 0, paid: 0, remaining: 0 };
 
-    const sub = items.reduce((acc, item) => {
+    const subItens = items.reduce((acc, item) => {
       const price = Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0);
       return acc + (Number(item.quant) * price);
     }, 0);
 
+    const sub = trans.total_price != null ? Number(trans.total_price) : subItens;
     const discountValue = sub * (Number(trans.discount_percent || 0) / 100);
-    const final = (sub - discountValue) + Number(tax) + Number(shipping);
+    const final = Math.round(((sub - discountValue) + Number(tax) + Number(shipping)) * 100) / 100;
     const paid = Number(trans.paid_amount || 0);
 
     return {
@@ -84,7 +87,7 @@ export function useCobrancaManager(id: string) {
     if (newPayment <= 0 || !trans) return false;
     setIsProcessing(true);
 
-    const totalPago = (Number(trans.paid_amount) || 0) + newPayment;
+    const totalPago = Math.round(((Number(trans.paid_amount) || 0) + newPayment) * 100) / 100;
     const status = totalPago >= financial.final ? 'CONCLUIDO' : 'COBRADO';
 
     const { error: payError } = await supabase

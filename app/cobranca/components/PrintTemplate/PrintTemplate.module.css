@@ -8,43 +8,61 @@
 
 /* --- O RECIBO EM SI (O QUE VAI NA FOTO) --- */
 .printContainer {
-  background: white;
+  background: #ffffff;
   width: 450px; /* Largura fixa ideal para WhatsApp */
-  padding: 40px;
+  padding: 36px 40px 40px;
   color: #1e293b;
   font-family: sans-serif;
+  font-variant-numeric: tabular-nums; /* valores alinham em coluna */
   box-sizing: border-box;
 }
 
+/* Cabeçalho */
 .header {
   text-align: center;
   border-bottom: 2px solid #0f172a;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .companyName {
   font-size: 22px;
   font-weight: 900;
+  line-height: 1.2;
   margin: 0;
   color: #0f172a;
 }
 
 .subtitle {
-  margin: 5px 0 0;
-  font-size: 12px;
+  margin: 6px 0 0;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 0.16em;
   color: #64748b;
 }
 
-/* Informações de Cliente e Data */
+/* Cliente (esquerda) e referência/data (direita) */
 .infoGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: start;
   font-size: 12px;
-  margin-bottom: 25px;
-  line-height: 1.6;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.customer {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #0f172a;
+}
+
+.meta {
+  margin: 0;
+  color: #475569;
 }
 
 /* Tabela de Itens */
@@ -52,51 +70,56 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  margin-bottom: 25px;
+  margin-bottom: 22px;
 }
 
 .table th {
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 10px 5px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid #cbd5e1;
   color: #64748b;
-  text-transform: uppercase;
   font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .table td {
-  padding: 10px 5px;
+  padding: 9px 0;
   border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
 }
+
+.colQty { width: 72px; }
+.colTotal { width: 104px; }
+
+.qty { color: #475569; }
 
 /* Seção de Totais */
 .summarySection {
   background: #f8fafc;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 25px;
+  padding: 16px 18px 18px;
+  border-radius: 10px;
+  margin-bottom: 22px;
 }
 
 .summaryRow {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  margin-bottom: 8px;
-}
-
-.discount { 
-  color: #dc2626; 
-  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
 }
 
 .totalRow {
   display: flex;
   justify-content: space-between;
-  margin-top: 12px;
+  align-items: baseline;
+  margin-top: 10px;
   padding-top: 12px;
   border-top: 2px solid #0f172a;
+  font-size: 20px;
   font-weight: 900;
-  font-size: 18px;
   color: #0f172a;
 }
 
@@ -106,26 +129,34 @@
 }
 
 .pixBox {
-  border: 1px dashed #cbd5e1;
-  padding: 15px;
-  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 14px 16px;
   font-size: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+}
+
+.pixBox p {
+  margin: 0;
 }
 
 .pixKey {
+  margin-top: 6px !important;
   font-size: 16px;
   font-weight: 900;
-  margin: 5px 0;
   color: #0f172a;
 }
 
 .thankYou {
-  font-size: 11px;
+  margin: 0;
+  font-size: 12px;
   font-style: italic;
-  color: #94a3b8;
+  color: #64748b; /* contraste AA sobre branco; #94a3b8 ficava abaixo de 3:1 */
 }
 
 /* Auxiliares */
 .textRight { text-align: right; }
 .textCenter { text-align: center; }
+
+/* Dentro da tabela, precisa vencer `.table th { text-align: left }` */
+.table .textRight { text-align: right; }

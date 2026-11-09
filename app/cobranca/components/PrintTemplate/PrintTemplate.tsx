@@ -32,11 +32,12 @@ export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, 
 
         <div className={styles.infoGrid}>
           <div>
-            <p><strong>Cliente:</strong> {trans.customer_vendor}</p>
-            <p><strong>Data:</strong> {new Date(trans.created_at).toLocaleDateString('pt-BR')}</p>
+            <p><strong>Cliente:</strong></p>
+            <p className={styles.customer}>{trans.customer_vendor}</p>
           </div>
-          <div className={styles.textRight}>
+          <div className={`${styles.meta} ${styles.textRight}`}>
             <p><strong>Ref:</strong> {trans.serial_number || trans.id.slice(0, 8).toUpperCase()}</p>
+            <p><strong>Data:</strong> {new Date(trans.created_at).toLocaleDateString('pt-BR')}</p>
           </div>
         </div>
 
@@ -44,15 +45,17 @@ export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, 
           <thead>
             <tr>
               <th>Produto</th>
-              <th className={styles.textCenter}>Qtd</th>
-              <th className={styles.textRight}>Total</th>
+              <th className={`${styles.colQty} ${styles.textRight}`}>Qtd</th>
+              <th className={`${styles.colTotal} ${styles.textRight}`}>Total</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, i: number) => (
               <tr key={i}>
                 <td>{item.ESTOQUE_product?.name}</td>
-                <td className={styles.textCenter}>{item.quant}</td>
+                <td className={`${styles.qty} ${styles.textRight}`}>
+                  {Number(item.quant).toLocaleString('pt-BR', { maximumFractionDigits: 3 })}
+                </td>
                 <td className={styles.textRight}>
                   {formatCurrency(item.quant * Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0))}
                 </td>
