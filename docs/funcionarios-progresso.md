@@ -39,7 +39,7 @@ Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada
 - Total por pessoa (só para quem está presente): soma das diárias dos abates em que foi, menos **R$ 10,00** se recebeu frango. Aparece abaixo das etiquetas, por exemplo "Total R$ 140,00 · desc. frango R$ 10,00". Constante `DESCONTO_FRANGO` em `utils/diarias.ts`.
 - **Extra (R$)**: caixa de texto em cada linha, para valor extra da pessoa no dia. Soma ao total (também de quem não foi). Aceita negativo, por exemplo "-20". Aparece no total e no resumo como "Extras". Não é gravado.
 - Resumo: na lista, presentes, faltas, receberam frango, descontos (frango) e total a pagar.
-- Impressão (botão "Imprimir relatório", na barra lateral, abaixo de "Salvar frequência"): relatório de pagamento só de quem foi (presente) na lista do dia, com Nº, Nome, Abate, Presença, Recebeu frango, Total, Pix e Obs. 30 linhas por página. Cabeçalho com data, pessoas, presentes, faltas, total a pagar e as diárias usadas. Os valores são os da tela no momento da impressão.
+- Impressão (botão "Imprimir relatório", na barra lateral, abaixo de "Salvar frequência"): relatório de pagamento só de quem foi (presente) na lista do dia, com Nº, Nome, Abate, Recebeu frango, Total, Pix e Obs. 30 linhas por página. Cabeçalho com data, pessoas, presentes, faltas, total a pagar e as diárias usadas. Os valores são os da tela no momento da impressão.
 - **Salvar frequência** grava presença e recebimento. Não altera a lista de chamada.
 
 ### Histórico (`/funcionarios/historico`)

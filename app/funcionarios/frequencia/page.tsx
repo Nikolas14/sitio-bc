@@ -76,21 +76,18 @@ export default function FrequenciaFuncionarios() {
         'Nº',
         'Nome',
         'Abate',
-        'Presença',
         'Recebeu frango',
         'Total',
         'Pix',
         'Obs',
     ];
     const printValoresDaLinha = (linha: (typeof printLinhas)[number], numero: number) => {
-        const { employee, entry, presente, pagamento } = linha;
+        const { employee, entry, pagamento } = linha;
         const abate = entry.frango && entry.boi ? 'Frango e Boi' : entry.frango ? 'Frango' : 'Boi';
-        const presenca = presente === true ? 'Presente' : presente === false ? 'Falta' : '—';
         return [
             String(numero),
             employee.name,
             abate,
-            presenca,
             entry.frango ? (entry.receivedChicken ? 'Sim' : 'Não') : '',
             formatReais(pagamento.total),
             employee.pix_key || '',
