@@ -2,20 +2,21 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/api/supabase';
 import { IAttendance } from '@/types';
 
-type AttendanceRow = Pick<IAttendance, 'id' | 'employee_id' | 'confirmed' | 'present'>;
+type AttendanceRow = Pick<IAttendance, 'id' | 'employee_id' | 'confirmed' | 'frango' | 'boi' | 'received_chicken' | 'present'>;
 export interface AttendanceEntry {
-  confirmed: boolean; // confirmou no grupo do WhatsApp
+  confirmed: boolean; // vai em pelo menos um abate (vem da lista de chamada)
+  frango: boolean; // confirmou para o frango
+  boi: boolean; // confirmou para o boi
+  receivedChicken: boolean; // recebeu o frango
   present: boolean | null; // quem realmente foi; null = ainda não lançado
 }
 
-const EMPTY: AttendanceEntry = { confirmed: false, present: null };
+const EMPTY: AttendanceEntry = { confirmed: false, frango: false, boi: false, receivedChicken: false, present: null };
 const isEmpty = (entry: AttendanceEntry) => !entry.confirmed && entry.present === null;
 
 /**
- * Chamada de um dia (YYYY-MM-DD) em duas etapas:
- * - lista de chamada: marcar quem confirmou (`confirmed`);
- * - frequência: marcar quem realmente foi (`present`). Quem confirmou entra como presente
- *   até ser marcado como falta.
+ * Frequência real de um dia (YYYY-MM-DD). Parte de quem está na lista de chamada:
+ * quem confirmou entra como presente até ser marcado como falta.
  */
 export function useAttendanceDay(workDate: string) {
     const [savedRows, setSavedRows] = useState<AttendanceRow[]>([]);
@@ -28,7 +29,7 @@ export function useAttendanceDay(workDate: string) {
         setLoading(true);
         const { data, error } = await supabase
             .from('ESTOQUE_employee_attendance')
-            .select('id, employee_id, confirmed, present')
+            .select('id, employee_id, confirmed, frango, boi, received_chicken, present')
             .eq('work_date', workDate);
 
         if (error) {
@@ -39,7 +40,13 @@ export function useAttendanceDay(workDate: string) {
             setSavedRows(rows);
             setDraft(Object.fromEntries(rows.map((row) => [
                 row.employee_id,
-                { confirmed: row.confirmed, present: row.present },
+                {
+                    confirmed: row.confirmed,
+                    frango: row.frango,
+                    boi: row.boi,
+                    receivedChicken: row.received_chicken,
+                    present: row.present,
+                },
             ])));
         }
         setLoading(false);
@@ -55,18 +62,11 @@ export function useAttendanceDay(workDate: string) {
 
     const entryOf = (employeeId: string): AttendanceEntry => draft[employeeId] ?? EMPTY;
 
-    // Status na frequência real: quem confirmou é presumido presente até ser marcado.
+    // Status na frequência real: quem está na lista é presumido presente até ser marcado.
     const presentOf = (employeeId: string): boolean | null => {
         const entry = entryOf(employeeId);
         if (entry.present !== null) return entry.present;
         return entry.confirmed ? true : null;
-    };
-
-    const toggleConfirmed = (employeeId: string) => {
-        setDraft((prev) => {
-            const current = prev[employeeId] ?? EMPTY;
-            return { ...prev, [employeeId]: { ...current, confirmed: !current.confirmed } };
-        });
     };
 
     // Clicar no status que já está marcado limpa a marcação.
@@ -74,22 +74,27 @@ export function useAttendanceDay(workDate: string) {
         setDraft((prev) => {
             const current = prev[employeeId] ?? EMPTY;
             const next = current.present === present ? null : present;
-            return { ...prev, [employeeId]: { ...current, present: next } };
+            // Quem foi marcado como falta não recebe frango.
+            const receivedChicken = next === false ? false : current.receivedChicken;
+            return { ...prev, [employeeId]: { ...current, present: next, receivedChicken } };
         });
     };
 
-    /**
-     * 'lista': grava só as confirmações.
-     * 'frequencia': grava a presença real; quem confirmou e não foi marcado como falta vira presente.
-     */
-    const save = async (stage: 'lista' | 'frequencia'): Promise<string | null> => {
+    const setReceivedChicken = (employeeId: string, value: boolean) => {
+        setDraft((prev) => {
+            const current = prev[employeeId] ?? EMPTY;
+            return { ...prev, [employeeId]: { ...current, receivedChicken: value } };
+        });
+    };
+
+    // Grava a presença real. Quem está na lista e não foi marcado como falta vira presente.
+    // A lista (frango/boi) não é alterada aqui.
+    const save = async (): Promise<string | null> => {
         setSaving(true);
 
         const resolve = (employeeId: string): AttendanceEntry => {
             const entry = entryOf(employeeId);
-            if (stage === 'frequencia' && entry.confirmed && entry.present === null) {
-                return { ...entry, present: true };
-            }
+            if (entry.confirmed && entry.present === null) return { ...entry, present: true };
             return entry;
         };
 
@@ -100,6 +105,7 @@ export function useAttendanceDay(workDate: string) {
                 employee_id: employeeId,
                 work_date: workDate,
                 confirmed: entry.confirmed,
+                received_chicken: entry.receivedChicken,
                 present: entry.present,
             }));
 
@@ -133,7 +139,7 @@ export function useAttendanceDay(workDate: string) {
         return null;
     };
 
-    return { loading, saving, error, entryOf, presentOf, toggleConfirmed, setPresent, save };
+    return { loading, saving, error, entryOf, presentOf, setPresent, setReceivedChicken, save };
 }
 
 /** Todas as chamadas de um funcionário, da mais recente para a mais antiga. */

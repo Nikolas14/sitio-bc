@@ -46,6 +46,7 @@ export interface IAttendance {
   confirmed: boolean; // vai em pelo menos um abate (derivado de frango ou boi)
   frango: boolean; // confirmou para o abate do frango
   boi: boolean; // confirmou para o abate do boi
+  received_chicken: boolean; // recebeu o frango (só faz sentido para quem foi no frango)
   present: boolean | null; // quem realmente foi; null = ainda não lançado
   created_at?: string;
 }

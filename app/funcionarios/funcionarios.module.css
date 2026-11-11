@@ -37,9 +37,13 @@
 .rollInfo { min-width: 0; }
 .rollName { display: block; color: #1e293b; font-size: 14px; font-weight: 800; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rollMeta { display: block; margin-top: 3px; color: #64748b; font-size: 11px; }
-.toggleGroup { display: flex; gap: 8px; flex-shrink: 0; }
+.toggleGroup { display: flex; gap: 10px; flex-shrink: 0; }
 .toggle { padding: 9px 14px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #64748b; font-weight: 700; font-size: 12px; cursor: pointer; }
 .toggle:disabled { opacity: .6; cursor: default; }
+/* Botões da linha com a mesma largura, alinhados e com o mesmo espaço entre eles */
+.toggleGroup > button { width: 130px; text-align: center; }
+/* Espaço reservado para o botão que não aparece nesta linha, mantendo o alinhamento */
+.toggleSpacer { width: 130px; flex-shrink: 0; }
 .togglePresent.on { background: #16a34a; border-color: #16a34a; color: white; }
 .toggleAbsent.on { background: #e11d48; border-color: #e11d48; color: white; }
 
@@ -62,7 +66,8 @@
     .statGrid { grid-template-columns: 1fr; }
     .rollRow { flex-direction: column; align-items: stretch; }
     .toggleGroup { width: 100%; }
-    .toggle { flex: 1; }
+    .toggleGroup > button { width: auto; flex: 1; }
+    .toggleSpacer { display: none; }
 }
 
 /* Filtro por grupo */

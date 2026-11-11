@@ -11,6 +11,7 @@ create table if not exists public."ESTOQUE_employee_attendance" (
   confirmed boolean not null default false,
   frango boolean not null default false,
   boi boolean not null default false,
+  received_chicken boolean not null default false,
   present boolean,
   created_at timestamptz not null default now(),
   unique (employee_id, work_date)
@@ -20,7 +21,8 @@ create table if not exists public."ESTOQUE_employee_attendance" (
 alter table public."ESTOQUE_employee_attendance"
   add column if not exists confirmed boolean not null default false,
   add column if not exists frango boolean not null default false,
-  add column if not exists boi boolean not null default false;
+  add column if not exists boi boolean not null default false,
+  add column if not exists received_chicken boolean not null default false;
 alter table public."ESTOQUE_employee_attendance" alter column present drop not null;
 
 create index if not exists employee_attendance_date_idx

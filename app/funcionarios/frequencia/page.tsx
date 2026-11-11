@@ -7,23 +7,38 @@ import { useToast } from '@/components/Toast/Toast';
 import { useEmployeeManager } from '@/hooks/useEmployeeManager';
 import { useAttendanceDay } from '@/hooks/useAttendance';
 import { formatLongDate, todayISO } from '@/utils/dates';
-import { employeeGroupText, GROUP_FILTERS, matchesGroupFilter } from '@/utils/employeeGroups';
+import { employeeGroupText } from '@/utils/employeeGroups';
 import styles from '../funcionarios.module.css';
+
+type AbateFilter = 'todos' | 'frango' | 'boi';
+
+const ABATE_FILTERS: { value: AbateFilter; label: string }[] = [
+    { value: 'todos', label: 'Todos' },
+    { value: 'frango', label: 'Frango' },
+    { value: 'boi', label: 'Boi' },
+];
 
 export default function FrequenciaFuncionarios() {
     const manager = useEmployeeManager();
     const toast = useToast();
     const [workDate, setWorkDate] = useState(todayISO);
-    const [groupFilter, setGroupFilter] = useState('todos');
+    const [abateFilter, setAbateFilter] = useState<AbateFilter>('todos');
     const attendance = useAttendanceDay(workDate);
 
-    const total = manager.employees.length;
-    const presentes = manager.employees.filter((e) => attendance.presentOf(e.id) === true).length;
-    const faltas = manager.employees.filter((e) => attendance.presentOf(e.id) === false).length;
-    const visible = manager.filteredEmployees.filter((e) => matchesGroupFilter(e.group_name, groupFilter));
+    // Quem está na lista de chamada do dia.
+    const onList = manager.employees.filter((employee) => attendance.entryOf(employee.id).confirmed);
+    const presentes = onList.filter((employee) => attendance.presentOf(employee.id) === true).length;
+    const faltas = onList.filter((employee) => attendance.presentOf(employee.id) === false).length;
+    const receberam = onList.filter((employee) => attendance.entryOf(employee.id).receivedChicken).length;
+
+    const rows = manager.filteredEmployees.filter((employee) => {
+        const entry = attendance.entryOf(employee.id);
+        if (!entry.confirmed) return false;
+        return abateFilter === 'todos' || entry[abateFilter];
+    });
 
     const handleSave = async () => {
-        const saveError = await attendance.save('frequencia');
+        const saveError = await attendance.save();
         if (saveError === null) toast.success('Frequência salva!');
         else toast.error(`Erro ao salvar frequência: ${saveError}`);
     };
@@ -55,14 +70,14 @@ export default function FrequenciaFuncionarios() {
                     </div>
 
                     <div>
-                        <span className={styles.fieldLabel}>Grupo</span>
+                        <span className={styles.fieldLabel}>Abate</span>
                         <div className={styles.chipGroup}>
-                            {GROUP_FILTERS.map((filter) => (
+                            {ABATE_FILTERS.map((filter) => (
                                 <button
                                     key={filter.value}
                                     type="button"
-                                    className={`${styles.chip} ${groupFilter === filter.value ? styles.chipActive : ''}`}
-                                    onClick={() => setGroupFilter(filter.value)}
+                                    className={`${styles.chip} ${abateFilter === filter.value ? styles.chipActive : ''}`}
+                                    onClick={() => setAbateFilter(filter.value)}
                                 >
                                     {filter.label}
                                 </button>
@@ -71,9 +86,10 @@ export default function FrequenciaFuncionarios() {
                     </div>
 
                     <div className={styles.summaryBox}>
+                        <div className={styles.summaryRow}><span>Na lista</span><strong>{onList.length}</strong></div>
                         <div className={styles.summaryRow}><span>Presentes</span><strong>{presentes}</strong></div>
                         <div className={styles.summaryRow}><span>Faltas</span><strong>{faltas}</strong></div>
-                        <div className={styles.summaryRow}><span>Total de funcionários</span><strong>{total}</strong></div>
+                        <div className={styles.summaryRow}><span>Receberam frango</span><strong>{receberam}</strong></div>
                     </div>
                 </div>
 
@@ -89,16 +105,18 @@ export default function FrequenciaFuncionarios() {
                     <span className={styles.eyebrow}>FREQUÊNCIA REAL</span>
                     <h2 className={styles.pageTitle}>{formatLongDate(workDate)}</h2>
                     <p className={styles.pageSub}>
-                        Quem confirmou entra como presente. Marque Falta para quem não foi. Clique de novo para desfazer.
+                        Quem está na lista de chamada aparece aqui. Marque Falta para quem não foi. Clique de novo para desfazer.
                     </p>
 
                     {manager.loading || attendance.loading ? (
-                        <p className={styles.listMessage}>Carregando funcionários...</p>
-                    ) : visible.length === 0 ? (
-                        <p className={styles.listMessage}>Nenhum funcionário encontrado.</p>
+                        <p className={styles.listMessage}>Carregando lista...</p>
+                    ) : onList.length === 0 ? (
+                        <p className={styles.listMessage}>Ninguém na lista deste dia. Monte a lista em Lista de chamada.</p>
+                    ) : rows.length === 0 ? (
+                        <p className={styles.listMessage}>Nenhum funcionário encontrado neste filtro.</p>
                     ) : (
                         <div className={styles.rollList}>
-                            {visible.map((employee) => {
+                            {rows.map((employee) => {
                                 const entry = attendance.entryOf(employee.id);
                                 const status = attendance.presentOf(employee.id);
                                 return (
@@ -106,19 +124,24 @@ export default function FrequenciaFuncionarios() {
                                         <div className={styles.rollInfo}>
                                             <span className={styles.rollName}>{employee.name}</span>
                                             <span className={styles.rollMeta}>{employeeGroupText(employee.group_name)}</span>
-                                            <span className={entry.confirmed ? styles.badgeConfirmed : styles.badgeMuted}>
-                                                {entry.confirmed ? 'Confirmou no WhatsApp' : 'Não confirmou'}
-                                            </span>
+                                            <div>
+                                                {entry.frango && <span className={styles.badgeConfirmed}>Frango</span>}{' '}
+                                                {entry.boi && <span className={styles.badgeConfirmed}>Boi</span>}
+                                            </div>
                                         </div>
                                         <div className={styles.toggleGroup}>
-                                            <button
-                                                type="button"
-                                                className={`${styles.toggle} ${styles.togglePresent} ${status === true ? styles.on : ''}`}
-                                                onClick={() => attendance.setPresent(employee.id, true)}
-                                                disabled={attendance.saving}
-                                            >
-                                                Presente
-                                            </button>
+                                            {entry.frango && status === true ? (
+                                                <button
+                                                    type="button"
+                                                    className={`${styles.toggle} ${styles.toggleConfirm} ${entry.receivedChicken ? styles.on : ''}`}
+                                                    onClick={() => attendance.setReceivedChicken(employee.id, !entry.receivedChicken)}
+                                                    disabled={attendance.saving}
+                                                >
+                                                    Recebeu frango
+                                                </button>
+                                            ) : (
+                                                <span className={styles.toggleSpacer} aria-hidden="true" />
+                                            )}
                                             <button
                                                 type="button"
                                                 className={`${styles.toggle} ${styles.toggleAbsent} ${status === false ? styles.on : ''}`}
@@ -126,6 +149,14 @@ export default function FrequenciaFuncionarios() {
                                                 disabled={attendance.saving}
                                             >
                                                 Falta
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`${styles.toggle} ${styles.togglePresent} ${status === true ? styles.on : ''}`}
+                                                onClick={() => attendance.setPresent(employee.id, true)}
+                                                disabled={attendance.saving}
+                                            >
+                                                Presente
                                             </button>
                                         </div>
                                     </div>
