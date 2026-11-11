@@ -7,6 +7,11 @@
 .fieldLabel { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
 .dateInput { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; font-weight: 700; box-sizing: border-box; }
 .dateInput:focus { outline: none; border-color: #3b82f6; background: white; }
+.diariaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.diariaField { display: flex; flex-direction: column; gap: 6px; }
+.diariaInput { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; font-weight: 700; box-sizing: border-box; }
+.diariaInput:focus { outline: none; border-color: #3b82f6; background: white; }
+.diariaError { color: #dc2626; font-size: 11px; font-weight: 600; }
 .summaryBox { display: flex; flex-direction: column; gap: 8px; padding: 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9; }
 .summaryRow { display: flex; justify-content: space-between; font-size: 13px; color: #334155; font-weight: 600; }
 .summaryRow strong { color: #0f172a; }
@@ -37,6 +42,12 @@
 .rollInfo { min-width: 0; }
 .rollName { display: block; color: #1e293b; font-size: 14px; font-weight: 800; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rollMeta { display: block; margin-top: 3px; color: #64748b; font-size: 11px; }
+.rollTotal { display: block; margin-top: 3px; color: #0f172a; font-size: 12px; font-weight: 800; }
+.rollTotal > span { display: inline; margin-top: 0; font-weight: 600; }
+.extraField { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.extraInput { width: 110px; padding: 6px 8px; border: 1px solid #e2e8f0; border-radius: 6px; background: white; font-size: 12px; font-weight: 700; box-sizing: border-box; }
+.extraInput:focus { outline: none; border-color: #3b82f6; }
+.extraInputInvalid { border-color: #dc2626; }
 .toggleGroup { display: flex; gap: 10px; flex-shrink: 0; }
 .toggle { padding: 9px 14px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #64748b; font-weight: 700; font-size: 12px; cursor: pointer; }
 .toggle:disabled { opacity: .6; cursor: default; }
@@ -95,6 +106,8 @@
 .printBar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 .btnPrint { padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #0f172a; font-weight: 700; font-size: 13px; cursor: pointer; }
 .btnPrint:disabled { opacity: .5; cursor: default; }
+.btnPrintWide { width: 100%; margin-top: 10px; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #0f172a; font-weight: 700; font-size: 13px; cursor: pointer; }
+.btnPrintWide:disabled { opacity: .5; cursor: default; }
 .printSheet { display: none; }
 
 @media print {
@@ -110,6 +123,8 @@
     .printTable td { height: 7.8mm; }
     .printTable th:first-child, .printTable td:first-child { width: 40px; }
     .printCol { width: 22%; }
+    .printReport { font-size: 10px; }
+    .printReport th, .printReport td { padding: 2px 4px; }
 }
 
 @media print {

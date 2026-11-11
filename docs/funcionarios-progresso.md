@@ -32,10 +32,14 @@ Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada
 ### Frequência (`/funcionarios/frequencia`)
 - Mostra só quem está na lista de chamada do dia.
 - Filtro: Todos, Frango, Boi.
+- **Valor da diária (R$)**: duas caixas de texto, uma para Frango e outra para Boi. Aceita "150", "150,00" ou "1.500,00". Vazio fica sem valor. Os valores não são gravados: o total é calculado na hora e some quando a página é recarregada ou a data muda.
 - Etiquetas Frango e Boi em cada linha.
 - Botões na ordem: **Recebeu frango**, **Falta**, **Presente**. O "Recebeu frango" aparece só para quem foi no frango e está presente. Quando não aparece, um espaço reservado mantém o alinhamento.
 - Quem está na lista começa como Presente. Marcar Falta desmarca o recebimento de frango.
-- Resumo: na lista, presentes, faltas e receberam frango.
+- Total por pessoa (só para quem está presente): soma das diárias dos abates em que foi, menos **R$ 10,00** se recebeu frango. Aparece abaixo das etiquetas, por exemplo "Total R$ 140,00 · desc. frango R$ 10,00". Constante `DESCONTO_FRANGO` em `utils/diarias.ts`.
+- **Extra (R$)**: caixa de texto em cada linha, para valor extra da pessoa no dia. Soma ao total (também de quem não foi). Aceita negativo, por exemplo "-20". Aparece no total e no resumo como "Extras". Não é gravado.
+- Resumo: na lista, presentes, faltas, receberam frango, descontos (frango) e total a pagar.
+- Impressão (botão "Imprimir relatório", na barra lateral, abaixo de "Salvar frequência"): relatório de pagamento só de quem foi (presente) na lista do dia, com Nº, Nome, Abate, Presença, Recebeu frango, Total, Pix e Obs. 30 linhas por página. Cabeçalho com data, pessoas, presentes, faltas, total a pagar e as diárias usadas. Os valores são os da tela no momento da impressão.
 - **Salvar frequência** grava presença e recebimento. Não altera a lista de chamada.
 
 ### Histórico (`/funcionarios/historico`)
@@ -47,7 +51,7 @@ Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada
 
 - **`ESTOQUE_employee`**: cadastro. Colunas usadas: `name`, `group_name`, `phone`, `cpf`, `rg`, `pix_key`, `notes`. As colunas antigas `pix_type`, `bank`, `nickname`, `sex` e `active` continuam existindo, sem uso.
 - **`ESTOQUE_employee_attendance`**: uma linha por funcionário e data (chave única). Colunas: `confirmed` (vai em algum abate), `frango`, `boi`, `received_chicken`, `present` (true, false ou null).
-- **`ESTOQUE_abate_day`**: guardava a assinatura da lista. Não é mais usada. A tabela continua no banco, sem apagar.
+- **`ESTOQUE_abate_day`**: guardava a assinatura da lista. Não é usada. A tabela continua no banco, sem apagar.
 - As tabelas novas têm RLS com acesso para `anon` e `authenticated`, no mesmo padrão de clientes.
 - SQL de referência: `supabase/employees.sql` e `supabase/attendance.sql`.
 
@@ -67,7 +71,7 @@ Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada
 - Lista e frequência ficam em telas separadas, com a frequência partindo da lista.
 
 ## Pendências
-1. **Diária e desconto**: a diária é R$ 150,00 nos dois abates, e recebeu frango desconta R$ 10,00. Ainda não há cálculo.
+1. **Fechamento e pagamento**: o total do dia já é calculado na Frequência (diárias por abate em que a pessoa foi, menos o desconto de R$ 10,00 de quem recebeu frango). As diárias são digitadas e não gravadas. Se o fechamento precisar dos valores depois, decidir como guardá-los.
 2. **Fechamento semanal** (segunda a domingo), com extras positivos e negativos, folha para impressão com nome, valor e Pix, e registro de pagamento. Não começou.
 3. **Confirmar a regra "frango e boi em dias diferentes"**. Hoje a tela permite que a mesma pessoa vá nos dois abates na mesma data.
 4. **Frequência com quem não está na lista**: hoje só aparece quem foi adicionado na lista. Se precisar lançar presença de quem não estava, dá para permitir.
