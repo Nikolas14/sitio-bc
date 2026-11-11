@@ -26,6 +26,28 @@ export interface ICustomer {
   updated_at?: string;
 }
 
+export interface IEmployee {
+  id: string;
+  name: string;
+  group_name: string;
+  phone: string;
+  cpf: string;
+  rg: string;
+  pix_key: string;
+  notes: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface IAttendance {
+  id: string;
+  employee_id: string;
+  work_date: string; // YYYY-MM-DD
+  confirmed: boolean; // confirmou no grupo do WhatsApp (lista de chamada)
+  present: boolean | null; // quem realmente foi; null = ainda não lançado
+  created_at?: string;
+}
+
 export interface ITransaction {
   id: string;
   type: 'IN' | 'OUT';

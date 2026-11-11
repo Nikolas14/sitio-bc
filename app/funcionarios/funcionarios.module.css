@@ -1,0 +1,77 @@
+/* Sidebar (comum às telas de frequência e histórico) */
+.sidebarTop { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+.sidebarBody { flex: 1; overflow-y: auto; min-height: 0; padding: 15px; display: flex; flex-direction: column; gap: 14px; }
+.sidebarBottom { padding: 20px; border-top: 1px solid #f1f5f9; background: white; }
+.btnPrimary { width: 100%; background: #0f172a; color: white; border: 0; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.btnPrimary:disabled { opacity: .6; cursor: default; }
+.fieldLabel { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+.dateInput { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; font-weight: 700; box-sizing: border-box; }
+.dateInput:focus { outline: none; border-color: #3b82f6; background: white; }
+.summaryBox { display: flex; flex-direction: column; gap: 8px; padding: 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9; }
+.summaryRow { display: flex; justify-content: space-between; font-size: 13px; color: #334155; font-weight: 600; }
+.summaryRow strong { color: #0f172a; }
+
+/* Lista de itens (sidebar do histórico) */
+.itemList { flex: 1; overflow-y: auto; min-height: 0; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+.listItem { padding: 13px 15px; border-radius: 8px; cursor: pointer; transition: all .2s; border: 1px solid transparent; background: #f8fafc; text-align: left; }
+.listItem:hover { background: #f1f5f9; }
+.listItem.active { background: #eff6ff; border-color: #3b82f6; }
+.itemName { display: block; color: #1e293b; font-size: 13px; font-weight: 800; text-transform: uppercase; }
+.itemDetails { display: block; margin-top: 5px; color: #64748b; font-size: 11px; }
+.listMessage { color: #94a3b8; font-size: 12px; text-align: center; padding: 24px 8px; }
+
+/* Área principal */
+.mainArea { padding: 32px 36px; overflow-y: auto; }
+.card { background: white; width: 100%; max-width: 860px; margin: 0 auto; padding: 32px 36px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.05); box-sizing: border-box; }
+.eyebrow { color: #3b82f6; font-size: 10px; font-weight: 800; letter-spacing: .1em; }
+.pageTitle { color: #0f172a; font-size: 24px; font-weight: 900; margin-top: 6px; text-transform: capitalize; }
+.pageSub { color: #64748b; font-size: 14px; margin-top: 5px; }
+.emptyState { color: #94a3b8; text-align: center; margin: auto; }
+.emptyState h2 { color: #334155; font-size: 22px; margin-bottom: 8px; }
+.emptyState p { font-size: 14px; }
+.emptyIcon { color: #cbd5e1; font-size: 56px; margin-bottom: 12px; }
+
+/* Lista de chamada */
+.rollList { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+.rollRow { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; border: 1px solid #f1f5f9; border-radius: 8px; background: #f8fafc; }
+.rollInfo { min-width: 0; }
+.rollName { display: block; color: #1e293b; font-size: 14px; font-weight: 800; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rollMeta { display: block; margin-top: 3px; color: #64748b; font-size: 11px; }
+.toggleGroup { display: flex; gap: 8px; flex-shrink: 0; }
+.toggle { padding: 9px 14px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #64748b; font-weight: 700; font-size: 12px; cursor: pointer; }
+.toggle:disabled { opacity: .6; cursor: default; }
+.togglePresent.on { background: #16a34a; border-color: #16a34a; color: white; }
+.toggleAbsent.on { background: #e11d48; border-color: #e11d48; color: white; }
+
+/* Histórico */
+.statGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 24px; }
+.statCard { padding: 16px; border-radius: 10px; background: #f8fafc; border: 1px solid #f1f5f9; }
+.statValue { display: block; color: #0f172a; font-size: 26px; font-weight: 900; }
+.statLabel { display: block; margin-top: 4px; color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 14px; }
+.table th { text-align: left; color: #94a3b8; font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+.table td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+.weekday { color: #64748b; text-transform: capitalize; }
+.pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+.pillPresent { background: #dcfce7; color: #15803d; }
+.pillAbsent { background: #ffe4e6; color: #be123c; }
+
+@media (max-width: 760px) {
+    .mainArea { padding: 20px 16px; }
+    .card { padding: 24px 18px; }
+    .statGrid { grid-template-columns: 1fr; }
+    .rollRow { flex-direction: column; align-items: stretch; }
+    .toggleGroup { width: 100%; }
+    .toggle { flex: 1; }
+}
+
+/* Filtro por grupo */
+.chipGroup { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 7px 11px; border-radius: 999px; border: 1px solid #e2e8f0; background: white; color: #64748b; font-size: 11px; font-weight: 700; cursor: pointer; }
+.chipActive { background: #0f172a; border-color: #0f172a; color: white; }
+
+/* Confirmação e situação */
+.toggleConfirm.on { background: #2563eb; border-color: #2563eb; color: white; }
+.badgeConfirmed { display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 800; }
+.badgeMuted { display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; color: #94a3b8; font-size: 10px; font-weight: 800; }
+.pillMuted { background: #f1f5f9; color: #94a3b8; }
