@@ -26,6 +26,36 @@ export interface ICustomer {
   updated_at?: string;
 }
 
+export interface IEmployee {
+  id: string;
+  name: string;
+  group_name: string;
+  phone: string;
+  cpf: string;
+  rg: string;
+  pix_key: string;
+  notes: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface IAttendance {
+  id: string;
+  employee_id: string;
+  work_date: string; // YYYY-MM-DD
+  confirmed: boolean; // vai em pelo menos um abate (derivado de frango ou boi)
+  frango: boolean; // confirmou para o abate do frango
+  boi: boolean; // confirmou para o abate do boi
+  received_chicken: boolean; // recebeu o frango (só faz sentido para quem foi no frango)
+  present: boolean | null; // quem realmente foi; null = ainda não lançado
+  created_at?: string;
+}
+
+export interface IAbateDay {
+  work_date: string; // YYYY-MM-DD
+  signed_at: string | null; // lista assinada em
+}
+
 export interface ITransaction {
   id: string;
   type: 'IN' | 'OUT';

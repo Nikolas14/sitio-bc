@@ -14,7 +14,11 @@ import {
   Tags,
   Info,
    Users,
-   ScanBarcode
+   ScanBarcode,
+   Briefcase,
+   ClipboardCheck,
+   CalendarDays,
+   ListChecks
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -35,6 +39,15 @@ export default function Dashboard() {
       itens: [
         { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
         { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
+        { title: 'Funcionários', path: '/cadastro/funcionarios', icon: <Briefcase size={24} /> },
+      ]
+    },
+    {
+      nome: 'Funcionários',
+      itens: [
+        { title: 'Lista de chamada', path: '/funcionarios/lista-chamada', icon: <ListChecks size={24} /> },
+        { title: 'Frequência', path: '/funcionarios/frequencia', icon: <ClipboardCheck size={24} /> },
+        { title: 'Histórico de frequência', path: '/funcionarios/historico', icon: <CalendarDays size={24} /> },
       ]
     },
     {
