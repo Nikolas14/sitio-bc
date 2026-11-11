@@ -1,7 +1,7 @@
 # Funcionários: progresso
 
-Branch: `feat/funcionarios-frequencia` (criada a partir de `fix/custos-adicionais-zero-inicial`).
-Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada por abate e impressão), e o commit desta atualização.
+Branch: `feat/funcionarios-frequencia` (criada a partir de `fix/custos-adicionais-zero-inicial`). Enviada ao GitHub. PR para `master` ainda não aberto (o `gh` não está instalado nesta máquina; o link de comparação está no histórico da conversa).
+Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada por abate e impressão), `b091288` (frequência a partir da lista, recebimento de frango), `a0b17f0` (diárias, desconto, extras e relatório de pagamento), `22ae3f5` (tira a coluna Presença do relatório).
 
 ## O que existe hoje
 
@@ -30,6 +30,7 @@ Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada
   - Tudo e boi: colunas Nº, Nome e Presença.
 
 ### Frequência (`/funcionarios/frequencia`)
+- Barra lateral: busca (nome, CPF, telefone ou grupo), data do abate, filtro Abate, valores das diárias, resumo, e os botões **Salvar frequência** e **Imprimir relatório**.
 - Mostra só quem está na lista de chamada do dia.
 - Filtro: Todos, Frango, Boi.
 - **Valor da diária (R$)**: duas caixas de texto, uma para Frango e outra para Boi. Aceita "150", "150,00" ou "1.500,00". Vazio fica sem valor. Os valores não são gravados: o total é calculado na hora e some quando a página é recarregada ou a data muda.
@@ -39,7 +40,7 @@ Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada
 - Total por pessoa (só para quem está presente): soma das diárias dos abates em que foi, menos **R$ 10,00** se recebeu frango. Aparece abaixo das etiquetas, por exemplo "Total R$ 140,00 · desc. frango R$ 10,00". Constante `DESCONTO_FRANGO` em `utils/diarias.ts`.
 - **Extra (R$)**: caixa de texto em cada linha, para valor extra da pessoa no dia. Soma ao total (também de quem não foi). Aceita negativo, por exemplo "-20". Aparece no total e no resumo como "Extras". Não é gravado.
 - Resumo: na lista, presentes, faltas, receberam frango, descontos (frango) e total a pagar.
-- Impressão (botão "Imprimir relatório", na barra lateral, abaixo de "Salvar frequência"): relatório de pagamento só de quem foi (presente) na lista do dia, com Nº, Nome, Abate, Recebeu frango, Total, Pix e Obs. 30 linhas por página. Cabeçalho com data, pessoas, presentes, faltas, total a pagar e as diárias usadas. Os valores são os da tela no momento da impressão.
+- Impressão (botão "Imprimir relatório", na barra lateral, abaixo de "Salvar frequência"): relatório de pagamento só de quem foi (presente) na lista do dia, com Nº, Nome, Abate, Recebeu frango, Total, Pix e Obs. 30 linhas por página. Cabeçalho com data, pessoas, total a pagar e as diárias usadas. Os valores são os da tela no momento da impressão.
 - **Salvar frequência** grava presença e recebimento. Não altera a lista de chamada.
 
 ### Histórico (`/funcionarios/historico`)
@@ -69,10 +70,12 @@ Commits: `022df1f` (cadastro + frequência inicial), `b6e9ef2` (lista de chamada
 - O salvamento de presença fica só na Frequência.
 - Frango e boi são escolhidos por pessoa e por data, não por dia.
 - Lista e frequência ficam em telas separadas, com a frequência partindo da lista.
+- Diárias e extras são digitados na hora e não são gravados. O relatório sai com os valores da tela no momento da impressão.
+- O relatório de pagamento sai só com quem foi (presente). Quem faltou não entra, mesmo que tenha extra. Não tem colunas de diária, desconto ou extra; só o total.
 
 ## Pendências
-1. **Fechamento e pagamento**: o total do dia já é calculado na Frequência (diárias por abate em que a pessoa foi, menos o desconto de R$ 10,00 de quem recebeu frango). As diárias são digitadas e não gravadas. Se o fechamento precisar dos valores depois, decidir como guardá-los.
-2. **Fechamento semanal** (segunda a domingo), com extras positivos e negativos, folha para impressão com nome, valor e Pix, e registro de pagamento. Não começou.
+1. **Fechamento e pagamento**: o total do dia já é calculado na Frequência (diárias por abate em que a pessoa foi, menos o desconto de R$ 10,00 de quem recebeu frango). As diárias são digitadas e não gravadas. Se o fechamento precisar dos valores depois, decidir como guardá-los. Também falta decidir se o extra de quem faltou deve sair no relatório (hoje não sai, mas entra no total da tela).
+2. **Fechamento semanal** (segunda a domingo), somando os dias, com extras positivos e negativos, e registro de pagamento. Não começou. O relatório do dia já sai na Frequência, com nome, Pix e Obs.
 3. **Confirmar a regra "frango e boi em dias diferentes"**. Hoje a tela permite que a mesma pessoa vá nos dois abates na mesma data.
 4. **Frequência com quem não está na lista**: hoje só aparece quem foi adicionado na lista. Se precisar lançar presença de quem não estava, dá para permitir.
 5. **Histórico**: mostrar abate e recebimento de frango por data.
