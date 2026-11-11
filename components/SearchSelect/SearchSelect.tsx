@@ -19,6 +19,8 @@ interface SearchSelectProps<T> {
   emptyText?: string;
   maxResults?: number;
   loading?: boolean;
+  /** Devolve o foco (e abre a lista) ao limpar a seleção. */
+  focusOnClear?: boolean;
 }
 
 export default function SearchSelect<T>({
@@ -33,6 +35,7 @@ export default function SearchSelect<T>({
   emptyText = 'Nada encontrado.',
   maxResults = 8,
   loading = false,
+  focusOnClear = true,
 }: SearchSelectProps<T>) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -48,9 +51,9 @@ export default function SearchSelect<T>({
 
   // Ao limpar a seleção, devolve o foco para a busca.
   useEffect(() => {
-    if (hadSelection.current && !selected) inputRef.current?.focus();
+    if (focusOnClear && hadSelection.current && !selected) inputRef.current?.focus();
     hadSelection.current = !!selected;
-  }, [selected]);
+  }, [selected, focusOnClear]);
 
   const choose = (item: T) => {
     onSelect(item);

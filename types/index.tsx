@@ -43,9 +43,16 @@ export interface IAttendance {
   id: string;
   employee_id: string;
   work_date: string; // YYYY-MM-DD
-  confirmed: boolean; // confirmou no grupo do WhatsApp (lista de chamada)
+  confirmed: boolean; // vai em pelo menos um abate (derivado de frango ou boi)
+  frango: boolean; // confirmou para o abate do frango
+  boi: boolean; // confirmou para o abate do boi
   present: boolean | null; // quem realmente foi; null = ainda não lançado
   created_at?: string;
+}
+
+export interface IAbateDay {
+  work_date: string; // YYYY-MM-DD
+  signed_at: string | null; // lista assinada em
 }
 
 export interface ITransaction {

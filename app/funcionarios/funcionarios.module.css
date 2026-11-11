@@ -75,3 +75,39 @@
 .badgeConfirmed { display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 800; }
 .badgeMuted { display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; color: #94a3b8; font-size: 10px; font-weight: 800; }
 .pillMuted { background: #f1f5f9; color: #94a3b8; }
+
+/* Lista de chamada: dia de abate e remoção */
+.checkGroup { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.checkRow { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; color: #1e293b; font-size: 14px; font-weight: 700; cursor: pointer; }
+.checkRow input { width: 16px; height: 16px; accent-color: #0f172a; }
+.checkRow:has(input:disabled) { opacity: .6; cursor: default; }
+.btnRemove { padding: 9px 14px; border-radius: 8px; border: 1px solid #fecdd3; background: transparent; color: #e11d48; font-weight: 700; font-size: 12px; cursor: pointer; flex-shrink: 0; }
+.btnRemove:disabled { opacity: .6; cursor: default; }
+.btnClear { width: 100%; margin-bottom: 10px; padding: 12px; border-radius: 8px; border: 1px solid #fecdd3; background: transparent; color: #e11d48; font-weight: 700; cursor: pointer; }
+.btnClear:disabled { opacity: .6; cursor: default; }
+
+/* Impressão da lista de chamada */
+.printBar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.btnPrint { padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #0f172a; font-weight: 700; font-size: 13px; cursor: pointer; }
+.btnPrint:disabled { opacity: .5; cursor: default; }
+.printSheet { display: none; }
+
+@media print {
+    @page { margin: 12mm; }
+    :global(html), :global(body) { height: auto !important; overflow: visible !important; background: white !important; }
+    .screenOnly { display: none !important; }
+    .printSheet { display: block; color: #000; font-family: Arial, sans-serif; }
+    .printTitle { font-size: 18px; margin: 0 0 4px; }
+    .printMeta { font-size: 12px; margin: 0 0 12px; }
+    .printTable { width: 100%; border-collapse: collapse; font-size: 15px; }
+    .printTable th, .printTable td { border: 1px solid #000; padding: 2px 6px; text-align: left; }
+    .printTable th { font-size: 12px; }
+    .printTable td { height: 7.8mm; }
+    .printTable th:first-child, .printTable td:first-child { width: 40px; }
+    .printCol { width: 22%; }
+}
+
+@media print {
+    .printPage { break-after: page; page-break-after: always; }
+    .printPage:last-child { break-after: auto; page-break-after: auto; }
+}
