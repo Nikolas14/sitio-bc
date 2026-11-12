@@ -25,3 +25,16 @@ export function formatLongDate(iso: string): string {
 export function weekdayOf(iso: string): string {
   return parseISO(iso).toLocaleDateString('pt-BR', { weekday: 'long' });
 }
+
+/** Soma dias a uma data YYYY-MM-DD. */
+export function addDays(iso: string, days: number): string {
+  const date = parseISO(iso);
+  date.setDate(date.getDate() + days);
+  return date.toLocaleDateString('en-CA');
+}
+
+/** Segunda-feira da semana (segunda a domingo) que contém a data, em YYYY-MM-DD. */
+export function mondayOf(iso: string): string {
+  const diasDesdeSegunda = (parseISO(iso).getDay() + 6) % 7;
+  return addDays(iso, -diasDesdeSegunda);
+}

@@ -26,9 +26,7 @@ const SumaryCobranca = ({ trans, shipping, tax }: Props) => {
                 <div className={styles.clientGroup}>
                     <span className={styles.mainLabel}>CLIENTE</span>
                     <h1 className={styles.clientName}>{trans.customer_vendor}</h1>
-                    {trans.ESTOQUE_customer?.airport && (
-                        <span className={styles.airport}>Aeroporto de destino: <strong>{trans.ESTOQUE_customer.airport}</strong></span>
-                    )}
+                    <span className={styles.airport}>Aeroporto de destino: <strong>{trans.ESTOQUE_customer?.airport || '-'}</strong></span>
                 </div>
                 <div className={styles.statusGroup}>
                     <span className={`${styles.statusBadge} ${styles[trans.status.toLowerCase()]}`}>

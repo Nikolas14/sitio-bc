@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/api/supabase';
 import { IAttendance } from '@/types';
+import { addDays } from '@/utils/dates';
 
 type AttendanceRow = Pick<IAttendance, 'id' | 'employee_id' | 'confirmed' | 'frango' | 'boi' | 'received_chicken' | 'present'>;
 export interface AttendanceEntry {
@@ -178,4 +179,23 @@ export function useEmployeeAttendance(employeeId: string | null) {
     }, [employeeId]);
 
     return { rows: employeeId ? rows : [], loading, error };
+}
+
+export interface AttendanceWeekRow {
+  employee_id: string;
+  work_date: string;
+  confirmed: boolean;
+  present: boolean | null;
+}
+
+/** Lista de chamada e presença de uma semana (segunda a domingo). Null se a consulta falhar. */
+export async function fetchAttendanceWeek(weekStart: string): Promise<AttendanceWeekRow[] | null> {
+    const { data, error } = await supabase
+        .from('ESTOQUE_employee_attendance')
+        .select('employee_id, work_date, confirmed, present')
+        .gte('work_date', weekStart)
+        .lte('work_date', addDays(weekStart, 6));
+
+    if (error) return null;
+    return (data ?? []) as AttendanceWeekRow[];
 }

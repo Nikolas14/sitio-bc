@@ -102,6 +102,7 @@ export interface IReceiptProduct {
 }
 
 export interface IReceiptItem {
+  product_id?: number | null;
   quant: number;
   unit_price?: number | null;
   ESTOQUE_product: IReceiptProduct | null;

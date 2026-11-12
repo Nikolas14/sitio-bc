@@ -1,0 +1,102 @@
+/* Estilos da tela Imprimir Pedido. Seguem o padrão da Nova Projeção:
+   sidebar com cliente + botão de ação, e um painel branco à direita.
+   O esqueleto (sidebar + main) é provido por PageLayout. */
+
+.topContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.footerActions {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+/* Painel da direita, igual ao da lista de conferência da projeção */
+.panel {
+  background: #ffffff;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 24px;
+  background: #1e293b;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.panelBadge {
+  font-size: 10px;
+  background: #3b82f6;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.panelBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.textarea {
+  flex: 1;
+  min-height: 300px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+}
+
+/* Folha de impressão: escondida na tela, aparece só ao imprimir */
+.printSheet { display: none; }
+
+.pedidoImpresso {
+  margin: 20px 0 0;
+  font-family: inherit;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+@media print {
+  .panel { display: none; }
+  .printSheet { display: block; }
+  .pedidoImpresso { font-size: 13px; }
+}

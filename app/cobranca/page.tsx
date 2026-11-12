@@ -1,9 +1,10 @@
 'use client';
 
 import styles from './page.module.css';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { useCobrancas } from '@/hooks/useCobrancas';
+import { usePersistedState } from '@/hooks/usePersistedState';
 
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import StatusFilter from '@/components/StatusFilter/StatusFilter';
@@ -16,9 +17,10 @@ const STATUS_LIST = STATUS_COBRANCA;
 
 export default function ListaCobrancasPage() {
   const { transactions, loading, error, refresh } = useCobrancas();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [hideConcluded, setHideConcluded] = useState(true);
+  // Filtros ficam salvos: ao voltar de uma transação, a lista continua do mesmo jeito.
+  const [searchTerm, setSearchTerm] = usePersistedState('sitio-bc:cobranca-busca', '');
+  const [selectedStatus, setSelectedStatus] = usePersistedState<string[]>('sitio-bc:cobranca-status', []);
+  const [hideConcluded, setHideConcluded] = usePersistedState('sitio-bc:cobranca-ocultar-concluidos', true);
 
   const toggleStatus = (status: string) => {
     setSelectedStatus(prev =>

@@ -32,12 +32,16 @@ export default function ProjecaoEnvioPage() {
   // A referência é montada sozinha: cliente (principal) + subnome (secundário).
   const finalReference = [customer?.name, identifier.trim()].filter(Boolean).join(' · ') || 'PROJEÇÃO_AVULSA';
 
-  // Cálculos consolidados (Peso e Preço)
+  // O desconto vem sempre do cliente selecionado (não é editado aqui).
+  const discountPercent = Number(customer?.discount_percent) || 0;
+
+  // Cálculos consolidados (Peso e Preço com desconto)
   const financial = useMemo(() => {
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
-    const totalPrice = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
-    return { totalKg, totalPrice };
-  }, [items]);
+    const subtotal = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
+    const discountVal = subtotal * (discountPercent / 100);
+    return { totalKg, totalPrice: subtotal - discountVal };
+  }, [items, discountPercent]);
 
   // Produto repetido soma na linha que já existe em vez de duplicar.
   const addItem = (product: IProduct, quantKg: number) => {
@@ -67,6 +71,7 @@ export default function ProjecaoEnvioPage() {
         reference: finalReference,
         customer_id: customer?.id ?? null,
         subname: identifier.trim() || null,
+        discount_percent: discountPercent,
         status: 'ABERTO'
       }));
 

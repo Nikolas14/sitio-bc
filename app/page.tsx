@@ -18,7 +18,8 @@ import {
    Briefcase,
    ClipboardCheck,
    CalendarDays,
-   ListChecks
+   ListChecks,
+  Printer
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -68,6 +69,7 @@ export default function Dashboard() {
         { title: 'Resumo / Saldo', path: '/projecao/saldo', icon: <BarChart3 size={24} /> },
         { title: 'Lista projeção', path: '/projecao/lista', icon: <List size={24} /> },
         { title: 'Resumo projeção', path: '/projecao/resumo', icon: <Info size={24} /> },
+        { title: 'Imprimir pedido', path: '/projecao/imprimir', icon: <Printer size={24} /> },
       ]
     }
   ];

@@ -90,6 +90,7 @@
   vertical-align: top;
 }
 
+.colId { width: 48px; }
 .colQty { width: 72px; }
 .colTotal { width: 104px; }
 

@@ -125,6 +125,7 @@ export default function TransacoesInterface() {
               serialNumber={active.serial_number}
               createdAt={active.created_at}
               totalKg={active.total_kg}
+              discountPercent={active.discount_percent}
             />
 
             <TransactionItemsTable
