@@ -21,6 +21,20 @@ type Props = {
 export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, financial, shipping, tax, discount }, ref) => {
   const formatCurrency = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
 
+  // Itens do mesmo produto viram uma linha só: soma quantidades e totais.
+  const linhas = Object.values(
+    items.reduce<Record<string, { id: number | null; name: string; quant: number; total: number }>>((acc, item) => {
+      const key = String(item.product_id ?? item.ESTOQUE_product?.name ?? '');
+      const quant = Number(item.quant);
+      const price = Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0);
+      const linha = acc[key] ?? { id: item.product_id ?? null, name: item.ESTOQUE_product?.name ?? '', quant: 0, total: 0 };
+      linha.quant += quant;
+      linha.total += quant * price;
+      acc[key] = linha;
+      return acc;
+    }, {})
+  );
+
   return (
     <div className={styles.printWrapper}>
       {/* O REF vai aqui para capturar apenas o que importa */}
@@ -34,7 +48,6 @@ export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, 
           <div>
             <p><strong>Cliente:</strong></p>
             <p className={styles.customer}>{trans.customer_vendor}</p>
-            <p><strong>Desconto:</strong> {Number(trans.discount_percent) || 0}%</p>
           </div>
           <div className={`${styles.meta} ${styles.textRight}`}>
             <p><strong>Ref:</strong> {trans.serial_number || trans.id.slice(0, 8).toUpperCase()}</p>
@@ -45,20 +58,22 @@ export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, 
         <table className={styles.table}>
           <thead>
             <tr>
+              <th className={styles.colId}>ID</th>
               <th>Produto</th>
               <th className={`${styles.colQty} ${styles.textRight}`}>Qtd</th>
               <th className={`${styles.colTotal} ${styles.textRight}`}>Total</th>
             </tr>
           </thead>
           <tbody>
-            {items.map((item, i: number) => (
-              <tr key={i}>
-                <td>{item.ESTOQUE_product?.name}</td>
+            {linhas.map((linha, i: number) => (
+              <tr key={`${linha.id ?? 'x'}-${i}`}>
+                <td className={styles.colId}>{linha.id ?? '-'}</td>
+                <td>{linha.name}</td>
                 <td className={`${styles.qty} ${styles.textRight}`}>
-                  {Number(item.quant).toLocaleString('pt-BR', { maximumFractionDigits: 3 })}
+                  {linha.quant.toLocaleString('pt-BR', { maximumFractionDigits: 3 })}
                 </td>
                 <td className={styles.textRight}>
-                  {formatCurrency(item.quant * Number(item.unit_price ?? item.ESTOQUE_product?.price ?? 0))}
+                  {formatCurrency(linha.total)}
                 </td>
               </tr>
             ))}

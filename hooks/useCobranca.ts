@@ -29,7 +29,7 @@ export function useCobranca(id: string | string[] | undefined) {
       // 2. Busca as operations
       const { data: iData, error: iError } = await supabase
         .from('ESTOQUE_operation')
-        .select('quant, unit_price, ESTOQUE_product(name, price)')
+        .select('product_id, quant, unit_price, ESTOQUE_product(name, price)')
         .eq('transaction_id', id);
 
       if (iError) throw iError;
