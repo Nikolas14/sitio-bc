@@ -26,6 +26,9 @@ const SumaryCobranca = ({ trans, shipping, tax }: Props) => {
                 <div className={styles.clientGroup}>
                     <span className={styles.mainLabel}>CLIENTE</span>
                     <h1 className={styles.clientName}>{trans.customer_vendor}</h1>
+                    {trans.ESTOQUE_customer?.airport && (
+                        <span className={styles.airport}>Aeroporto de destino: <strong>{trans.ESTOQUE_customer.airport}</strong></span>
+                    )}
                 </div>
                 <div className={styles.statusGroup}>
                     <span className={`${styles.statusBadge} ${styles[trans.status.toLowerCase()]}`}>
@@ -38,7 +41,7 @@ const SumaryCobranca = ({ trans, shipping, tax }: Props) => {
             <div className={styles.infoBar}>
                 <div className={styles.section}>
                     <div className={styles.item}>
-                        <span className={styles.label}>SÉRIE</span>
+                        <span className={styles.label}>CUPOM</span>
                         <span className={styles.value}>#{trans.serial_number}</span>
                     </div>
                     <div className={styles.item}>

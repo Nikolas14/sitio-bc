@@ -61,6 +61,9 @@ export interface ITransaction {
   id: string;
   type: 'IN' | 'OUT';
   customer_vendor: string;
+  customer_id?: string | null;
+  // Join com ESTOQUE_customer (só o aeroporto), quando a venda tem cliente vinculado
+  ESTOQUE_customer?: { airport: string } | null;
   total_price: number;
   total_kg: number;
   created_at: string;

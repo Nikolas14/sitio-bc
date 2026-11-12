@@ -57,7 +57,7 @@ export default function ListaCobrancasPage() {
           labelDescricao="Buscar por Cliente"
           valor={searchTerm}
           setValor={setSearchTerm}
-          placeholder="Nome ou Série..."
+          placeholder="Nome ou Cupom..."
         />
 
         <StatusFilter

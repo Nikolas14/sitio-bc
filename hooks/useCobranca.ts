@@ -20,7 +20,7 @@ export function useCobranca(id: string | string[] | undefined) {
       // 1. Busca a transaction
       const { data: tData, error: tError } = await supabase
         .from('ESTOQUE_transaction')
-        .select('*')
+        .select('*, ESTOQUE_customer(airport)')
         .eq('id', id)
         .single();
 

@@ -61,6 +61,7 @@ export default function VendaSimplificadaPage() {
         .insert([{
           type: 'OUT',
           customer_vendor: customerLabel,
+          customer_id: customer?.id ?? null,
           total_price: financial.subtotal, // Salvamos o BRUTO
           total_kg: financial.totalKg,
           discount_percent: discountPercent,
@@ -99,7 +100,7 @@ export default function VendaSimplificadaPage() {
     } finally {
       setLoading(false);
     }
-  }, [items, customerLabel, financial, discountPercent, toast]);
+  }, [items, customerLabel, customer?.id, financial, discountPercent, toast]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

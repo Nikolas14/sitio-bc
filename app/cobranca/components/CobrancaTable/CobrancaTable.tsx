@@ -111,7 +111,7 @@ export default function CobrancaTable({ transactions, loading }: CobrancaTablePr
         <table className={styles.table}>
           <thead>
             <tr>
-              {sortableTh('serial_number', 'Série')}
+              {sortableTh('serial_number', 'Cupom')}
               {sortableTh('customer_vendor', 'Cliente')}
               {sortableTh('created_at', 'Data')}
               {sortableTh('net_total', 'Total Líquido')}
