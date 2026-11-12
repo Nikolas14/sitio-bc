@@ -5,8 +5,8 @@ import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import { useToast } from '@/components/Toast/Toast';
 import { useEmployeeManager } from '@/hooks/useEmployeeManager';
-import { useAttendanceDay } from '@/hooks/useAttendance';
-import { formatLongDate, todayISO } from '@/utils/dates';
+import { fetchAttendanceWeek, useAttendanceDay, type AttendanceWeekRow } from '@/hooks/useAttendance';
+import { addDays, formatLongDate, formatShortDate, mondayOf, todayISO } from '@/utils/dates';
 import { DESCONTO_FRANGO, calcularPagamento, formatReais, parseValor } from '@/utils/diarias';
 import { employeeGroupText } from '@/utils/employeeGroups';
 import styles from '../funcionarios.module.css';
@@ -21,6 +21,9 @@ const ABATE_FILTERS: { value: AbateFilter; label: string }[] = [
 
 // Cada página impressa tem 30 linhas; as que faltam ficam em branco.
 const PRINT_ROWS_PER_PAGE = 30;
+
+// Dias da semana na lista impressa (segunda a domingo).
+const DIAS_SEMANA = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
 export default function FrequenciaFuncionarios() {
     const manager = useEmployeeManager();
@@ -60,8 +63,42 @@ export default function FrequenciaFuncionarios() {
         return abateFilter === 'todos' || entry[abateFilter];
     });
 
-    // Relatório impresso para pagamento: todos da lista do dia.
-    const [imprimindo, setImprimindo] = useState(false);
+    // Impressão: pagamento do dia ou frequência da semana. Uma por vez.
+    const [impressao, setImpressao] = useState<'pagamento' | 'semana' | null>(null);
+    const [semanaImpressa, setSemanaImpressa] = useState<AttendanceWeekRow[]>([]);
+    const semanaInicio = mondayOf(workDate);
+    const semanaFim = addDays(semanaInicio, 6);
+    const semanaDias = Array.from({ length: 7 }, (_, i) => addDays(semanaInicio, i));
+
+    // Uma linha por pessoa que esteve na lista em algum dia da semana.
+    // P = presente, F = falta, vazio = não estava na lista naquele dia.
+    const linhasDaSemana = manager.employees.flatMap((employee) => {
+        const marcas = semanaDias.map((dia) => {
+            const row = semanaImpressa.find((r) => r.employee_id === employee.id && r.work_date === dia);
+            if (!row || !row.confirmed) return '';
+            return (row.present ?? true) ? 'P' : 'F';
+        });
+        if (marcas.every((marca) => marca === '')) return [];
+        return [{ employee, marcas, dias: marcas.filter((marca) => marca === 'P').length }];
+    });
+    const semanaPages = Array.from(
+        { length: Math.max(1, Math.ceil(linhasDaSemana.length / PRINT_ROWS_PER_PAGE)) },
+        (_, pageIndex) => Array.from(
+            { length: PRINT_ROWS_PER_PAGE },
+            (__, rowIndex) => linhasDaSemana[pageIndex * PRINT_ROWS_PER_PAGE + rowIndex] ?? null,
+        ),
+    );
+
+    // A semana é buscada na hora de imprimir, para pegar o que foi salvo nos dias.
+    const imprimirSemana = async () => {
+        const rows = await fetchAttendanceWeek(semanaInicio);
+        if (rows === null) {
+            toast.error('Erro ao carregar a semana para impressão');
+            return;
+        }
+        setSemanaImpressa(rows);
+        setImpressao('semana');
+    };
     // Só quem foi (presente). Quem faltou não entra no relatório.
     const printLinhas = onList
         .filter((employee) => attendance.presentOf(employee.id) === true)
@@ -105,12 +142,12 @@ export default function FrequenciaFuncionarios() {
     );
 
     useEffect(() => {
-        if (!imprimindo) return;
-        const reset = () => setImprimindo(false);
+        if (!impressao) return;
+        const reset = () => setImpressao(null);
         window.addEventListener('afterprint', reset);
         window.print();
         return () => window.removeEventListener('afterprint', reset);
-    }, [imprimindo]);
+    }, [impressao]);
 
     const handleSave = async () => {
         const saveError = await attendance.save();
@@ -143,6 +180,7 @@ export default function FrequenciaFuncionarios() {
                                 if (e.target.value) setWorkDate(e.target.value);
                             }}
                         />
+                        <span className={styles.fieldLabel}>Semana: {formatShortDate(semanaInicio)} a {formatShortDate(semanaFim)}</span>
                     </div>
 
                     <div>
@@ -205,8 +243,11 @@ export default function FrequenciaFuncionarios() {
                     <button type="button" className={styles.btnPrimary} onClick={handleSave} disabled={attendance.loading || attendance.saving}>
                         {attendance.saving ? 'Salvando...' : 'Salvar frequência'}
                     </button>
-                    <button type="button" className={styles.btnPrintWide} onClick={() => setImprimindo(true)} disabled={onList.length === 0}>
-                        Imprimir relatório
+                    <button type="button" className={styles.btnPrintWide} onClick={imprimirSemana}>
+                        Imprimir frequência da semana
+                    </button>
+                    <button type="button" className={styles.btnPrintWide} onClick={() => setImpressao('pagamento')} disabled={onList.length === 0}>
+                        Imprimir pagamento do dia
                     </button>
                 </div>
             </Sidebar>
@@ -304,6 +345,7 @@ export default function FrequenciaFuncionarios() {
             </Main>
         </PageLayout>
 
+        {impressao === 'pagamento' && (
         <div className={styles.printSheet}>
             {printPages.map((paginaLinhas, pageIndex) => (
                 <section key={pageIndex} className={styles.printPage}>
@@ -335,6 +377,47 @@ export default function FrequenciaFuncionarios() {
                 </section>
             ))}
         </div>
+        )}
+
+        {impressao === 'semana' && (
+        <div className={styles.printSheet}>
+            {semanaPages.map((paginaLinhas, pageIndex) => (
+                <section key={pageIndex} className={styles.printPage}>
+                    <h1 className={styles.printTitle}>Frequência · Semana</h1>
+                    <p className={styles.printMeta}>
+                        Semana de {formatShortDate(semanaInicio)} a {formatShortDate(semanaFim)} · Página {pageIndex + 1} de {semanaPages.length} · Pessoas: {linhasDaSemana.length}
+                    </p>
+                    <p className={styles.printMeta}>
+                        P = presente · F = falta · em branco = não estava na lista naquele dia
+                    </p>
+                    <table className={`${styles.printTable} ${styles.printReport} ${styles.printWeek}`}>
+                        <thead>
+                            <tr>
+                                <th>Nº</th>
+                                <th>Nome</th>
+                                {semanaDias.map((dia, i) => (
+                                    <th key={dia} className={styles.printCentro}>{DIAS_SEMANA[i]}<br />{dia.slice(8, 10)}/{dia.slice(5, 7)}</th>
+                                ))}
+                                <th className={styles.printCentro}>Dias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {paginaLinhas.map((linha, rowIndex) => (
+                                <tr key={rowIndex}>
+                                    <td>{linha ? pageIndex * PRINT_ROWS_PER_PAGE + rowIndex + 1 : ''}</td>
+                                    <td>{linha?.employee.name ?? ''}</td>
+                                    {Array.from({ length: 7 }, (_, i) => (
+                                        <td key={i} className={styles.printCentro}>{linha?.marcas[i] ?? ''}</td>
+                                    ))}
+                                    <td className={styles.printCentro}>{linha ? linha.dias : ''}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </section>
+            ))}
+        </div>
+        )}
         </>
     );
 }

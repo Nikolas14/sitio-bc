@@ -125,6 +125,18 @@
     .printCol { width: 22%; }
     .printReport { font-size: 10px; }
     .printReport th, .printReport td { padding: 2px 4px; }
+    /* Larguras fixas: sem isso, cada página calcula as colunas pelo próprio conteúdo e fica diferente da 1ª. */
+    .printReport { table-layout: fixed; }
+    .printReport th:nth-child(2), .printReport td:nth-child(2) { width: 26%; }
+    .printReport th:nth-child(3), .printReport td:nth-child(3) { width: 14%; }
+    .printReport th:nth-child(4), .printReport td:nth-child(4) { width: 14%; }
+    .printReport th:nth-child(5), .printReport td:nth-child(5) { width: 12%; }
+    .printReport th:nth-child(6), .printReport td:nth-child(6) { width: 18%; }
+    .printCentro { text-align: center; }
+    /* Lista semanal: Nome, sete dias e total de dias. */
+    .printWeek th:nth-child(2), .printWeek td:nth-child(2) { width: 26%; }
+    .printWeek th:nth-child(n+3):nth-child(-n+9), .printWeek td:nth-child(n+3):nth-child(-n+9) { width: 8.5%; }
+    .printWeek th:nth-child(10), .printWeek td:nth-child(10) { width: 8%; }
 }
 
 @media print {
