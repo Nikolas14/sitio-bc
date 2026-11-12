@@ -27,7 +27,7 @@ export const ReceiptHeader = ({ trans, currentPage, totalPages }: ReceiptHeaderP
 
       <div className={styles.invoiceMeta}>
         <div className={styles.metaBox}>
-          <span className={styles.metaLabel}>NÚMERO DA SÉRIE</span>
+          <span className={styles.metaLabel}>NÚMERO DO CUPOM</span>
           <span className={styles.metaValue}>#{trans.serial_number}</span>
         </div>
         <div className={styles.metaBox}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './AvailabilityTable.module.css';
 
 interface AvailabilityItem {
@@ -14,11 +14,17 @@ interface AvailabilityItem {
 
 const NO_CATEGORY = 'Sem Categoria';
 
+type NumKey = 'estoque_real' | 'total_projetado' | 'saldo_previsto';
+type SortKey = 'product_name' | 'situacao' | NumKey;
+
+// Situação: 0 em falta, 1 no limite, 2 OK
+const situacaoRank = (item: AvailabilityItem) =>
+  item.saldo_previsto < 0 ? 0 : item.saldo_previsto === 0 && item.total_projetado > 0 ? 1 : 2;
+
 const fmt = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 export default function AvailabilityTable({ data }: { data: AvailabilityItem[] }) {
-  // Agrupa por categoria (A–Z, "Sem Categoria" por último); dentro de cada grupo
-  // os itens em falta vêm primeiro (a lista já chega ordenada por saldo).
+  // Agrupa por categoria (A–Z, "Sem Categoria" por último).
   const groups = useMemo(() => {
     const map = new Map<string, AvailabilityItem[]>();
     for (const item of data) {
@@ -32,6 +38,33 @@ export default function AvailabilityTable({ data }: { data: AvailabilityItem[] }
       return a.localeCompare(b, 'pt-BR');
     });
   }, [data]);
+
+  // Padrão: nome do produto A–Z. Clicar no cabeçalho alterna crescente/decrescente.
+  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'product_name', dir: 1 });
+
+  const toggleSort = (key: SortKey) =>
+    setSort(prev => (prev.key === key ? { key, dir: prev.dir === 1 ? -1 : 1 } : { key, dir: 1 }));
+
+  const sortItems = (items: AvailabilityItem[]) => {
+    const { key, dir } = sort;
+    return [...items].sort((a, b) => {
+      const va = key === 'situacao' ? situacaoRank(a) : a[key];
+      const vb = key === 'situacao' ? situacaoRank(b) : b[key];
+      const r = typeof va === 'string' ? va.localeCompare(vb as string, 'pt-BR') : (va as number) - (vb as number);
+      return r * dir;
+    });
+  };
+
+  const header = (key: SortKey, label: string, className?: string) => {
+    const active = sort.key === key;
+    return (
+      <th className={className} aria-sort={active ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}>
+        <button type="button" className={styles.sortBtn} onClick={() => toggleSort(key)}>
+          {label}{active && (sort.dir === 1 ? ' ▲' : ' ▼')}
+        </button>
+      </th>
+    );
+  };
 
   if (data.length === 0) {
     return <div className={styles.empty}>Nenhum item encontrado.</div>;
@@ -55,15 +88,15 @@ export default function AvailabilityTable({ data }: { data: AvailabilityItem[] }
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Produto</th>
-                  <th className={styles.num}>Físico</th>
-                  <th className={styles.num}>Projetado</th>
-                  <th className={styles.num}>Saldo</th>
-                  <th className={styles.statusCol}>Situação</th>
+                  {header('product_name', 'Produto')}
+                  {header('estoque_real', 'Físico', styles.num)}
+                  {header('total_projetado', 'Projetado', styles.num)}
+                  {header('saldo_previsto', 'Saldo', styles.num)}
+                  {header('situacao', 'Situação', styles.statusCol)}
                 </tr>
               </thead>
               <tbody>
-                {items.map(item => {
+                {sortItems(items).map(item => {
                   const isNegative = item.saldo_previsto < 0;
                   const isWarning = item.saldo_previsto === 0 && item.total_projetado > 0;
                   const rowClass = isNegative ? styles.rowDanger : isWarning ? styles.rowWarning : '';

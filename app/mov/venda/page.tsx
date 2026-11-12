@@ -36,6 +36,12 @@ export default function VendaSimplificadaPage() {
   // Cliente (principal) + identificador (minuta, pedido...) viram o nome da venda.
   const customerLabel = [customer?.name, identifier.trim()].filter(Boolean).join(' · ') || 'VENDA_AVULSA';
 
+  // Ao escolher o cliente, o desconto dele já entra na venda (continua editável).
+  const selectCustomer = (c: ICustomer | null) => {
+    setCustomer(c);
+    setDiscountPercent(Number(c?.discount_percent) || 0);
+  };
+
   const financial = useMemo(() => {
     const subtotal = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
@@ -55,6 +61,7 @@ export default function VendaSimplificadaPage() {
         .insert([{
           type: 'OUT',
           customer_vendor: customerLabel,
+          customer_id: customer?.id ?? null,
           total_price: financial.subtotal, // Salvamos o BRUTO
           total_kg: financial.totalKg,
           discount_percent: discountPercent,
@@ -93,7 +100,7 @@ export default function VendaSimplificadaPage() {
     } finally {
       setLoading(false);
     }
-  }, [items, customerLabel, financial, discountPercent, toast]);
+  }, [items, customerLabel, customer?.id, financial, discountPercent, toast]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -164,7 +171,7 @@ export default function VendaSimplificadaPage() {
 
           <CustomerFields
             customer={customer}
-            setCustomer={setCustomer}
+            setCustomer={selectCustomer}
             identifier={identifier}
             setIdentifier={setIdentifier}
             resultLabel={customerLabel}

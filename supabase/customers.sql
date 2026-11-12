@@ -12,6 +12,7 @@ create table if not exists public."ESTOQUE_customer" (
   alternative_pickup_person text not null default '',
   alternative_pickup_cpf text not null default '',
   notes text not null default '',
+  discount_percent numeric not null default 0 check (discount_percent >= 0 and discount_percent <= 100),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

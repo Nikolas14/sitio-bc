@@ -17,6 +17,7 @@ const emptyForm: CustomerFormData = {
     alternative_pickup_person: '',
     alternative_pickup_cpf: '',
     notes: '',
+    discount_percent: 0,
 };
 
 export function useCustomerManager() {
@@ -72,16 +73,21 @@ export function useCustomerManager() {
             alternative_pickup_person: customer.alternative_pickup_person ?? '',
             alternative_pickup_cpf: customer.alternative_pickup_cpf ?? '',
             notes: customer.notes ?? '',
+            discount_percent: Number(customer.discount_percent) || 0,
         });
     };
 
     const saveCustomer = async (): Promise<string | null> => {
         setLoading(true);
 
-        const payload = Object.fromEntries(
-            Object.entries(formData).map(([key, value]) => [key, value.trim().toUpperCase()]),
-        );
-        payload.updated_at = new Date().toISOString();
+        const { discount_percent, ...texts } = formData;
+        const payload = {
+            ...Object.fromEntries(
+                Object.entries(texts).map(([key, value]) => [key, value.trim().toUpperCase()]),
+            ),
+            discount_percent: Number(discount_percent) || 0,
+            updated_at: new Date().toISOString(),
+        };
 
         const result = selectedId === 'new'
             ? await supabase.from('ESTOQUE_customer').insert(payload)

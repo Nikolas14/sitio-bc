@@ -22,6 +22,7 @@ export interface ICustomer {
   alternative_pickup_person: string;
   alternative_pickup_cpf: string;
   notes: string;
+  discount_percent: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -60,6 +61,9 @@ export interface ITransaction {
   id: string;
   type: 'IN' | 'OUT';
   customer_vendor: string;
+  customer_id?: string | null;
+  // Join com ESTOQUE_customer (só o aeroporto), quando a venda tem cliente vinculado
+  ESTOQUE_customer?: { airport: string } | null;
   total_price: number;
   total_kg: number;
   created_at: string;
