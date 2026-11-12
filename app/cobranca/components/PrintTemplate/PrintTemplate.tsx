@@ -34,6 +34,7 @@ export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, 
           <div>
             <p><strong>Cliente:</strong></p>
             <p className={styles.customer}>{trans.customer_vendor}</p>
+            <p><strong>Desconto:</strong> {Number(trans.discount_percent) || 0}%</p>
           </div>
           <div className={`${styles.meta} ${styles.textRight}`}>
             <p><strong>Ref:</strong> {trans.serial_number || trans.id.slice(0, 8).toUpperCase()}</p>

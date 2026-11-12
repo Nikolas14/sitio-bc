@@ -7,13 +7,15 @@ interface ReceiptHeaderProps {
   serialNumber: string;
   createdAt: string;
   totalKg: number | string;
+  discountPercent?: number;
 }
 
-const TransactionReceiptHeader = ({ 
-  customerVendor, 
-  serialNumber, 
-  createdAt, 
-  totalKg 
+const TransactionReceiptHeader = ({
+  customerVendor,
+  serialNumber,
+  createdAt,
+  totalKg,
+  discountPercent = 0
 }: ReceiptHeaderProps) => {
   return (
     <header className={styles.receiptHeader}>
@@ -22,6 +24,7 @@ const TransactionReceiptHeader = ({
         <h2 className={styles.mainTitle}>{customerVendor}</h2>
         <p className={styles.subLabel}>
           <strong>#{serialNumber}</strong> • {new Date(createdAt).toLocaleString('pt-BR')}
+          {' • '}Desconto {Number(discountPercent) || 0}%
         </p>
       </div>
 

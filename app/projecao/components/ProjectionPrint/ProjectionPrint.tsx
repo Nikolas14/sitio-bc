@@ -18,6 +18,27 @@ export interface PrintData {
 
 const kg = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 
+// Dados do cliente: 4 colunas x 4 linhas, usado na impressão da projeção e em /projecao/imprimir.
+export function CustomerInfo({ customer }: { customer: ICustomer }) {
+  return (
+    <div className={styles.customerData}>
+      <div><span>CLIENTE</span><strong>{customer.name || '-'}</strong></div>
+      <div><span>CPF</span><strong>{customer.cpf || '-'}</strong></div>
+      <div><span>DESCONTO</span><strong>{Number(customer.discount_percent) || 0}%</strong></div>
+      <div><span>TELEFONE</span><strong>{customer.phone || '-'}</strong></div>
+      <div><span>ENDEREÇO</span><strong>{customer.address || '-'}</strong></div>
+      <div><span>CEP</span><strong>{customer.cep || '-'}</strong></div>
+      <div><span>CIDADE</span><strong>{customer.city || '-'}</strong></div>
+      <div><span>AEROPORTO</span><strong>{customer.airport || '-'}</strong></div>
+      <div><span>RETIRADA</span><strong>{customer.pickup_person || '-'}</strong></div>
+      <div><span>CPF RETIRADA</span><strong>{customer.pickup_cpf || '-'}</strong></div>
+      <div><span>RETIRADA ALTERNATIVA</span><strong>{customer.alternative_pickup_person || '-'}</strong></div>
+      <div><span>CPF RETIRADA ALTERNATIVA</span><strong>{customer.alternative_pickup_cpf || '-'}</strong></div>
+      <div><span>OBSERVAÇÕES DO CLIENTE</span><strong>{customer.notes || '-'}</strong></div>
+    </div>
+  );
+}
+
 export default function ProjectionPrint({ data }: { data: PrintData }) {
   const { customer, items } = data;
   const total = items.reduce((acc, i) => acc + i.weightKg, 0);
@@ -38,25 +59,7 @@ export default function ProjectionPrint({ data }: { data: PrintData }) {
         {data.subname && <em>{data.subname}</em>}
       </div>
 
-      {customer && (
-        <div className={styles.customerData}>
-          <div><span>CLIENTE</span><strong>{customer.name}</strong></div>
-          <div><span>CPF</span><strong>{customer.cpf || '-'}</strong></div>
-          <div className={styles.wide}><span>ENDEREÇO</span><strong>{customer.address || '-'}</strong></div>
-          <div><span>CEP</span><strong>{customer.cep || '-'}</strong></div>
-          <div><span>TELEFONE</span><strong>{customer.phone || '-'}</strong></div>
-          <div><span>CIDADE</span><strong>{customer.city || '-'}</strong></div>
-          <div><span>AEROPORTO</span><strong>{customer.airport || '-'}</strong></div>
-          <div className={styles.wide}><span>RETIRADA</span><strong>{customer.pickup_person || '-'}</strong></div>
-          {customer.pickup_cpf && <div><span>CPF RETIRADA</span><strong>{customer.pickup_cpf}</strong></div>}
-          {customer.alternative_pickup_person && (
-            <div className={styles.wide}><span>RETIRADA ALTERNATIVA</span><strong>{customer.alternative_pickup_person}</strong></div>
-          )}
-          {customer.notes && (
-            <div className={styles.wide}><span>OBSERVAÇÕES DO CLIENTE</span><strong>{customer.notes}</strong></div>
-          )}
-        </div>
-      )}
+      {customer && <CustomerInfo customer={customer} />}
 
       <div className={styles.items}>
         <h3>ITENS DO PEDIDO</h3>
