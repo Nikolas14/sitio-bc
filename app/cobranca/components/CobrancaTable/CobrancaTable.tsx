@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './CobrancaTable.module.css';
 import { ITransaction } from '@/types';
+import { usePersistedState } from '@/hooks/usePersistedState';
 
 interface CobrancaTableProps {
   transactions: ITransaction[];
@@ -35,15 +36,19 @@ type SortConfig = {
 
 export default function CobrancaTable({ transactions, loading }: CobrancaTableProps) {
   const router = useRouter();
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'created_at', direction: 'desc' });
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+  // Ordenação, página e tamanho da página ficam salvos (ver usePersistedState).
+  const [sortConfig, setSortConfig] = usePersistedState<SortConfig>('sitio-bc:cobranca-ordem', { key: 'created_at', direction: 'desc' });
+  const [page, setPage] = usePersistedState('sitio-bc:cobranca-pagina', 1);
+  const [pageSize, setPageSize] = usePersistedState('sitio-bc:cobranca-tamanho', PAGE_SIZES[0]);
   const [prevTransactions, setPrevTransactions] = useState(transactions);
+  const [carregou, setCarregou] = useState(false);
 
   // Filtro/busca mudou a lista: volta para a primeira página.
+  // A primeira carga de dados não conta, senão jogaria fora a página salva.
   if (transactions !== prevTransactions) {
     setPrevTransactions(transactions);
-    setPage(1);
+    if (carregou) setPage(1);
+    if (!carregou && transactions.length > 0) setCarregou(true);
   }
 
   // Lógica de Ordenação
