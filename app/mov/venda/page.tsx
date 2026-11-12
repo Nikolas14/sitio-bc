@@ -36,6 +36,12 @@ export default function VendaSimplificadaPage() {
   // Cliente (principal) + identificador (minuta, pedido...) viram o nome da venda.
   const customerLabel = [customer?.name, identifier.trim()].filter(Boolean).join(' · ') || 'VENDA_AVULSA';
 
+  // Ao escolher o cliente, o desconto dele já entra na venda (continua editável).
+  const selectCustomer = (c: ICustomer | null) => {
+    setCustomer(c);
+    setDiscountPercent(Number(c?.discount_percent) || 0);
+  };
+
   const financial = useMemo(() => {
     const subtotal = items.reduce((acc, item) => acc + ((item.price || 0) * item.weightKg), 0);
     const totalKg = items.reduce((acc, item) => acc + item.weightKg, 0);
@@ -164,7 +170,7 @@ export default function VendaSimplificadaPage() {
 
           <CustomerFields
             customer={customer}
-            setCustomer={setCustomer}
+            setCustomer={selectCustomer}
             identifier={identifier}
             setIdentifier={setIdentifier}
             resultLabel={customerLabel}

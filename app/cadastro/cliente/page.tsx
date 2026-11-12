@@ -132,6 +132,19 @@ export default function GerenciadorClientes() {
                                     />
                                 </div>
                             ))}
+                            <div>
+                                <label className={styles.label} htmlFor="discount_percent">DESCONTO (%)</label>
+                                <input
+                                    id="discount_percent"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    className={styles.input}
+                                    value={manager.formData.discount_percent || ''}
+                                    onChange={(event) => manager.setFormData({ ...manager.formData, discount_percent: Number(event.target.value) || 0 })}
+                                    placeholder="Ex: 10"
+                                />
+                            </div>
                             <div className={styles.full}>
                                 <label className={styles.label} htmlFor="notes">OBS</label>
                                 <textarea

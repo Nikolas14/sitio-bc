@@ -22,6 +22,7 @@ export interface ICustomer {
   alternative_pickup_person: string;
   alternative_pickup_cpf: string;
   notes: string;
+  discount_percent: number;
   created_at?: string;
   updated_at?: string;
 }
