@@ -29,11 +29,23 @@
   color: #1e293b;
 }
 
+.originHeader,
+.originCell {
+  width: 240px;
+  max-width: 240px;
+}
+
 .originCell {
   font-weight: 700;
   color: #64748b;
   text-transform: uppercase;
   font-size: 11px;
+}
+
+.customerName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .serialRef {
@@ -42,6 +54,9 @@
   color: #cbd5e1;
   font-weight: 800;
   margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .badgeIn, .badgeOut {
@@ -84,6 +99,7 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
+    table-layout: fixed;
 }
 
 .historyTable th {

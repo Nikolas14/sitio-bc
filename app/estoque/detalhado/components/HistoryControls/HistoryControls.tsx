@@ -1,39 +1,40 @@
 'use client';
 
 import styles from './HistoryControls.module.css';
-import { Period } from '@/hooks/useHistory';
+import { DateRange } from '@/hooks/useHistory';
 
 interface HistoryControlsProps {
-  period: Period;
-  setPeriod: (period: Period) => void;
+  range: DateRange;
+  setRange: (range: DateRange) => void;
 }
 
-const HistoryControls = ({ period, setPeriod }: HistoryControlsProps) => {
-  const periods: { value: Period; label: string }[] = [
-    { value: 'yesterday', label: 'ONTEM' },
-    { value: '3d', label: '3D' },
-    { value: '7d', label: '7D' },
-    { value: '15d', label: '15D' },
-    { value: '30d', label: '30D' },
-    { value: 'all', label: 'TUDO' },
-  ];
-
+const HistoryControls = ({ range, setRange }: HistoryControlsProps) => {
   return (
     <div className={styles.historyControls}>
       <h3 className={styles.sectionTitle}>HISTÓRICO DE MOVIMENTAÇÕES</h3>
 
-      <div className={styles.periodToggle}>
-        {periods.map((p) => (
-          <button
-            key={p.value}
-            className={`${styles.periodBtn} ${
-              period === p.value ? styles.periodBtnActive : ''
-            }`}
-            onClick={() => setPeriod(p.value)}
-          >
-            {p.label}
-          </button>
-        ))}
+      <div className={styles.dateRange}>
+        <label className={styles.dateField}>
+          <span className={styles.dateLabel}>De</span>
+          <input
+            type="date"
+            className={styles.dateInput}
+            value={range.from}
+            max={range.to || undefined}
+            onChange={(e) => setRange({ ...range, from: e.target.value })}
+          />
+        </label>
+
+        <label className={styles.dateField}>
+          <span className={styles.dateLabel}>Até</span>
+          <input
+            type="date"
+            className={styles.dateInput}
+            value={range.to}
+            min={range.from || undefined}
+            onChange={(e) => setRange({ ...range, to: e.target.value })}
+          />
+        </label>
       </div>
     </div>
   );

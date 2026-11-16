@@ -1,40 +1,25 @@
 'use client';
 
-import { useMemo } from 'react';
 import { IOperation } from '@/types';
 import styles from './ProductHistoryTable.module.css';
 
+// Operação com o saldo do produto logo após ela (calculado na página, do mais novo ao mais antigo)
+export type HistoryRow = IOperation & { balanceAfter: number };
+
 interface ProductHistoryTableProps {
-  history: IOperation[];
+  rows: HistoryRow[];
   loading: boolean;
 }
 
-const ProductHistoryTable = ({ history, loading }: ProductHistoryTableProps) => {
-  const historyWithBalance = useMemo(() => {
-    const sortedHistory = [...history].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
-
-    type HistoryWithBalance = IOperation & { balanceAfter: number };
-
-    const computed = sortedHistory.reduce<HistoryWithBalance[]>((acc, op) => {
-      const prevBalance = acc.length > 0 ? acc[acc.length - 1].balanceAfter : 0;
-      const delta = Number(op.quant);
-      const balanceAfter = op.type === 'IN' ? prevBalance + delta : prevBalance - delta;
-      return [...acc, { ...op, balanceAfter }];
-    }, []);
-
-    return computed.reverse();
-  }, [history]);
-
+const ProductHistoryTable = ({ rows, loading }: ProductHistoryTableProps) => {
   if (loading) {
     return <div className={styles.loadingState}>Buscando movimentações...</div>;
   }
 
-  if (history.length === 0) {
+  if (rows.length === 0) {
     return (
       <div className={styles.emptyHistory}>
-        Nenhuma movimentação encontrada para este período.
+        Nenhuma movimentação encontrada neste intervalo.
       </div>
     );
   }
@@ -48,11 +33,11 @@ const ProductHistoryTable = ({ history, loading }: ProductHistoryTableProps) => 
             <th>Tipo</th>
             <th>Qtd (KG)</th>
             <th>Saldo</th>
-            <th>Origem / Cliente</th>
+            <th className={styles.originHeader}>Origem / Cliente</th>
           </tr>
         </thead>
         <tbody>
-          {historyWithBalance.map((h) => (
+          {rows.map((h) => (
             <tr key={h.id}>
               <td className={styles.dateCell}>
                 {new Date(h.created_at).toLocaleDateString('pt-BR')}
@@ -69,7 +54,7 @@ const ProductHistoryTable = ({ history, loading }: ProductHistoryTableProps) => 
                 {h.balanceAfter.toFixed(3)} kg
               </td>
               <td className={styles.originCell}>
-                <div className={styles.customerName}>
+                <div className={styles.customerName} title={h.ESTOQUE_transaction?.customer_vendor || 'Ajuste Interno'}>
                   {h.ESTOQUE_transaction?.customer_vendor || 'Ajuste Interno'}
                 </div>
                 <span className={styles.serialRef}>
