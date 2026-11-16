@@ -48,22 +48,24 @@
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  padding-left: 0.5rem;
-  border-left: 3px solid #cbd5e1;
+  text-align: center;
 }
 
+/* Botões centralizados: quebram de linha e a última linha fica no centro */
 .menuGrid {
-  display: grid;
-  /* Grid responsiva: ajusta o número de colunas conforme o tamanho da tela */
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1rem;
 }
 
 .menuCard {
+  flex: 0 0 200px;
+  min-height: 150px;
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,7 +89,7 @@
 
 .iconWrapper {
   background-color: #f1f5f9;
-  padding: 12px;
+  padding: 16px;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -101,7 +103,7 @@
 }
 
 .cardTitle {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #334155;
   text-align: center;
@@ -126,10 +128,13 @@
 
 /* Ajustes para telas bem pequenas (celulares antigos) */
 @media (max-width: 480px) {
-  .menuGrid {
-    grid-template-columns: repeat(2, 1fr);
+  /* Dois botões por linha, ocupando a largura toda */
+  .menuCard {
+    flex: 0 0 calc(50% - 0.5rem);
+    min-height: 130px;
+    padding: 1.5rem 1rem;
   }
-  
+
   .title {
     font-size: 1.5rem;
   }

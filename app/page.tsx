@@ -32,14 +32,7 @@ export default function Dashboard() {
       itens: [
         { title: 'Caixa / Venda', path: '/mov/venda', icon: <ShoppingCart size={24} />, color: '#22c55e' },
         { title: 'Entrada de Carga', path: '/mov/entrada', icon: <Package size={24} /> },
-      ]
-    },
-    {
-      nome: 'Cadastros',
-      itens: [
-        { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
-        { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
-        { title: 'Funcionários', path: '/cadastro/funcionarios', icon: <Briefcase size={24} /> },
+        { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
       ]
     },
     {
@@ -51,23 +44,35 @@ export default function Dashboard() {
       ]
     },
     {
-      nome: 'Estoque e financeiro',
+      nome: 'Estoque',
       itens: [
+        { title: 'Resumo / Saldo', path: '/projecao/saldo', icon: <BarChart3 size={24} /> },
         { title: 'Estoque Geral', path: '/estoque', icon: <Database size={24} /> },
         { title: 'Estoque Detalhado', path: '/estoque/detalhado', icon: <List size={24} /> },
-        { title: 'Conferência', path: '/estoque/conferencia', icon: <ScanBarcode size={24} /> },
-        { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
-        { title: 'Histórico', path: '/transacoes', icon: <History size={24} /> },
+      ]
+    },
+    {
+      nome: 'Projeções',
+      itens: [
+        { title: 'Nova Projeção', path: '/projecao', icon: <TrendingUp size={24} /> },
+        { title: 'Lista projeção', path: '/projecao/lista', icon: <List size={24} /> },
+        { title: 'Imprimir pedido', path: '/projecao/imprimir', icon: <Printer size={24} /> },
+      ]
+    },
+    {
+      nome: 'Cadastros',
+      itens: [
+        { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
+        { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
+        { title: 'Funcionários', path: '/cadastro/funcionarios', icon: <Briefcase size={24} /> },
       ]
     },
     {
       nome: 'Catálogo e planejamento',
       itens: [
         { title: 'Catálogo de Preços', path: '/lista_preco', icon: <Tags size={24} /> },
-        { title: 'Nova Projeção', path: '/projecao', icon: <TrendingUp size={24} /> },
-        { title: 'Resumo / Saldo', path: '/projecao/saldo', icon: <BarChart3 size={24} /> },
-        { title: 'Lista projeção', path: '/projecao/lista', icon: <List size={24} /> },
-        { title: 'Imprimir pedido', path: '/projecao/imprimir', icon: <Printer size={24} /> },
+        { title: 'Conferência', path: '/estoque/conferencia', icon: <ScanBarcode size={24} /> },
+        { title: 'Histórico', path: '/transacoes', icon: <History size={24} /> },
       ]
     }
   ];
