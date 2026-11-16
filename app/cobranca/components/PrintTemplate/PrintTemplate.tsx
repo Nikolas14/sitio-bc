@@ -18,8 +18,10 @@ type Props = {
   discount: number;
 };
 
+const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const formatCurrency = (v: number) => moeda.format(v || 0);
+
 export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, financial, shipping, tax, discount }, ref) => {
-  const formatCurrency = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
 
   // Itens do mesmo produto viram uma linha só: soma quantidades e totais.
   const linhas = Object.values(

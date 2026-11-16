@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import Image from 'next/image';
 import { Download } from 'lucide-react';
 import { supabase } from '@/api/supabase';
@@ -45,10 +46,24 @@ const getProductCategory = (product: IProduct) => {
   return 'EMBUTIDOS';
 };
 
+// Colunas da grade do PDF: deve bater com o repeat(...) do @media print no CSS.
+const PRINT_COLUMNS = 4;
+
+const groupByCategory = (list: IProduct[]) =>
+  list.reduce((acc: { [key: string]: IProduct[] }, product) => {
+    const category = getProductCategory(product);
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(product);
+    return acc;
+  }, {});
+
+const formatStamp = (d: Date) =>
+  `${d.toLocaleDateString('pt-BR')} · ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
 export default function CatalogoEstoque() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const generatedAt = new Date();
+  const [printedAt, setPrintedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -79,27 +94,24 @@ export default function CatalogoEstoque() {
     loadProducts();
   }, []);
 
-  // Lógica de filtragem e agrupamento
+  // Data de impressão: só depois de montar, para servidor e cliente não divergirem.
+  useEffect(() => setPrintedAt(new Date()), []);
+
+  // Disponíveis: base da tela (com busca) e do PDF (sem busca).
+  const availableProducts = useMemo(
+    () => products.filter(p => p.details?.is_available !== false),
+    [products],
+  );
+
+  // A busca vale só para a tela; o PDF sempre sai com a lista completa.
   const groupedProducts = useMemo(() => {
-    const filtered = products.filter(p => {
-      // Filtro 1: Termo de busca (Nome ou Categoria)
-      const matchesSearch = 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.type?.toLowerCase().includes(searchTerm.toLowerCase());
+    const term = searchTerm.toLowerCase();
+    return groupByCategory(availableProducts.filter(p =>
+      p.name.toLowerCase().includes(term) || p.type?.toLowerCase().includes(term)
+    ));
+  }, [availableProducts, searchTerm]);
 
-      // Filtro 2: Disponibilidade (SÓ MOSTRA SE FOR DIFERENTE DE FALSE)
-      const isAvailable = p.details?.is_available !== false;
-      return matchesSearch && isAvailable;
-    });
-
-    // Agrupa o resultado por categoria (type)
-    return filtered.reduce((acc: { [key: string]: IProduct[] }, product) => {
-      const category = getProductCategory(product);
-      if (!acc[category]) acc[category] = [];
-      acc[category].push(product);
-      return acc;
-    }, {});
-  }, [products, searchTerm]);
+  const printGroups = useMemo(() => groupByCategory(availableProducts), [availableProducts]);
 
   const orderedProducts = useMemo(
     () => Object.keys(groupedProducts)
@@ -113,8 +125,8 @@ export default function CatalogoEstoque() {
     let page: { category: string; products: IProduct[] }[] = [];
     let usedRows = 0;
 
-    Object.keys(groupedProducts).sort((a, b) => categoryRank(a) - categoryRank(b)).forEach((category) => {
-      const categoryProducts = groupedProducts[category];
+    Object.keys(printGroups).sort((a, b) => categoryRank(a) - categoryRank(b)).forEach((category) => {
+      const categoryProducts = printGroups[category];
       let offset = 0;
 
       while (offset < categoryProducts.length) {
@@ -126,17 +138,21 @@ export default function CatalogoEstoque() {
           availableRows = 3;
         }
 
-        const amount = Math.min(availableRows * 5, categoryProducts.length - offset);
+        const amount = Math.min(availableRows * PRINT_COLUMNS, categoryProducts.length - offset);
         page.push({ category, products: categoryProducts.slice(offset, offset + amount) });
         offset += amount;
-        usedRows += Math.ceil(amount / 5);
+        usedRows += Math.ceil(amount / PRINT_COLUMNS);
       }
     });
     if (page.length > 0) pages.push(page);
     return pages;
-  }, [groupedProducts]);
+  }, [printGroups]);
 
-  const handlePrint = () => window.print();
+  // flushSync garante que o cabeçalho já mostra a hora certa antes do diálogo de impressão.
+  const handlePrint = () => {
+    flushSync(() => setPrintedAt(new Date()));
+    window.print();
+  };
 
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
@@ -150,7 +166,7 @@ export default function CatalogoEstoque() {
             <p>Escolha seus produtos com praticidade.</p>
           </div>
           <div className={styles.headerActions}>
-            <span className={styles.headerMeta}>Atualizada em <strong>{new Date().toLocaleDateString('pt-BR')}</strong></span>
+            <span className={styles.headerMeta}>Atualizada em <strong>{printedAt ? printedAt.toLocaleDateString('pt-BR') : '—'}</strong></span>
             <button onClick={handlePrint} className={styles.btnPrint}><Download size={17} />Salvar lista em PDF</button>
           </div>
         </header>
@@ -168,30 +184,30 @@ export default function CatalogoEstoque() {
             <h1>Lista de preços</h1>
             <div className={styles.printDate}>
               <span>LISTA GERADA EM</span>
-              <strong>{generatedAt.toLocaleDateString('pt-BR')} · {generatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</strong>
+              <strong>{printedAt ? formatStamp(printedAt) : '—'}</strong>
             </div>
         </div>
 
         {loading ? (
           <div className={styles.loader}>Sincronizando dados com o servidor...</div>
         ) : loadError ? (
-          <div className={styles.loader}>Erro ao carregar catálogo: {loadError}</div>
+          <div className={styles.loader} role="alert">Não foi possível carregar a lista de preços. Atualize a página para tentar de novo.</div>
         ) : (
-          Object.keys(groupedProducts).sort((a, b) => categoryRank(a) - categoryRank(b)).map((category) => (
+          Object.keys(groupedProducts).sort((a, b) => categoryRank(a) - categoryRank(b)).map((category, categoryIndex) => (
             <section key={category} className={`${styles.categorySection} ${category === 'FRANGO' ? styles.afterSpecial : ''}`}>
               <h2 className={styles.categoryTitle}>{categoryLabels[category] || category}</h2>
               <div className={styles.itemGrid}>
-                {groupedProducts[category].map(product => (
+                {groupedProducts[category].map((product, productIndex) => (
                   <article key={product.id} className={styles.productCard}>
                     <div className={styles.imageFrame}>
                       {product.details?.image_filename ? (
                           <Image
                            src={getLocalImagePath(product.details.image_filename)}
-                           alt={product.name}
+                           alt=""
                            fill
-                           sizes="(max-width: 700px) 100vw, (max-width: 1200px) 40vw, 260px"
+                           sizes="(max-width: 700px) 50vw, (max-width: 1150px) 33vw, 20vw"
                            style={{ objectFit: 'cover' }}
-                           loading="eager"
+                           loading={categoryIndex === 0 && productIndex < 5 ? 'eager' : 'lazy'}
                          />
                       ) : (
                         <div className={styles.noImage}>FOTO EM BREVE</div>
@@ -211,7 +227,7 @@ export default function CatalogoEstoque() {
                       )}
 
                       <div className={styles.priceContainer}>
-                        <span className={styles.priceLabel}>Preço</span>
+                        <span className={styles.priceLabel}>Preço por kg</span>
                         <span className={styles.priceValue}>{formatCurrency(product.price)}</span>
                       </div>
                     </div>
@@ -222,7 +238,7 @@ export default function CatalogoEstoque() {
           ))
         )}
 
-        {!loading && orderedProducts.length === 0 && (
+        {!loading && !loadError && orderedProducts.length === 0 && (
           <div className={styles.emptyState}>
             <p>Nenhum produto disponível encontrado para esta busca.</p>
           </div>
@@ -237,7 +253,7 @@ export default function CatalogoEstoque() {
                 <h1>Lista de preços</h1>
                 <div className={styles.printDate}>
                   <span>LISTA GERADA EM</span>
-                  <strong>{generatedAt.toLocaleDateString('pt-BR')} · {generatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</strong>
+                  <strong>{printedAt ? formatStamp(printedAt) : '—'}</strong>
                 </div>
               </header>
               {page.map((segment) => (
@@ -250,9 +266,9 @@ export default function CatalogoEstoque() {
                           {product.details?.image_filename ? (
                             <Image
                               src={getLocalImagePath(product.details.image_filename)}
-                              alt={product.name}
+                              alt=""
                               fill
-                              sizes="200px"
+                              sizes="170px"
                               style={{ objectFit: 'cover' }}
                               loading="eager"
                             />
@@ -263,7 +279,7 @@ export default function CatalogoEstoque() {
                           <h3 className={styles.itemName}>{product.name}</h3>
                           <p className={styles.description}>{product.details?.description || 'Produto selecionado com cuidado para você.'}</p>
                           {product.details?.package_weight_approx && <p className={styles.packageInfo}>Embalagem aproximada: <strong>{product.details.package_weight_approx} kg</strong></p>}
-                          <div className={styles.priceContainer}><span className={styles.priceLabel}>Preço</span><span className={styles.priceValue}>{formatCurrency(product.price)}</span></div>
+                          <div className={styles.priceContainer}><span className={styles.priceLabel}>Preço por kg</span><span className={styles.priceValue}>{formatCurrency(product.price)}</span></div>
                         </div>
                       </article>
                     ))}

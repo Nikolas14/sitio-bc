@@ -141,8 +141,8 @@
   margin: 0;
 }
 
-.pixKey {
-  margin-top: 6px !important;
+.pixBox .pixKey {
+  margin-top: 6px;
   font-size: 16px;
   font-weight: 900;
   color: #0f172a;
@@ -157,7 +157,6 @@
 
 /* Auxiliares */
 .textRight { text-align: right; }
-.textCenter { text-align: center; }
 
 /* Dentro da tabela, precisa vencer `.table th { text-align: left }` */
 .table .textRight { text-align: right; }
