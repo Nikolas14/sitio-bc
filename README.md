@@ -11,7 +11,7 @@ Sistema do **Beit Chabad Belém** para caixa/venda, entrada de carga, cobrança,
 - **Estoque** (`/estoque`, `/estoque/detalhado`) — saldo geral e extrato por produto
 - **Cadastros** (`/cadastro/produto`, `/cadastro/cliente`) — produtos e clientes; salvar/excluir exigem senha admin
 - **Catálogo** (`/lista_preco`) — tabela de preços por categoria, pronta para impressão
-- **Projeções** (`/projecao`, `/projecao/lista`, `/projecao/saldo`, `/projecao/resumo`) — cargas projetadas, disponibilidade (estoque real × projetado) e picking
+- **Projeções** (`/projecao`, `/projecao/lista`, `/projecao/saldo`) — cargas projetadas e disponibilidade (estoque real × projetado)
 - **Pedidos / Avisos** — impressão de pedidos e murais
 
 ## Stack

@@ -53,7 +53,6 @@ app/            rotas (App Router) — cada pasta é uma rota; page.tsx é clien
   projecao/       nova projeção
   projecao/lista  lista de projeções (excluir exige senha admin)
   projecao/saldo  disponibilidade (estoque real × projetado)
-  projecao/resumo picking list
   api/admin/verify/route.ts   POST que valida a senha admin (server)
 components/     UI compartilhada (Toast, AdminPasswordModal, InventoryCart, ...)
 hooks/          hooks de dados no padrão useXxx()
@@ -86,7 +85,6 @@ opencode/       este diretório — contexto/regras/memória dos agentes
 | `/projecao` | Nova projeção (`ESTOQUE_projection`, status `ABERTO`) | — |
 | `/projecao/lista` | Lista/agrupa projeções, excluir por referência | excluir |
 | `/projecao/saldo` | Disponibilidade: estoque real × projetado | — |
-| `/projecao/resumo` | Picking list consolidada | — |
 | `POST /api/admin/verify` | Valida senha admin no servidor | — |
 
 ## Banco (Supabase)

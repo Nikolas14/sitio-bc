@@ -12,7 +12,6 @@ import {
   BarChart3,
   PlusCircle,
   Tags,
-  Info,
    Users,
    ScanBarcode,
    Briefcase,
@@ -68,7 +67,6 @@ export default function Dashboard() {
         { title: 'Nova Projeção', path: '/projecao', icon: <TrendingUp size={24} /> },
         { title: 'Resumo / Saldo', path: '/projecao/saldo', icon: <BarChart3 size={24} /> },
         { title: 'Lista projeção', path: '/projecao/lista', icon: <List size={24} /> },
-        { title: 'Resumo projeção', path: '/projecao/resumo', icon: <Info size={24} /> },
         { title: 'Imprimir pedido', path: '/projecao/imprimir', icon: <Printer size={24} /> },
       ]
     }
