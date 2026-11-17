@@ -112,11 +112,11 @@ export default function FrequenciaFuncionarios() {
     const printColunas = [
         'Nº',
         'Nome',
-        'Abate',
-        'Recebeu frango',
         'Total',
         'Pix',
         'Obs',
+        'Abate',
+        'Recebeu frango',
     ];
     const printValoresDaLinha = (linha: (typeof printLinhas)[number], numero: number) => {
         const { employee, entry, pagamento } = linha;
@@ -124,11 +124,11 @@ export default function FrequenciaFuncionarios() {
         return [
             String(numero),
             employee.name,
-            abate,
-            entry.frango ? (entry.receivedChicken ? 'Sim' : 'Não') : '',
             formatReais(pagamento.total),
             employee.pix_key || '',
             employee.notes || '',
+            abate,
+            entry.frango ? (entry.receivedChicken ? 'Sim' : 'Não') : '',
         ];
     };
 
