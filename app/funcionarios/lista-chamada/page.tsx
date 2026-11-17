@@ -7,6 +7,7 @@ import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import { useToast } from '@/components/Toast/Toast';
 import { useEmployeeManager } from '@/hooks/useEmployeeManager';
 import { useConfirmationList, AbateKind, AbateKinds } from '@/hooks/useConfirmationList';
+import { fetchUltimaData } from '@/hooks/useAttendance';
 import { formatLongDate, todayISO } from '@/utils/dates';
 import { employeeGroupText } from '@/utils/employeeGroups';
 import type { IEmployee } from '@/types';
@@ -31,7 +32,21 @@ export default function ListaChamadaFuncionarios() {
     const manager = useEmployeeManager();
     const toast = useToast();
     const [workDate, setWorkDate] = useState(todayISO);
-    const list = useConfirmationList(workDate);
+    // Ao abrir, a tela vai para a última lista gravada. Só carrega depois de saber a data.
+    const [dataCarregada, setDataCarregada] = useState(false);
+    const list = useConfirmationList(dataCarregada ? workDate : null);
+
+    useEffect(() => {
+        let ativo = true;
+        fetchUltimaData().then((ultima) => {
+            if (!ativo) return;
+            if (ultima) setWorkDate(ultima);
+            setDataCarregada(true);
+        });
+        return () => {
+            ativo = false;
+        };
+    }, []);
 
     // Pessoa escolhida na busca, ainda fora da lista, e os abates em que vai.
     const [pending, setPending] = useState<IEmployee | null>(null);
@@ -140,6 +155,16 @@ export default function ListaChamadaFuncionarios() {
                                 }
                             }}
                         />
+                        <button
+                            type="button"
+                            className={styles.btnPrintWide}
+                            onClick={() => {
+                                setWorkDate(todayISO());
+                                handleSelectPending(null);
+                            }}
+                        >
+                            Começar nova lista (hoje)
+                        </button>
                     </div>
 
                     <div>

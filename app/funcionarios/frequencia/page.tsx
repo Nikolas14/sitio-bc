@@ -5,7 +5,7 @@ import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import { useToast } from '@/components/Toast/Toast';
 import { useEmployeeManager } from '@/hooks/useEmployeeManager';
-import { fetchAttendanceWeek, useAttendanceDay, type AttendanceWeekRow } from '@/hooks/useAttendance';
+import { fetchAttendanceWeek, fetchUltimaData, useAttendanceDay, type AttendanceWeekRow } from '@/hooks/useAttendance';
 import { addDays, formatLongDate, formatShortDate, mondayOf, todayISO } from '@/utils/dates';
 import { DESCONTO_FRANGO, calcularPagamento, formatReais, parseValor } from '@/utils/diarias';
 import { employeeGroupText } from '@/utils/employeeGroups';
@@ -29,8 +29,22 @@ export default function FrequenciaFuncionarios() {
     const manager = useEmployeeManager();
     const toast = useToast();
     const [workDate, setWorkDate] = useState(todayISO);
+    // Ao abrir, a tela vai para a lista mais recente. Só carrega a frequência depois de saber a data.
+    const [dataCarregada, setDataCarregada] = useState(false);
     const [abateFilter, setAbateFilter] = useState<AbateFilter>('todos');
-    const attendance = useAttendanceDay(workDate);
+    const attendance = useAttendanceDay(dataCarregada ? workDate : null);
+
+    useEffect(() => {
+        let ativo = true;
+        fetchUltimaData().then((ultima) => {
+            if (!ativo) return;
+            if (ultima) setWorkDate(ultima);
+            setDataCarregada(true);
+        });
+        return () => {
+            ativo = false;
+        };
+    }, []);
 
     // Valores das diárias digitados na hora. Não são gravados.
     const [textoFrango, setTextoFrango] = useState('');

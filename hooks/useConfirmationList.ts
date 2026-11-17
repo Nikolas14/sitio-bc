@@ -13,7 +13,7 @@ const NONE: AbateKinds = { frango: false, boi: false };
  * Lista de chamada de um dia. Cada pessoa entra marcando em quais abates vai
  * (frango, boi ou os dois). Cada ação grava direto no banco.
  */
-export function useConfirmationList(workDate: string) {
+export function useConfirmationList(workDate: string | null) {
     const [entries, setEntries] = useState<Record<string, AbateKinds>>({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -21,6 +21,8 @@ export function useConfirmationList(workDate: string) {
 
     // Busca os dados sem mexer em `loading`, para as ações não piscarem a tela.
     const fetchAll = useCallback(async (): Promise<string | null> => {
+        // Sem data ainda (aguardando a lista mais recente): não busca nada.
+        if (!workDate) return null;
         const { data, error } = await supabase
             .from('ESTOQUE_employee_attendance')
             .select('employee_id, frango, boi')
@@ -39,10 +41,11 @@ export function useConfirmationList(workDate: string) {
     }, [workDate]);
 
     const load = useCallback(async () => {
+        if (!workDate) return;
         setLoading(true);
         await fetchAll();
         setLoading(false);
-    }, [fetchAll]);
+    }, [workDate, fetchAll]);
 
     useEffect(() => {
         const timeoutId = window.setTimeout(() => {
@@ -86,6 +89,7 @@ export function useConfirmationList(workDate: string) {
 
     // Executa uma gravação, atualiza os dados e mostra o erro, se houver.
     const commit = async (write: () => Promise<string | null>): Promise<string | null> => {
+        if (!workDate) return 'Data ainda não carregada';
         setSaving(true);
         const writeError = await write();
         if (writeError) {
