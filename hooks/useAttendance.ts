@@ -19,7 +19,7 @@ const isEmpty = (entry: AttendanceEntry) => !entry.confirmed && entry.present ==
  * Frequência real de um dia (YYYY-MM-DD). Parte de quem está na lista de chamada:
  * quem confirmou entra como presente até ser marcado como falta.
  */
-export function useAttendanceDay(workDate: string) {
+export function useAttendanceDay(workDate: string | null) {
     const [savedRows, setSavedRows] = useState<AttendanceRow[]>([]);
     const [draft, setDraft] = useState<Record<string, AttendanceEntry>>({});
     const [loading, setLoading] = useState(true);
@@ -27,6 +27,8 @@ export function useAttendanceDay(workDate: string) {
     const [error, setError] = useState<string | null>(null);
 
     const load = useCallback(async () => {
+        // Sem data ainda (aguardando a lista mais recente): não carrega nada.
+        if (!workDate) return;
         setLoading(true);
         const { data, error } = await supabase
             .from('ESTOQUE_employee_attendance')
@@ -91,6 +93,7 @@ export function useAttendanceDay(workDate: string) {
     // Grava a presença real. Quem está na lista e não foi marcado como falta vira presente.
     // A lista (frango/boi) não é alterada aqui.
     const save = async (): Promise<string | null> => {
+        if (!workDate) return 'Data ainda não carregada';
         setSaving(true);
 
         const resolve = (employeeId: string): AttendanceEntry => {
@@ -186,6 +189,18 @@ export interface AttendanceWeekRow {
   work_date: string;
   confirmed: boolean;
   present: boolean | null;
+}
+
+/** Data (YYYY-MM-DD) da lista mais recente já gravada. Null se não houver nenhuma ou a consulta falhar. */
+export async function fetchUltimaData(): Promise<string | null> {
+    const { data, error } = await supabase
+        .from('ESTOQUE_employee_attendance')
+        .select('work_date')
+        .order('work_date', { ascending: false })
+        .limit(1);
+
+    if (error || !data || data.length === 0) return null;
+    return (data[0] as { work_date: string }).work_date;
 }
 
 /** Lista de chamada e presença de uma semana (segunda a domingo). Null se a consulta falhar. */
