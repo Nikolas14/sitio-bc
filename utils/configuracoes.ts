@@ -1,11 +1,17 @@
 // Configurações do sistema, guardadas em ESTOQUE_configuracao (uma linha por chave, valor em jsonb).
 
+export interface DadosEmpresa {
+  nome: string;
+  cnpj: string;
+}
+
 export interface Configuracoes {
   empresas: string[];
   bancos: string[];
   diasVenceEmBreve: number;
   descontoFrango: number;
   acrescimoFreteKg: number;
+  empresa: DadosEmpresa;
 }
 
 export interface LinhaConfiguracao {
@@ -20,12 +26,19 @@ const CHAVES: Record<keyof Configuracoes, string> = {
   diasVenceEmBreve: 'dias_vence_em_breve',
   descontoFrango: 'desconto_frango',
   acrescimoFreteKg: 'acrescimo_frete_kg',
+  empresa: 'empresa',
 };
 
 const ehListaDeTextos = (valor: unknown): valor is string[] =>
   Array.isArray(valor) && valor.every((item) => typeof item === 'string');
 
 const ehNumero = (valor: unknown): valor is number => typeof valor === 'number' && Number.isFinite(valor);
+
+const ehDadosEmpresa = (valor: unknown): valor is DadosEmpresa => {
+  if (typeof valor !== 'object' || valor === null) return false;
+  const campos = valor as Record<string, unknown>;
+  return typeof campos.nome === 'string' && typeof campos.cnpj === 'string';
+};
 
 /** Monta as configurações a partir das linhas do banco. Retorna null se alguma chave estiver faltando ou com tipo errado. */
 export function montarConfiguracoes(linhas: LinhaConfiguracao[]): Configuracoes | null {
@@ -36,9 +49,11 @@ export function montarConfiguracoes(linhas: LinhaConfiguracao[]): Configuracoes 
   const dias = porChave.get(CHAVES.diasVenceEmBreve);
   const desconto = porChave.get(CHAVES.descontoFrango);
   const acrescimo = porChave.get(CHAVES.acrescimoFreteKg);
+  const empresa = porChave.get(CHAVES.empresa);
 
   if (!ehListaDeTextos(empresas) || !ehListaDeTextos(bancos)) return null;
   if (!ehNumero(dias) || !ehNumero(desconto) || !ehNumero(acrescimo)) return null;
+  if (!ehDadosEmpresa(empresa)) return null;
 
   return {
     empresas,
@@ -46,6 +61,7 @@ export function montarConfiguracoes(linhas: LinhaConfiguracao[]): Configuracoes 
     diasVenceEmBreve: dias,
     descontoFrango: desconto,
     acrescimoFreteKg: acrescimo,
+    empresa,
   };
 }
 
@@ -57,5 +73,6 @@ export function paraLinhasConfiguracoes(config: Configuracoes): LinhaConfiguraca
     { chave: CHAVES.diasVenceEmBreve, valor: config.diasVenceEmBreve },
     { chave: CHAVES.descontoFrango, valor: config.descontoFrango },
     { chave: CHAVES.acrescimoFreteKg, valor: config.acrescimoFreteKg },
+    { chave: CHAVES.empresa, valor: config.empresa },
   ];
 }

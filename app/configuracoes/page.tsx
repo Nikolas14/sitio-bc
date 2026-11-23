@@ -11,12 +11,21 @@ import type { Configuracoes } from '@/utils/configuracoes';
 import { parseValor } from '@/utils/diarias';
 import styles from './page.module.css';
 
+type Aba = 'sistema' | 'empresa';
+
+const ABAS: { id: Aba; rotulo: string }[] = [
+    { id: 'sistema', rotulo: 'Sistema' },
+    { id: 'empresa', rotulo: 'Empresa' },
+];
+
 interface Rascunho {
     empresas: string[];
     bancos: string[];
     dias: string;
     desconto: string;
     acrescimo: string;
+    empresaNome: string;
+    empresaCnpj: string;
 }
 
 const formatarNumero = (numero: number) => String(numero).replace('.', ',');
@@ -31,12 +40,19 @@ function rascunhoParaConfig(rascunho: Rascunho): Configuracoes | string {
     const acrescimo = parseValor(rascunho.acrescimo);
     if (typeof acrescimo !== 'number') return 'Acréscimo por kg inválido.';
 
+    const nomeEmpresa = rascunho.empresaNome.trim();
+    if (!nomeEmpresa) return 'Informe o nome da empresa.';
+
+    const cnpj = rascunho.empresaCnpj.trim();
+    if (!cnpj) return 'Informe o CNPJ da empresa.';
+
     return {
         empresas: rascunho.empresas,
         bancos: rascunho.bancos,
         diasVenceEmBreve: Number(rascunho.dias.trim()),
         descontoFrango: desconto,
         acrescimoFreteKg: acrescimo,
+        empresa: { nome: nomeEmpresa, cnpj },
     };
 }
 
@@ -102,7 +118,7 @@ function EditorLista({ titulo, placeholder, itens, onChange }: EditorListaProps)
 }
 
 // Só monta o formulário quando a configuração já carregou, então o rascunho começa com os valores do banco.
-function FormConfiguracoes({ config }: { config: Configuracoes }) {
+function FormConfiguracoes({ config, aba }: { config: Configuracoes; aba: Aba }) {
     const { salvar } = useConfiguracoes();
     const toast = useToast();
     const [rascunho, setRascunho] = useState<Rascunho>({
@@ -111,6 +127,8 @@ function FormConfiguracoes({ config }: { config: Configuracoes }) {
         dias: String(config.diasVenceEmBreve),
         desconto: formatarNumero(config.descontoFrango),
         acrescimo: formatarNumero(config.acrescimoFreteKg),
+        empresaNome: config.empresa.nome,
+        empresaCnpj: config.empresa.cnpj,
     });
     const [pendente, setPendente] = useState<Configuracoes | null>(null);
     const [password, setPassword] = useState('');
@@ -159,63 +177,92 @@ function FormConfiguracoes({ config }: { config: Configuracoes }) {
     return (
         <>
             <form onSubmit={requestSave} className={styles.card}>
-                <section className={styles.secao}>
-                    <h2>Boletos</h2>
-                    <p>Listas que aparecem nos campos de empresa e de banco do pagamento.</p>
-                    <EditorLista
-                        titulo="Empresas"
-                        placeholder="Nome da empresa"
-                        itens={rascunho.empresas}
-                        onChange={(empresas) => atualizar({ empresas })}
-                    />
-                    <EditorLista
-                        titulo="Bancos do pagamento"
-                        placeholder="Nome do banco"
-                        itens={rascunho.bancos}
-                        onChange={(bancos) => atualizar({ bancos })}
-                    />
-                    <div className={styles.campo}>
-                        <label className={styles.label} htmlFor="dias-vence-em-breve">DIAS PARA VENCE EM BREVE</label>
-                        <input
-                            id="dias-vence-em-breve"
-                            className={styles.input}
-                            inputMode="numeric"
-                            value={rascunho.dias}
-                            onChange={(event) => atualizar({ dias: event.target.value })}
-                        />
-                        <p className={styles.dica}>Boleto que vence de hoje até esse número de dias aparece como &ldquo;Vence em breve&rdquo;.</p>
-                    </div>
-                </section>
+                {aba === 'sistema' ? (
+                    <>
+                        <section className={styles.secao}>
+                            <h2>Boletos</h2>
+                            <p>Listas que aparecem nos campos de empresa e de banco do pagamento.</p>
+                            <EditorLista
+                                titulo="Empresas"
+                                placeholder="Nome da empresa"
+                                itens={rascunho.empresas}
+                                onChange={(empresas) => atualizar({ empresas })}
+                            />
+                            <EditorLista
+                                titulo="Bancos do pagamento"
+                                placeholder="Nome do banco"
+                                itens={rascunho.bancos}
+                                onChange={(bancos) => atualizar({ bancos })}
+                            />
+                            <div className={styles.campo}>
+                                <label className={styles.label} htmlFor="dias-vence-em-breve">DIAS PARA VENCE EM BREVE</label>
+                                <input
+                                    id="dias-vence-em-breve"
+                                    className={styles.input}
+                                    inputMode="numeric"
+                                    value={rascunho.dias}
+                                    onChange={(event) => atualizar({ dias: event.target.value })}
+                                />
+                                <p className={styles.dica}>Boleto que vence de hoje até esse número de dias aparece como &ldquo;Vence em breve&rdquo;.</p>
+                            </div>
+                        </section>
 
-                <section className={styles.secao}>
-                    <h2>Funcionários</h2>
-                    <div className={styles.campo}>
-                        <label className={styles.label} htmlFor="desconto-frango">DESCONTO DE QUEM RECEBEU FRANGO (R$)</label>
-                        <input
-                            id="desconto-frango"
-                            className={styles.input}
-                            inputMode="decimal"
-                            value={rascunho.desconto}
-                            onChange={(event) => atualizar({ desconto: event.target.value })}
-                        />
-                        <p className={styles.dica}>Descontado do total do dia de quem está presente e recebeu frango.</p>
-                    </div>
-                </section>
+                        <section className={styles.secao}>
+                            <h2>Funcionários</h2>
+                            <div className={styles.campo}>
+                                <label className={styles.label} htmlFor="desconto-frango">DESCONTO DE QUEM RECEBEU FRANGO (R$)</label>
+                                <input
+                                    id="desconto-frango"
+                                    className={styles.input}
+                                    inputMode="decimal"
+                                    value={rascunho.desconto}
+                                    onChange={(event) => atualizar({ desconto: event.target.value })}
+                                />
+                                <p className={styles.dica}>Descontado do total do dia de quem está presente e recebeu frango.</p>
+                            </div>
+                        </section>
 
-                <section className={styles.secao}>
-                    <h2>Cobrança</h2>
-                    <div className={styles.campo}>
-                        <label className={styles.label} htmlFor="acrescimo-frete">ACRÉSCIMO POR KG NO FRETE (R$)</label>
-                        <input
-                            id="acrescimo-frete"
-                            className={styles.input}
-                            inputMode="decimal"
-                            value={rascunho.acrescimo}
-                            onChange={(event) => atualizar({ acrescimo: event.target.value })}
-                        />
-                        <p className={styles.dica}>Frete = kg da LATAM × (taxa por kg + acréscimo).</p>
-                    </div>
-                </section>
+                        <section className={styles.secao}>
+                            <h2>Cobrança</h2>
+                            <div className={styles.campo}>
+                                <label className={styles.label} htmlFor="acrescimo-frete">ACRÉSCIMO POR KG NO FRETE (R$)</label>
+                                <input
+                                    id="acrescimo-frete"
+                                    className={styles.input}
+                                    inputMode="decimal"
+                                    value={rascunho.acrescimo}
+                                    onChange={(event) => atualizar({ acrescimo: event.target.value })}
+                                />
+                                <p className={styles.dica}>Frete = kg da LATAM × (taxa por kg + acréscimo).</p>
+                            </div>
+                        </section>
+                    </>
+                ) : (
+                    <section className={styles.secao}>
+                        <h2>Dados da empresa</h2>
+                        <p>Aparecem no cabeçalho e no pagamento dos recibos.</p>
+                        <div className={styles.campo}>
+                            <label className={styles.label} htmlFor="empresa-nome">NOME</label>
+                            <input
+                                id="empresa-nome"
+                                className={styles.input}
+                                value={rascunho.empresaNome}
+                                onChange={(event) => atualizar({ empresaNome: event.target.value })}
+                            />
+                        </div>
+                        <div className={styles.campo}>
+                            <label className={styles.label} htmlFor="empresa-cnpj">CNPJ</label>
+                            <input
+                                id="empresa-cnpj"
+                                className={styles.input}
+                                inputMode="numeric"
+                                value={rascunho.empresaCnpj}
+                                onChange={(event) => atualizar({ empresaCnpj: event.target.value })}
+                            />
+                            <p className={styles.dica}>Aparece como CNPJ da chave PIX no recibo.</p>
+                        </div>
+                    </section>
+                )}
 
                 <div className={styles.acoes}>
                     <button type="submit" className={styles.btnSave} disabled={salvando}>
@@ -239,11 +286,26 @@ function FormConfiguracoes({ config }: { config: Configuracoes }) {
 
 export default function Configuracoes() {
     const { config, error } = useConfiguracoes();
+    const [aba, setAba] = useState<Aba>('sistema');
 
     return (
         <PageLayout>
             <Sidebar>
                 <HeaderPadrao titulo="Configurações" />
+                <nav className={styles.nav} role="tablist" aria-orientation="vertical">
+                    {ABAS.map((item) => (
+                        <button
+                            key={item.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={aba === item.id}
+                            className={`${styles.navItem} ${aba === item.id ? styles.navItemAtivo : ''}`}
+                            onClick={() => setAba(item.id)}
+                        >
+                            {item.rotulo}
+                        </button>
+                    ))}
+                </nav>
             </Sidebar>
 
             <Main>
@@ -253,7 +315,7 @@ export default function Configuracoes() {
                 />
                 <div className={styles.conteudo}>
                     {config ? (
-                        <FormConfiguracoes config={config} />
+                        <FormConfiguracoes config={config} aba={aba} />
                     ) : (
                         <PageState kind={error ? 'error' : 'loading'} message={error ?? 'Carregando configurações...'} />
                     )}

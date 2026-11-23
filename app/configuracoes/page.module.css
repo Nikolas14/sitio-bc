@@ -5,7 +5,7 @@
 .secao > p { color: #64748b; font-size: 13px; margin-top: -10px; }
 .campo { display: flex; flex-direction: column; gap: 8px; }
 .label { display: block; color: #94a3b8; font-size: 10px; font-weight: 800; letter-spacing: .05em; }
-.input { width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc; color: #1e293b; font-size: 14px; padding: 12px; box-sizing: border-box; }
+.input { width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc; color: #1e293b; font-size: 14px; padding: 12px; box-sizing: border-box; text-transform: uppercase; }
 .input:focus { outline: none; border-color: #3b82f6; background: white; }
 .addRow { display: flex; gap: 10px; }
 .btnAdd { background: #0f172a; color: white; border: 0; padding: 0 18px; border-radius: 6px; font-weight: 700; cursor: pointer; white-space: nowrap; }
@@ -23,3 +23,7 @@
     .addRow { flex-direction: column; }
     .btnAdd { padding: 12px; }
 }
+.nav { display: flex; flex-direction: column; gap: 8px; }
+.navItem { text-align: left; background: #f8fafc; border: 1px solid transparent; color: #334155; padding: 12px 15px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all .2s; }
+.navItem:hover { background: #f1f5f9; }
+.navItemAtivo { background: #eff6ff; border-color: #3b82f6; color: #1e3a8a; }

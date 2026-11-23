@@ -29,3 +29,13 @@ insert into public."ESTOQUE_configuracao" (chave, valor) values
   ('desconto_frango', '10'),
   ('acrescimo_frete_kg', '0.5')
 on conflict (chave) do nothing;
+
+-- Dados da empresa exibidos no recibo: nome e CNPJ (chave PIX).
+insert into public."ESTOQUE_configuracao" (chave, valor) values
+  ('empresa', '{"nome": "Beit Chabad Belém", "cnpj": "02.256.458/0001-31"}')
+on conflict (chave) do nothing;
+
+-- Bases que já tinham a versão anterior (nome, subtítulo e logo).
+update public."ESTOQUE_configuracao"
+set valor = jsonb_build_object('nome', valor->>'nome', 'cnpj', '02.256.458/0001-31')
+where chave = 'empresa' and not (valor ? 'cnpj');
