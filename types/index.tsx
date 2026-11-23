@@ -108,5 +108,17 @@ export interface IReceiptItem {
   ESTOQUE_product: IReceiptProduct | null;
 }
 
+export interface IBoleto {
+  id: string;
+  numero: string;
+  empresa: string;
+  vencimento: string; // YYYY-MM-DD
+  valor: number;
+  paid_at: string | null; // null = em aberto
+  banco: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export const STATUS_COBRANCA = ['PENDENTE', 'ENVIADO', 'COBRADO', 'CONCLUIDO'];
 export const TIPOS_PRODUTOS = ['FRANGO', 'CARNE', 'EMBUTIDOS', 'SORVETE', 'PEIXE', 'OUTROS', 'EXTRA', 'INTERNO', 'ISOPOR'];
