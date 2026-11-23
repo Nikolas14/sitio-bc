@@ -11,7 +11,7 @@ export interface BoletoFormData {
     banco: string;
 }
 
-const emptyForm: BoletoFormData = {
+export const formVazio: BoletoFormData = {
     numero: '',
     empresa: '',
     vencimento: '',
@@ -21,11 +21,12 @@ const emptyForm: BoletoFormData = {
 
 // Código do Postgres para violação de chave única (número de boleto repetido).
 const CODIGO_DUPLICADO = '23505';
+const MENSAGEM_DUPLICADO = 'Já existe um boleto com esse número.';
 
 export function useBoletoManager() {
     const [boletos, setBoletos] = useState<IBoleto[]>([]);
-    const [selectedId, setSelectedId] = useState<string | 'new' | null>(null);
-    const [formData, setFormData] = useState<BoletoFormData>(emptyForm);
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [formData, setFormData] = useState<BoletoFormData>(formVazio);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -54,13 +55,7 @@ export function useBoletoManager() {
         return () => window.clearTimeout(timeoutId);
     }, []);
 
-    const handleSelect = (boleto: IBoleto | 'new') => {
-        if (boleto === 'new') {
-            setSelectedId('new');
-            setFormData({ ...emptyForm });
-            return;
-        }
-
+    const handleSelect = (boleto: IBoleto) => {
         setSelectedId(boleto.id);
         setFormData({
             numero: boleto.numero ?? '',
@@ -91,33 +86,50 @@ export function useBoletoManager() {
         return null;
     };
 
-    const saveBoleto = async (): Promise<string | null> => {
-        const erroValidacao = validarFormulario(formData);
-        if (erroValidacao) return erroValidacao;
+    // Valida e converte o formulário. Pagamento (paid_at e banco) nunca passa por aqui.
+    const montarPayload = (form: BoletoFormData) => {
+        const erroValidacao = validarFormulario(form);
+        if (erroValidacao) return { erro: erroValidacao, payload: null };
 
-        const valor = parseValor(formData.valor);
-        if (valor === null) return 'Valor inválido.';
+        const valor = parseValor(form.valor);
+        if (valor === null) return { erro: 'Valor inválido.', payload: null };
+
+        return {
+            erro: null,
+            payload: {
+                numero: form.numero.trim().toUpperCase(),
+                empresa: form.empresa.trim().toUpperCase(),
+                vencimento: form.vencimento,
+                valor,
+            },
+        };
+    };
+
+    const createBoleto = async (form: BoletoFormData): Promise<string | null> => {
+        const { erro, payload } = montarPayload(form);
+        if (!payload) return erro;
 
         setLoading(true);
+        const { error } = await supabase.from('ESTOQUE_boleto').insert(payload);
+        return finishWrite(error, MENSAGEM_DUPLICADO, false);
+    };
 
-        const payload = {
-            numero: formData.numero.trim().toUpperCase(),
-            empresa: formData.empresa.trim().toUpperCase(),
-            vencimento: formData.vencimento,
-            valor,
-            updated_at: new Date().toISOString(),
-        };
+    const saveBoleto = async (): Promise<string | null> => {
+        if (!selectedId) return 'Nenhum boleto selecionado.';
 
-        // Pagamento (paid_at e banco) não muda aqui: só marcar/desfazer pagamento altera esses campos.
-        const result = selectedId === 'new'
-            ? await supabase.from('ESTOQUE_boleto').insert(payload)
-            : await supabase.from('ESTOQUE_boleto').update(payload).eq('id', selectedId);
+        const { erro, payload } = montarPayload(formData);
+        if (!payload) return erro;
 
-        return finishWrite(result.error, 'Já existe um boleto com esse número.', true);
+        setLoading(true);
+        const { error } = await supabase
+            .from('ESTOQUE_boleto')
+            .update({ ...payload, updated_at: new Date().toISOString() })
+            .eq('id', selectedId);
+        return finishWrite(error, MENSAGEM_DUPLICADO, true);
     };
 
     const deleteBoleto = async (): Promise<string | null> => {
-        if (!selectedId || selectedId === 'new') return 'Nenhum boleto selecionado.';
+        if (!selectedId) return 'Nenhum boleto selecionado.';
 
         setLoading(true);
         const { error } = await supabase.from('ESTOQUE_boleto').delete().eq('id', selectedId);
@@ -125,7 +137,7 @@ export function useBoletoManager() {
     };
 
     const markPaid = async (banco: string): Promise<string | null> => {
-        if (!selectedId || selectedId === 'new') return 'Nenhum boleto selecionado.';
+        if (!selectedId) return 'Nenhum boleto selecionado.';
         if (!banco.trim()) return 'Escolha o banco do pagamento.';
 
         setLoading(true);
@@ -137,7 +149,7 @@ export function useBoletoManager() {
     };
 
     const undoPaid = async (): Promise<string | null> => {
-        if (!selectedId || selectedId === 'new') return 'Nenhum boleto selecionado.';
+        if (!selectedId) return 'Nenhum boleto selecionado.';
 
         setLoading(true);
         const { error } = await supabase
@@ -177,6 +189,7 @@ export function useBoletoManager() {
         formData,
         setFormData,
         handleSelect,
+        createBoleto,
         saveBoleto,
         deleteBoleto,
         markPaid,

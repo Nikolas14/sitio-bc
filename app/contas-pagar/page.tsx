@@ -4,7 +4,7 @@ import { useState } from 'react';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
-import { useBoletoManager, type BoletoFormData } from '@/hooks/useBoletoManager';
+import { useBoletoManager, formVazio, type BoletoFormData } from '@/hooks/useBoletoManager';
 import { useToast } from '@/components/Toast/Toast';
 import { BANCOS_SUGERIDOS, hojeLocal, statusBoleto, type StatusBoleto } from '@/utils/boletos';
 import type { IBoleto } from '@/types';
@@ -24,7 +24,7 @@ const STATUS_CLASS: Record<StatusBoleto, string> = {
     EM_ABERTO: styles.badgeEmAberto,
 };
 
-const campos: { key: keyof BoletoFormData; label: string; placeholder: string; full?: boolean; type?: string }[] = [
+const camposFicha: { key: keyof BoletoFormData; label: string; placeholder: string; full?: boolean; type?: string }[] = [
     { key: 'empresa', label: 'EMPRESA', placeholder: 'Nome da empresa', full: true },
     { key: 'numero', label: 'NÚMERO DO BOLETO', placeholder: 'Número do boleto' },
     { key: 'valor', label: 'VALOR (R$)', placeholder: '0,00' },
@@ -42,52 +42,57 @@ const formatarData = (iso: string) => {
 export default function ContasPagar() {
     const manager = useBoletoManager();
     const toast = useToast();
+    const [novo, setNovo] = useState<BoletoFormData>(formVazio);
     const [password, setPassword] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<'save' | 'delete' | null>(null);
-    // Ficha só para leitura até apertar "Editar"; boleto novo já abre editável.
+    // Ficha só para leitura até apertar "Editar".
     const [editing, setEditing] = useState(false);
     const [pagando, setPagando] = useState(false);
     const [banco, setBanco] = useState('');
 
     const hoje = hojeLocal();
-    const isNew = manager.selectedId === 'new';
     const selecionado = manager.boletos.find((boleto) => boleto.id === manager.selectedId) ?? null;
+    const totalEmAberto = manager.boletos
+        .filter((boleto) => !boleto.paid_at)
+        .reduce((soma, boleto) => soma + boleto.valor, 0);
+    const quantidadeEmAberto = manager.boletos.filter((boleto) => !boleto.paid_at).length;
 
-    const selectBoleto = (boleto: IBoleto | 'new') => {
+    const abrirFicha = (boleto: IBoleto) => {
         manager.handleSelect(boleto);
-        setEditing(boleto === 'new');
+        setEditing(false);
+        setPagando(false);
+        setBanco('');
+    };
+
+    const fecharFicha = () => {
+        manager.setSelectedId(null);
+        setEditing(false);
         setPagando(false);
         setBanco('');
     };
 
     const cancelEdit = () => {
-        if (isNew) {
-            manager.setSelectedId(null);
-        } else if (selecionado) {
-            manager.handleSelect(selecionado);
-        }
+        if (selecionado) manager.handleSelect(selecionado);
         setEditing(false);
     };
 
-    const gravarBoleto = async () => {
-        const saveError = await manager.saveBoleto();
-        if (saveError === null) {
-            setEditing(false);
-            toast.success('Boleto salvo com sucesso!');
+    // Cadastro novo não pede senha.
+    const cadastrarNovo = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const erro = await manager.createBoleto(novo);
+        if (erro === null) {
+            setNovo(formVazio);
+            toast.success('Boleto cadastrado.');
         } else {
-            toast.error(`Erro ao salvar boleto: ${saveError}`);
+            toast.error(`Erro ao cadastrar boleto: ${erro}`);
         }
     };
 
-    // Cadastrar boleto novo não pede senha; alterar um boleto existente pede.
-    const requestSave = async (e: React.FormEvent) => {
+    // Alterar um boleto existente pede senha.
+    const requestSave = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editing) return;
-        if (isNew) {
-            await gravarBoleto();
-            return;
-        }
         setPendingAction('save');
         setShowModal(true);
     };
@@ -114,7 +119,13 @@ export default function ContasPagar() {
         setPassword('');
 
         if (pendingAction === 'save') {
-            await gravarBoleto();
+            const saveError = await manager.saveBoleto();
+            if (saveError === null) {
+                setEditing(false);
+                toast.success('Boleto salvo com sucesso!');
+            } else {
+                toast.error(`Erro ao salvar boleto: ${saveError}`);
+            }
         } else if (pendingAction === 'delete') {
             const deleteError = await manager.deleteBoleto();
             if (deleteError === null) {
@@ -167,71 +178,144 @@ export default function ContasPagar() {
                         placeholder="Digite para buscar..."
                     />
                 </div>
+            </Sidebar>
 
-                <nav className={styles.customerList}>
-                    {manager.loading && !manager.selectedId ? (
+            <Main className={styles.mainArea}>
+                <form onSubmit={cadastrarNovo} className={styles.novoCard}>
+                    <span className={styles.eyebrow}>NOVO BOLETO</span>
+                    <div className={styles.novoRow}>
+                        <div>
+                            <label className={styles.label} htmlFor="novo-empresa">EMPRESA</label>
+                            <input
+                                id="novo-empresa"
+                                className={`${styles.input} ${styles.caps}`}
+                                list="empresas-sugeridas"
+                                value={novo.empresa}
+                                onChange={(event) => setNovo({ ...novo, empresa: event.target.value })}
+                                placeholder="Nome da empresa"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className={styles.label} htmlFor="novo-numero">NÚMERO</label>
+                            <input
+                                id="novo-numero"
+                                className={styles.input}
+                                value={novo.numero}
+                                onChange={(event) => setNovo({ ...novo, numero: event.target.value })}
+                                placeholder="Número"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className={styles.label} htmlFor="novo-valor">VALOR (R$)</label>
+                            <input
+                                id="novo-valor"
+                                inputMode="decimal"
+                                className={styles.input}
+                                value={novo.valor}
+                                onChange={(event) => setNovo({ ...novo, valor: event.target.value })}
+                                placeholder="0,00"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className={styles.label} htmlFor="novo-vencimento">VENCIMENTO</label>
+                            <input
+                                id="novo-vencimento"
+                                type="date"
+                                className={styles.input}
+                                value={novo.vencimento}
+                                onChange={(event) => setNovo({ ...novo, vencimento: event.target.value })}
+                                required
+                            />
+                        </div>
+                        <button type="submit" className={styles.btnSave} disabled={manager.loading}>Adicionar</button>
+                    </div>
+                    <datalist id="empresas-sugeridas">
+                        {manager.empresasSugeridas.map((nome) => <option key={nome} value={nome} />)}
+                    </datalist>
+                </form>
+
+                <div className={styles.listaCard}>
+                    <div className={styles.listaHeader}>
+                        <h2>Boletos</h2>
+                        <span>{quantidadeEmAberto} em aberto · {formatarValor(totalEmAberto)}</span>
+                    </div>
+
+                    {manager.loading && manager.boletos.length === 0 ? (
                         <p className={styles.listMessage}>Carregando boletos...</p>
                     ) : manager.error && manager.boletos.length === 0 ? (
                         <p className={styles.listMessage}>Não foi possível carregar os boletos: {manager.error}</p>
                     ) : manager.filteredBoletos.length === 0 ? (
                         <p className={styles.listMessage}>Nenhum boleto encontrado.</p>
-                    ) : manager.filteredBoletos.map((boleto) => {
-                        const status = statusBoleto(boleto, hoje);
-                        return (
-                            <button
-                                type="button"
-                                key={boleto.id}
-                                className={`${styles.customerItem} ${manager.selectedId === boleto.id ? styles.active : ''}`}
-                                onClick={() => selectBoleto(boleto)}
-                            >
-                                <span className={styles.itemName}>{boleto.empresa}</span>
-                                <span className={styles.itemDetails}>
-                                    {boleto.numero} · vence {formatarData(boleto.vencimento)} · {formatarValor(boleto.valor)}
-                                </span>
-                                <span className={`${styles.badge} ${STATUS_CLASS[status]}`}>{STATUS_LABEL[status]}</span>
-                            </button>
-                        );
-                    })}
-                </nav>
-
-                <div className={styles.sidebarBottom}>
-                    <button type="button" className={styles.btnAdd} onClick={() => selectBoleto('new')}>
-                        + Novo boleto
-                    </button>
+                    ) : (
+                        <div className={styles.tableWrap}>
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>VENCIMENTO</th>
+                                        <th>EMPRESA</th>
+                                        <th>NÚMERO</th>
+                                        <th className={styles.right}>VALOR</th>
+                                        <th>STATUS</th>
+                                        <th>PAGAMENTO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {manager.filteredBoletos.map((boleto) => {
+                                        const status = statusBoleto(boleto, hoje);
+                                        return (
+                                            <tr key={boleto.id} className={styles.row} onClick={() => abrirFicha(boleto)}>
+                                                <td>{formatarData(boleto.vencimento)}</td>
+                                                <td className={styles.empresa}>{boleto.empresa}</td>
+                                                <td>{boleto.numero}</td>
+                                                <td className={styles.right}>{formatarValor(boleto.valor)}</td>
+                                                <td><span className={`${styles.badge} ${STATUS_CLASS[status]}`}>{STATUS_LABEL[status]}</span></td>
+                                                <td>
+                                                    {boleto.paid_at
+                                                        ? `${new Date(boleto.paid_at).toLocaleDateString('pt-BR')} · ${boleto.banco || '—'}`
+                                                        : '—'}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
-            </Sidebar>
+            </Main>
 
-            <Main className={styles.formArea}>
-                {manager.selectedId ? (
-                    <form onSubmit={requestSave} className={styles.formCard}>
+            {selecionado && (
+                <div className={styles.overlay} onClick={fecharFicha}>
+                    <form
+                        onSubmit={requestSave}
+                        className={styles.modal}
+                        onClick={(event) => event.stopPropagation()}
+                    >
                         <div className={styles.formHeader}>
                             <div>
                                 <span className={styles.eyebrow}>CONTAS A PAGAR</span>
-                                <h2>{isNew ? 'Novo boleto' : editing ? 'Editar boleto' : manager.formData.empresa || 'Boleto'}</h2>
-                                <p>
-                                    {isNew
-                                        ? 'Preencha os dados para cadastrar o boleto.'
-                                        : editing
-                                            ? 'Altere os dados e salve.'
-                                            : 'Somente leitura. Clique em Editar para alterar.'}
-                                </p>
+                                <h2>{editing ? 'Editar boleto' : manager.formData.empresa || 'Boleto'}</h2>
+                                <p>{editing ? 'Altere os dados e salve.' : 'Somente leitura. Clique em Editar para alterar.'}</p>
                             </div>
                             <div className={styles.headerActions}>
                                 {!editing && (
                                     <button type="button" className={styles.btnSave} onClick={() => setEditing(true)} disabled={manager.loading}>Editar</button>
                                 )}
-                                <button type="button" className={styles.closeButton} onClick={() => manager.setSelectedId(null)} aria-label="Fechar">×</button>
+                                <button type="button" className={styles.closeButton} onClick={fecharFicha} aria-label="Fechar">×</button>
                             </div>
                         </div>
 
                         <div className={styles.formGrid}>
-                            {campos.map(({ key, label, placeholder, full, type }) => (
+                            {camposFicha.map(({ key, label, placeholder, full, type }) => (
                                 <div key={key} className={full ? styles.full : ''}>
                                     {editing ? (
                                         <>
-                                            <label className={styles.label} htmlFor={key}>{label}</label>
+                                            <label className={styles.label} htmlFor={`ficha-${key}`}>{label}</label>
                                             <input
-                                                id={key}
+                                                id={`ficha-${key}`}
                                                 type={type ?? 'text'}
                                                 inputMode={key === 'valor' ? 'decimal' : undefined}
                                                 className={key === 'empresa' ? `${styles.input} ${styles.caps}` : styles.input}
@@ -250,14 +334,9 @@ export default function ContasPagar() {
                                     )}
                                 </div>
                             ))}
-                            {editing && (
-                                <datalist id="empresas-sugeridas">
-                                    {manager.empresasSugeridas.map((nome) => <option key={nome} value={nome} />)}
-                                </datalist>
-                            )}
                         </div>
 
-                        {!isNew && selecionado && !editing && (
+                        {!editing && (
                             <div className={styles.paymentBox}>
                                 {selecionado.paid_at ? (
                                     <>
@@ -307,7 +386,7 @@ export default function ContasPagar() {
 
                         {editing ? (
                             <div className={styles.formActions}>
-                                {!isNew && <button type="button" className={styles.btnDelete} onClick={requestDelete} disabled={manager.loading}>Excluir boleto</button>}
+                                <button type="button" className={styles.btnDelete} onClick={requestDelete} disabled={manager.loading}>Excluir boleto</button>
                                 <div className={styles.rightActions}>
                                     <button type="button" className={styles.btnCancel} onClick={cancelEdit}>Cancelar</button>
                                     <button type="submit" className={styles.btnSave} disabled={manager.loading}>{manager.loading ? 'Salvando...' : 'Salvar boleto'}</button>
@@ -317,20 +396,13 @@ export default function ContasPagar() {
                             <div className={styles.formActions}>
                                 <button type="button" className={styles.btnDelete} onClick={requestDelete} disabled={manager.loading}>Excluir boleto</button>
                                 <div className={styles.rightActions}>
-                                    <button type="button" className={styles.btnCancel} onClick={() => manager.setSelectedId(null)}>Fechar</button>
+                                    <button type="button" className={styles.btnCancel} onClick={fecharFicha}>Fechar</button>
                                 </div>
                             </div>
                         )}
                     </form>
-                ) : (
-                    <div className={styles.emptyState}>
-                        <div className={styles.emptyIcon}>◌</div>
-                        <h2>Contas a pagar</h2>
-                        <p>Selecione um boleto na lista ou cadastre um novo.</p>
-                        <button type="button" className={styles.btnSave} onClick={() => selectBoleto('new')}>Novo boleto</button>
-                    </div>
-                )}
-            </Main>
+                </div>
+            )}
 
             {showModal && (
                 <AdminPasswordModal
