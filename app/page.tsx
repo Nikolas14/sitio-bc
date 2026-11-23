@@ -18,7 +18,8 @@ import {
    ClipboardCheck,
    CalendarDays,
    ListChecks,
-  Printer
+  Printer,
+  Receipt
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -33,6 +34,12 @@ export default function Dashboard() {
         { title: 'Caixa / Venda', path: '/mov/venda', icon: <ShoppingCart size={24} />, color: '#22c55e' },
         { title: 'Entrada de Carga', path: '/mov/entrada', icon: <Package size={24} /> },
         { title: 'Cobrança', path: '/cobranca', icon: <FileText size={24} /> },
+      ]
+    },
+    {
+      nome: 'Contas a pagar',
+      itens: [
+        { title: 'Boletos', path: '/contas-pagar', icon: <Receipt size={24} /> },
       ]
     },
     {
