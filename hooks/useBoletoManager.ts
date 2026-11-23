@@ -136,14 +136,16 @@ export function useBoletoManager() {
         return finishWrite(error, '', true);
     };
 
-    const markPaid = async (banco: string): Promise<string | null> => {
+    // data: YYYY-MM-DD escolhida pelo usuário. Meio-dia local evita que o fuso mude o dia gravado.
+    const markPaid = async (banco: string, data: string): Promise<string | null> => {
         if (!selectedId) return 'Nenhum boleto selecionado.';
         if (!banco.trim()) return 'Escolha o banco do pagamento.';
+        if (!data) return 'Informe a data do pagamento.';
 
         setLoading(true);
         const { error } = await supabase
             .from('ESTOQUE_boleto')
-            .update({ paid_at: new Date().toISOString(), banco: banco.trim().toUpperCase() })
+            .update({ paid_at: new Date(`${data}T12:00:00`).toISOString(), banco: banco.trim().toUpperCase() })
             .eq('id', selectedId);
         return finishWrite(error, '', false);
     };

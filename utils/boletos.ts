@@ -46,7 +46,7 @@ export function parseValor(texto: string): number | null {
 
 // Lista fechada de empresas do campo EMPRESA. Por enquanto fica no código;
 // a página de configurações do sistema vai passar a editar essa lista.
-export const EMPRESAS: string[] = ['MIKI', 'RODIN', 'LEITE MENDEL', 'GBS', 'UNIMED', 'CLARO', 'EQUATORIAL'];
+export const EMPRESAS: string[] = ['MIKI', 'RODIN', 'LEITE MENDEL', 'GBS', 'UNIMED RABINO', 'CLARO MOLDEM', 'CLARO SITIO','INTERNETE SITIO', 'CLARO BC', 'EQUATORIAL SITIO', 'EQUATORIAL SITIO TAXA', 'EQUATORIAL BC', 'EQUATORIAL RABINO'];
 
 /** Primeira mensagem de erro do cadastro, ou null se estiver tudo certo. */
 export function validarFormulario(form: { numero: string; empresa: string; valor: string }): string | null {

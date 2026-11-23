@@ -29,7 +29,8 @@
 .table td { padding: 12px 14px; color: #1e293b; border-bottom: 1px solid #f8fafc; white-space: nowrap; }
 .row { cursor: pointer; }
 .row:hover td { background: #f8fafc; }
-.right { text-align: right; }
+.table .alignRight { text-align: right; }
+.table .alignCenter { text-align: center; }
 .empresa { font-weight: 700; text-transform: uppercase; }
 
 .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .04em; }
@@ -51,6 +52,7 @@
 .viewValue { margin: 0; min-height: 44px; display: flex; align-items: center; color: #1e293b; font-size: 14px; font-weight: 600; padding: 12px; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 6px; word-break: break-word; user-select: text; -webkit-user-select: text; }
 .paymentBox { margin-top: 22px; padding: 18px 20px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; }
 .paymentRow { display: flex; gap: 12px; align-items: flex-end; margin-top: 12px; }
+.paymentDate { width: 180px; flex-shrink: 0; }
 .paymentSelect { flex: 1; }
 .paymentText { margin: 0; color: #166534; font-size: 14px; font-weight: 700; }
 .paymentActions { display: flex; gap: 12px; margin-top: 12px; }

@@ -53,6 +53,7 @@ export default function ContasPagar() {
     const [editing, setEditing] = useState(false);
     const [pagando, setPagando] = useState(false);
     const [banco, setBanco] = useState('');
+    const [dataPagamento, setDataPagamento] = useState('');
 
     const hoje = hojeLocal();
     const selecionado = manager.boletos.find((boleto) => boleto.id === manager.selectedId) ?? null;
@@ -143,10 +144,11 @@ export default function ContasPagar() {
 
     // Marcar e desfazer pagamento não pedem senha de administrador (decisão do plano).
     const confirmarPagamento = async () => {
-        const erro = await manager.markPaid(banco);
+        const erro = await manager.markPaid(banco, dataPagamento);
         if (erro === null) {
             setPagando(false);
             setBanco('');
+            setDataPagamento('');
             toast.success('Pagamento registrado.');
         } else {
             toast.error(`Erro ao registrar pagamento: ${erro}`);
@@ -198,6 +200,7 @@ export default function ContasPagar() {
                                 getLabel={(nome) => nome}
                                 placeholder="Buscar empresa..."
                                 emptyText="Empresa não encontrada"
+                                maxResults={EMPRESAS.length}
                             />
                         </div>
                         <div>
@@ -258,8 +261,8 @@ export default function ContasPagar() {
                                         <th>VENCIMENTO</th>
                                         <th>EMPRESA</th>
                                         <th>NÚMERO</th>
-                                        <th className={styles.right}>VALOR</th>
-                                        <th>STATUS</th>
+                                        <th className={styles.alignRight}>VALOR</th>
+                                        <th className={styles.alignCenter}>STATUS</th>
                                         <th>PAGAMENTO</th>
                                     </tr>
                                 </thead>
@@ -271,8 +274,8 @@ export default function ContasPagar() {
                                                 <td>{formatarData(boleto.vencimento)}</td>
                                                 <td className={styles.empresa}>{boleto.empresa}</td>
                                                 <td>{boleto.numero}</td>
-                                                <td className={styles.right}>{formatarValor(boleto.valor)}</td>
-                                                <td><span className={`${styles.badge} ${STATUS_CLASS[status]}`}>{STATUS_LABEL[status]}</span></td>
+                                                <td className={styles.alignRight}>{formatarValor(boleto.valor)}</td>
+                                                <td className={styles.alignCenter}><span className={`${styles.badge} ${STATUS_CLASS[status]}`}>{STATUS_LABEL[status]}</span></td>
                                                 <td>
                                                     {boleto.paid_at
                                                         ? `${new Date(boleto.paid_at).toLocaleDateString('pt-BR')} · ${boleto.banco || '—'}`
@@ -324,6 +327,7 @@ export default function ContasPagar() {
                                                 getLabel={(nome) => nome}
                                                 placeholder="Buscar empresa..."
                                                 emptyText="Empresa não encontrada"
+                                                maxResults={EMPRESAS.length}
                                             />
                                         </>
                                     ) : editing ? (
@@ -363,9 +367,20 @@ export default function ContasPagar() {
                                     </>
                                 ) : pagando ? (
                                     <>
-                                        <span className={styles.label}>BANCO DO PAGAMENTO</span>
                                         <div className={styles.paymentRow}>
+                                            <div className={styles.paymentDate}>
+                                                <label className={styles.label} htmlFor="data-pagamento">DATA DO PAGAMENTO</label>
+                                                <input
+                                                    id="data-pagamento"
+                                                    type="date"
+                                                    className={styles.input}
+                                                    value={dataPagamento}
+                                                    onChange={(event) => setDataPagamento(event.target.value)}
+                                                    required
+                                                />
+                                            </div>
                                             <div className={styles.paymentSelect}>
+                                                <span className={styles.label}>BANCO DO PAGAMENTO</span>
                                                 <SearchSelect
                                                     items={BANCOS}
                                                     selected={banco || null}
@@ -375,6 +390,7 @@ export default function ContasPagar() {
                                                     getLabel={(nome) => nome}
                                                     placeholder="Buscar banco..."
                                                     emptyText="Banco não encontrado"
+                                                    maxResults={BANCOS.length}
                                                 />
                                             </div>
                                             <button type="button" className={styles.btnSave} onClick={confirmarPagamento} disabled={manager.loading}>
@@ -382,11 +398,11 @@ export default function ContasPagar() {
                                             </button>
                                         </div>
                                         <div className={styles.paymentActions}>
-                                            <button type="button" className={styles.btnCancel} onClick={() => { setPagando(false); setBanco(''); }}>Cancelar</button>
+                                            <button type="button" className={styles.btnCancel} onClick={() => { setPagando(false); setBanco(''); setDataPagamento(''); }}>Cancelar</button>
                                         </div>
                                     </>
                                 ) : (
-                                    <button type="button" className={styles.btnPay} onClick={() => setPagando(true)} disabled={manager.loading}>
+                                    <button type="button" className={styles.btnPay} onClick={() => { setDataPagamento(hoje); setPagando(true); }} disabled={manager.loading}>
                                         Marcar como pago
                                     </button>
                                 )}
