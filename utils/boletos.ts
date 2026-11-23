@@ -2,17 +2,8 @@ import type { IBoleto } from '@/types';
 
 export type StatusBoleto = 'PAGO' | 'VENCIDO' | 'VENCE_EM_BREVE' | 'EM_ABERTO';
 
-export const BANCOS_SUGERIDOS = [
-  'Banco do Brasil',
-  'Bradesco',
-  'Caixa',
-  'Itaú',
-  'Santander',
-  'Sicoob',
-  'Sicredi',
-  'Nubank',
-  'Inter',
-];
+// Lista fechada de bancos do pagamento. Como EMPRESAS, vai para a página de configurações depois.
+export const BANCOS: string[] = ['ITAU', 'BRADESCO', 'STONE', 'INTER', 'C6'];
 
 const DIAS_VENCE_EM_BREVE = 7;
 
@@ -53,19 +44,9 @@ export function parseValor(texto: string): number | null {
   return Math.round(valor * 100) / 100;
 }
 
-// Fornecedores que aparecem nas sugestões mesmo antes do primeiro boleto deles.
-export const FORNECEDORES_INICIAIS: string[] = [];
-
-/** Sugestões do campo EMPRESA: a lista fixa inicial mais as empresas já cadastradas em boletos, sem repetir. */
-export function sugestoesEmpresa(
-  boletos: Pick<IBoleto, 'empresa'>[],
-  iniciais: string[] = FORNECEDORES_INICIAIS,
-): string[] {
-  const nomes = [...iniciais, ...boletos.map((boleto) => boleto.empresa)]
-    .map((nome) => nome.trim().toUpperCase())
-    .filter(Boolean);
-  return [...new Set(nomes)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-}
+// Lista fechada de empresas do campo EMPRESA. Por enquanto fica no código;
+// a página de configurações do sistema vai passar a editar essa lista.
+export const EMPRESAS: string[] = ['MIKI', 'RODIN', 'LEITE MENDEL', 'GBS', 'UNIMED', 'CLARO', 'EQUATORIAL'];
 
 /** Primeira mensagem de erro do cadastro, ou null se estiver tudo certo. */
 export function validarFormulario(form: { numero: string; empresa: string; valor: string }): string | null {

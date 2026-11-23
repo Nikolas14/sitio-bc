@@ -6,7 +6,8 @@ import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
 import { useBoletoManager, formVazio, type BoletoFormData } from '@/hooks/useBoletoManager';
 import { useToast } from '@/components/Toast/Toast';
-import { BANCOS_SUGERIDOS, hojeLocal, statusBoleto, type StatusBoleto } from '@/utils/boletos';
+import SearchSelect, { normalize } from '@/components/SearchSelect/SearchSelect';
+import { BANCOS, EMPRESAS, hojeLocal, statusBoleto, type StatusBoleto } from '@/utils/boletos';
 import type { IBoleto } from '@/types';
 import styles from './page.module.css';
 
@@ -32,6 +33,8 @@ const camposFicha: { key: keyof BoletoFormData; label: string; placeholder: stri
 ];
 
 const formatarValor = (valor: number) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+const matchesNome = (nome: string, q: string) => normalize(nome).includes(q);
 
 // Datas vêm como YYYY-MM-DD: separar as partes evita o deslocamento de fuso que new Date() causaria.
 const formatarData = (iso: string) => {
@@ -185,22 +188,23 @@ export default function ContasPagar() {
                     <span className={styles.eyebrow}>NOVO BOLETO</span>
                     <div className={styles.novoRow}>
                         <div>
-                            <label className={styles.label} htmlFor="novo-empresa">EMPRESA</label>
-                            <input
-                                id="novo-empresa"
-                                className={`${styles.input} ${styles.caps}`}
-                                list="empresas-sugeridas"
-                                value={novo.empresa}
-                                onChange={(event) => setNovo({ ...novo, empresa: event.target.value })}
-                                placeholder="Nome da empresa"
-                                required
+                            <span className={styles.label}>EMPRESA</span>
+                            <SearchSelect
+                                items={EMPRESAS}
+                                selected={novo.empresa || null}
+                                onSelect={(nome) => setNovo({ ...novo, empresa: nome ?? '' })}
+                                matches={matchesNome}
+                                getKey={(nome) => nome}
+                                getLabel={(nome) => nome}
+                                placeholder="Buscar empresa..."
+                                emptyText="Empresa não encontrada"
                             />
                         </div>
                         <div>
                             <label className={styles.label} htmlFor="novo-numero">NÚMERO</label>
                             <input
                                 id="novo-numero"
-                                className={styles.input}
+                                className={`${styles.input} ${styles.caps}`}
                                 value={novo.numero}
                                 onChange={(event) => setNovo({ ...novo, numero: event.target.value })}
                                 placeholder="Número"
@@ -232,9 +236,6 @@ export default function ContasPagar() {
                         </div>
                         <button type="submit" className={styles.btnSave} disabled={manager.loading}>Adicionar</button>
                     </div>
-                    <datalist id="empresas-sugeridas">
-                        {manager.empresasSugeridas.map((nome) => <option key={nome} value={nome} />)}
-                    </datalist>
                 </form>
 
                 <div className={styles.listaCard}>
@@ -311,15 +312,28 @@ export default function ContasPagar() {
                         <div className={styles.formGrid}>
                             {camposFicha.map(({ key, label, placeholder, full, type }) => (
                                 <div key={key} className={full ? styles.full : ''}>
-                                    {editing ? (
+                                    {editing && key === 'empresa' ? (
+                                        <>
+                                            <span className={styles.label}>{label}</span>
+                                            <SearchSelect
+                                                items={EMPRESAS}
+                                                selected={manager.formData.empresa || null}
+                                                onSelect={(nome) => manager.setFormData({ ...manager.formData, empresa: nome ?? '' })}
+                                                matches={matchesNome}
+                                                getKey={(nome) => nome}
+                                                getLabel={(nome) => nome}
+                                                placeholder="Buscar empresa..."
+                                                emptyText="Empresa não encontrada"
+                                            />
+                                        </>
+                                    ) : editing ? (
                                         <>
                                             <label className={styles.label} htmlFor={`ficha-${key}`}>{label}</label>
                                             <input
                                                 id={`ficha-${key}`}
                                                 type={type ?? 'text'}
                                                 inputMode={key === 'valor' ? 'decimal' : undefined}
-                                                className={key === 'empresa' ? `${styles.input} ${styles.caps}` : styles.input}
-                                                list={key === 'empresa' ? 'empresas-sugeridas' : undefined}
+                                                className={key === 'valor' || key === 'vencimento' ? styles.input : `${styles.input} ${styles.caps}`}
                                                 value={manager.formData[key]}
                                                 onChange={(event) => manager.setFormData({ ...manager.formData, [key]: event.target.value })}
                                                 placeholder={placeholder}
@@ -349,25 +363,20 @@ export default function ContasPagar() {
                                     </>
                                 ) : pagando ? (
                                     <>
-                                        <label className={styles.label} htmlFor="banco">BANCO DO PAGAMENTO</label>
+                                        <span className={styles.label}>BANCO DO PAGAMENTO</span>
                                         <div className={styles.paymentRow}>
-                                            <input
-                                                id="banco"
-                                                list="bancos-sugeridos"
-                                                className={styles.input}
-                                                value={banco}
-                                                onChange={(event) => setBanco(event.target.value)}
-                                                onKeyDown={(event) => {
-                                                    if (event.key === 'Enter') {
-                                                        event.preventDefault();
-                                                        void confirmarPagamento();
-                                                    }
-                                                }}
-                                                placeholder="Escolha ou digite o banco"
-                                            />
-                                            <datalist id="bancos-sugeridos">
-                                                {BANCOS_SUGERIDOS.map((nome) => <option key={nome} value={nome} />)}
-                                            </datalist>
+                                            <div className={styles.paymentSelect}>
+                                                <SearchSelect
+                                                    items={BANCOS}
+                                                    selected={banco || null}
+                                                    onSelect={(nome) => setBanco(nome ?? '')}
+                                                    matches={matchesNome}
+                                                    getKey={(nome) => nome}
+                                                    getLabel={(nome) => nome}
+                                                    placeholder="Buscar banco..."
+                                                    emptyText="Banco não encontrado"
+                                                />
+                                            </div>
                                             <button type="button" className={styles.btnSave} onClick={confirmarPagamento} disabled={manager.loading}>
                                                 Confirmar pagamento
                                             </button>

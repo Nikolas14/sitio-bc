@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/api/supabase';
 import { IBoleto } from '@/types';
-import { parseValor, sugestoesEmpresa, validarFormulario } from '@/utils/boletos';
+import { parseValor, validarFormulario } from '@/utils/boletos';
 
 export interface BoletoFormData {
     numero: string;
@@ -174,8 +174,6 @@ export function useBoletoManager() {
             });
     }, [boletos, searchTerm]);
 
-    const empresasSugeridas = useMemo(() => sugestoesEmpresa(boletos), [boletos]);
-
     return {
         loading,
         error,
@@ -183,7 +181,6 @@ export function useBoletoManager() {
         searchTerm,
         setSearchTerm,
         filteredBoletos,
-        empresasSugeridas,
         selectedId,
         setSelectedId,
         formData,
