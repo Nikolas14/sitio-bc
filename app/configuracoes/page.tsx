@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type KeyboardEvent } from 'react';
+import Link from 'next/link';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
 import { PageLayout, Sidebar, Main, PageHeader, PageState } from '@/components/PageLayout/PageLayout';
@@ -16,6 +17,13 @@ type Aba = 'sistema' | 'empresa';
 const ABAS: { id: Aba; rotulo: string }[] = [
     { id: 'sistema', rotulo: 'Sistema' },
     { id: 'empresa', rotulo: 'Empresa' },
+];
+
+// Cadastros são telas próprias (registros, não configuração). Aqui só ficam os atalhos.
+const CADASTROS: { href: string; rotulo: string }[] = [
+    { href: '/cadastro/produto', rotulo: 'Produtos' },
+    { href: '/cadastro/cliente', rotulo: 'Clientes' },
+    { href: '/cadastro/funcionarios', rotulo: 'Funcionários' },
 ];
 
 interface Rascunho {
@@ -304,6 +312,14 @@ export default function Configuracoes() {
                         >
                             {item.rotulo}
                         </button>
+                    ))}
+                </nav>
+                <nav className={styles.nav} aria-label="Cadastros">
+                    <span className={styles.navTitulo}>CADASTROS</span>
+                    {CADASTROS.map((item) => (
+                        <Link key={item.href} href={item.href} className={`${styles.navItem} ${styles.navLink}`}>
+                            {item.rotulo}
+                        </Link>
                     ))}
                 </nav>
             </Sidebar>

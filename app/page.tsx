@@ -10,11 +10,8 @@ import {
   TrendingUp,
   List,
   BarChart3,
-  PlusCircle,
   Tags,
-   Users,
    ScanBarcode,
-   Briefcase,
    ClipboardCheck,
    CalendarDays,
    ListChecks,
@@ -65,14 +62,6 @@ export default function Dashboard() {
         { title: 'Nova Projeção', path: '/projecao', icon: <TrendingUp size={24} /> },
         { title: 'Lista projeção', path: '/projecao/lista', icon: <List size={24} /> },
         { title: 'Imprimir pedido', path: '/projecao/imprimir', icon: <Printer size={24} /> },
-      ]
-    },
-    {
-      nome: 'Cadastros',
-      itens: [
-        { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
-        { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
-        { title: 'Funcionários', path: '/cadastro/funcionarios', icon: <Briefcase size={24} /> },
       ]
     },
     {
