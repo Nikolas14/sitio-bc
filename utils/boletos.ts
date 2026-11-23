@@ -46,7 +46,7 @@ export function parseValor(texto: string): number | null {
 
 // Lista fechada de empresas do campo EMPRESA. Por enquanto fica no código;
 // a página de configurações do sistema vai passar a editar essa lista.
-export const EMPRESAS: string[] = ['MIKI', 'RODIN', 'LEITE MENDEL', 'GBS', 'UNIMED RABINO', 'CLARO MOLDEM', 'CLARO SITIO','INTERNETE SITIO', 'CLARO BC', 'EQUATORIAL SITIO', 'EQUATORIAL SITIO TAXA', 'EQUATORIAL BC', 'EQUATORIAL RABINO'];
+export const EMPRESAS: string[] = ['MIKI', 'RODIN', 'LEITE MENDEL', 'GBS', 'ALUGUEL SHLOMO', 'HCI', 'UNIMED RABINO', 'CLARO MOLDEM', 'CLARO SITIO','INTERNETE SITIO', 'CLARO BC', 'EQUATORIAL SITIO', 'EQUATORIAL SITIO TAXA', 'EQUATORIAL BC', 'EQUATORIAL RABINO'];
 
 /** Primeira mensagem de erro do cadastro, ou null se estiver tudo certo. */
 export function validarFormulario(form: { numero: string; empresa: string; valor: string }): string | null {
@@ -54,4 +54,13 @@ export function validarFormulario(form: { numero: string; empresa: string; valor
   if (!form.empresa.trim()) return 'Preencha a empresa.';
   if (parseValor(form.valor) === null) return 'Valor inválido.';
   return null;
+}
+
+export type FiltroStatus = 'ABERTO' | 'VENCIDO' | 'VENCE_EM_BREVE' | 'PAGO' | 'TODOS';
+
+/** Se o status entra no filtro escolhido. 'ABERTO' é tudo que ainda não foi pago. */
+export function passaFiltroStatus(status: StatusBoleto, filtro: FiltroStatus): boolean {
+  if (filtro === 'TODOS') return true;
+  if (filtro === 'ABERTO') return status !== 'PAGO';
+  return status === filtro;
 }

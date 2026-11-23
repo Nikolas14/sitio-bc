@@ -7,7 +7,7 @@ import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordMod
 import { useBoletoManager, formVazio, type BoletoFormData } from '@/hooks/useBoletoManager';
 import { useToast } from '@/components/Toast/Toast';
 import SearchSelect, { normalize } from '@/components/SearchSelect/SearchSelect';
-import { BANCOS, EMPRESAS, hojeLocal, statusBoleto, type StatusBoleto } from '@/utils/boletos';
+import { BANCOS, EMPRESAS, hojeLocal, statusBoleto, type FiltroStatus, type StatusBoleto } from '@/utils/boletos';
 import type { IBoleto } from '@/types';
 import styles from './page.module.css';
 
@@ -33,6 +33,14 @@ const camposFicha: { key: keyof BoletoFormData; label: string; placeholder: stri
 ];
 
 const formatarValor = (valor: number) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+const OPCOES_STATUS: { valor: FiltroStatus; rotulo: string }[] = [
+    { valor: 'ABERTO', rotulo: 'Em aberto' },
+    { valor: 'VENCIDO', rotulo: 'Vencidos' },
+    { valor: 'VENCE_EM_BREVE', rotulo: 'Vence em breve' },
+    { valor: 'PAGO', rotulo: 'Pagos' },
+    { valor: 'TODOS', rotulo: 'Todos' },
+];
 
 const matchesNome = (nome: string, q: string) => normalize(nome).includes(q);
 
@@ -181,6 +189,38 @@ export default function ContasPagar() {
                         valor={manager.searchTerm}
                         labelDescricao="Pesquise por número ou empresa:"
                         placeholder="Digite para buscar..."
+                    />
+                </div>
+
+                <div className={styles.filtros}>
+                    <span className={styles.filtroTitulo}>STATUS</span>
+                    {OPCOES_STATUS.map(({ valor, rotulo }) => (
+                        <button
+                            key={valor}
+                            type="button"
+                            className={`${styles.filtroBtn} ${manager.filtroStatus === valor ? styles.filtroBtnAtivo : ''}`}
+                            onClick={() => manager.setFiltroStatus(valor)}
+                        >
+                            {rotulo}
+                        </button>
+                    ))}
+                    {manager.filtroStatus === 'ABERTO' && manager.totalPagos > 0 && (
+                        <button type="button" className={styles.linkBtn} onClick={() => manager.setFiltroStatus('PAGO')}>
+                            {manager.totalPagos} pagos ocultos · mostrar
+                        </button>
+                    )}
+
+                    <span className={styles.filtroTitulo}>EMPRESA</span>
+                    <SearchSelect
+                        items={EMPRESAS}
+                        selected={manager.filtroEmpresa || null}
+                        onSelect={(nome) => manager.setFiltroEmpresa(nome ?? '')}
+                        matches={matchesNome}
+                        getKey={(nome) => nome}
+                        getLabel={(nome) => nome}
+                        placeholder="Todas as empresas"
+                        emptyText="Empresa não encontrada"
+                        maxResults={EMPRESAS.length}
                     />
                 </div>
             </Sidebar>

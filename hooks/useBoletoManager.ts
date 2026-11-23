@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/api/supabase';
 import { IBoleto } from '@/types';
-import { parseValor, validarFormulario } from '@/utils/boletos';
+import { FiltroStatus, hojeLocal, parseValor, passaFiltroStatus, statusBoleto, validarFormulario } from '@/utils/boletos';
 
 export interface BoletoFormData {
     numero: string;
@@ -28,6 +28,8 @@ export function useBoletoManager() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [formData, setFormData] = useState<BoletoFormData>(formVazio);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>('ABERTO');
+    const [filtroEmpresa, setFiltroEmpresa] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -164,7 +166,10 @@ export function useBoletoManager() {
     // Em aberto primeiro, por vencimento (mais próximo primeiro); depois pagos, do pagamento mais recente.
     const filteredBoletos = useMemo(() => {
         const term = searchTerm.toLowerCase();
+        const hoje = hojeLocal();
         return boletos
+            .filter((boleto) => passaFiltroStatus(statusBoleto(boleto, hoje), filtroStatus))
+            .filter((boleto) => !filtroEmpresa || boleto.empresa === filtroEmpresa)
             .filter((boleto) =>
                 [boleto.numero, boleto.empresa].some((value) => value?.toLowerCase().includes(term)),
             )
@@ -174,7 +179,9 @@ export function useBoletoManager() {
                 if (!a.paid_at && !b.paid_at) return a.vencimento.localeCompare(b.vencimento);
                 return (b.paid_at ?? '').localeCompare(a.paid_at ?? '');
             });
-    }, [boletos, searchTerm]);
+    }, [boletos, searchTerm, filtroStatus, filtroEmpresa]);
+
+    const totalPagos = useMemo(() => boletos.filter((boleto) => boleto.paid_at).length, [boletos]);
 
     return {
         loading,
@@ -183,6 +190,11 @@ export function useBoletoManager() {
         searchTerm,
         setSearchTerm,
         filteredBoletos,
+        filtroStatus,
+        setFiltroStatus,
+        filtroEmpresa,
+        setFiltroEmpresa,
+        totalPagos,
         selectedId,
         setSelectedId,
         formData,
