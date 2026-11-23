@@ -7,7 +7,8 @@ import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordMod
 import { useBoletoManager, formVazio, type BoletoFormData } from '@/hooks/useBoletoManager';
 import { useToast } from '@/components/Toast/Toast';
 import SearchSelect, { normalize } from '@/components/SearchSelect/SearchSelect';
-import { BANCOS, EMPRESAS, hojeLocal, statusBoleto, type FiltroStatus, type StatusBoleto } from '@/utils/boletos';
+import { hojeLocal, statusBoleto, type FiltroStatus, type StatusBoleto } from '@/utils/boletos';
+import { useConfiguracoes } from '@/hooks/useConfiguracoes';
 import type { IBoleto } from '@/types';
 import styles from './page.module.css';
 
@@ -52,6 +53,10 @@ const formatarData = (iso: string) => {
 
 export default function ContasPagar() {
     const manager = useBoletoManager();
+    const { config } = useConfiguracoes();
+    const empresas = config?.empresas ?? [];
+    const bancos = config?.bancos ?? [];
+    const diasVenceEmBreve = config?.diasVenceEmBreve ?? 0;
     const toast = useToast();
     const [novo, setNovo] = useState<BoletoFormData>(formVazio);
     const [password, setPassword] = useState('');
@@ -212,7 +217,7 @@ export default function ContasPagar() {
 
                     <span className={styles.filtroTitulo}>EMPRESA</span>
                     <SearchSelect
-                        items={EMPRESAS}
+                        items={empresas}
                         selected={manager.filtroEmpresa || null}
                         onSelect={(nome) => manager.setFiltroEmpresa(nome ?? '')}
                         matches={matchesNome}
@@ -220,7 +225,7 @@ export default function ContasPagar() {
                         getLabel={(nome) => nome}
                         placeholder="Todas as empresas"
                         emptyText="Empresa não encontrada"
-                        maxResults={EMPRESAS.length}
+                        maxResults={empresas.length}
                     />
                 </div>
             </Sidebar>
@@ -232,7 +237,7 @@ export default function ContasPagar() {
                         <div>
                             <span className={styles.label}>EMPRESA</span>
                             <SearchSelect
-                                items={EMPRESAS}
+                                items={empresas}
                                 selected={novo.empresa || null}
                                 onSelect={(nome) => setNovo({ ...novo, empresa: nome ?? '' })}
                                 matches={matchesNome}
@@ -240,7 +245,7 @@ export default function ContasPagar() {
                                 getLabel={(nome) => nome}
                                 placeholder="Buscar empresa..."
                                 emptyText="Empresa não encontrada"
-                                maxResults={EMPRESAS.length}
+                                maxResults={empresas.length}
                             />
                         </div>
                         <div>
@@ -308,7 +313,7 @@ export default function ContasPagar() {
                                 </thead>
                                 <tbody>
                                     {manager.filteredBoletos.map((boleto) => {
-                                        const status = statusBoleto(boleto, hoje);
+                                        const status = statusBoleto(boleto, hoje, diasVenceEmBreve);
                                         return (
                                             <tr key={boleto.id} className={styles.row} onClick={() => abrirFicha(boleto)}>
                                                 <td>{formatarData(boleto.vencimento)}</td>
@@ -359,7 +364,7 @@ export default function ContasPagar() {
                                         <>
                                             <span className={styles.label}>{label}</span>
                                             <SearchSelect
-                                                items={EMPRESAS}
+                                                items={empresas}
                                                 selected={manager.formData.empresa || null}
                                                 onSelect={(nome) => manager.setFormData({ ...manager.formData, empresa: nome ?? '' })}
                                                 matches={matchesNome}
@@ -367,7 +372,7 @@ export default function ContasPagar() {
                                                 getLabel={(nome) => nome}
                                                 placeholder="Buscar empresa..."
                                                 emptyText="Empresa não encontrada"
-                                                maxResults={EMPRESAS.length}
+                                                maxResults={empresas.length}
                                             />
                                         </>
                                     ) : editing ? (
@@ -422,7 +427,7 @@ export default function ContasPagar() {
                                             <div className={styles.paymentSelect}>
                                                 <span className={styles.label}>BANCO DO PAGAMENTO</span>
                                                 <SearchSelect
-                                                    items={BANCOS}
+                                                    items={bancos}
                                                     selected={banco || null}
                                                     onSelect={(nome) => setBanco(nome ?? '')}
                                                     matches={matchesNome}
@@ -430,7 +435,7 @@ export default function ContasPagar() {
                                                     getLabel={(nome) => nome}
                                                     placeholder="Buscar banco..."
                                                     emptyText="Banco não encontrado"
-                                                    maxResults={BANCOS.length}
+                                                    maxResults={bancos.length}
                                                 />
                                             </div>
                                             <button type="button" className={styles.btnSave} onClick={confirmarPagamento} disabled={manager.loading}>

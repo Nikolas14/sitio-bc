@@ -7,7 +7,8 @@ import { useToast } from '@/components/Toast/Toast';
 import { useEmployeeManager } from '@/hooks/useEmployeeManager';
 import { fetchAttendanceWeek, fetchUltimaData, useAttendanceDay, type AttendanceWeekRow } from '@/hooks/useAttendance';
 import { addDays, formatLongDate, formatShortDate, mondayOf, todayISO } from '@/utils/dates';
-import { DESCONTO_FRANGO, calcularPagamento, formatReais, parseValor } from '@/utils/diarias';
+import { calcularPagamento, formatReais, parseValor } from '@/utils/diarias';
+import { useConfiguracoes } from '@/hooks/useConfiguracoes';
 import { employeeGroupText } from '@/utils/employeeGroups';
 import styles from '../funcionarios.module.css';
 
@@ -28,6 +29,8 @@ const DIAS_SEMANA = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 export default function FrequenciaFuncionarios() {
     const manager = useEmployeeManager();
     const toast = useToast();
+    const { config } = useConfiguracoes();
+    const descontoFrango = config?.descontoFrango ?? 0;
     const [workDate, setWorkDate] = useState(todayISO);
     // Ao abrir, a tela vai para a lista mais recente. Só carrega a frequência depois de saber a data.
     const [dataCarregada, setDataCarregada] = useState(false);
@@ -66,7 +69,7 @@ export default function FrequenciaFuncionarios() {
 
     // Pagamento do dia: diárias de quem foi, menos o desconto de quem recebeu frango.
     const pagamentoDe = (employeeId: string) =>
-        calcularPagamento(attendance.presentOf(employeeId) === true, attendance.entryOf(employeeId), valores, extraDe(employeeId));
+        calcularPagamento(attendance.presentOf(employeeId) === true, attendance.entryOf(employeeId), valores, extraDe(employeeId), descontoFrango);
     const totalAPagar = onList.reduce((soma, employee) => soma + pagamentoDe(employee.id).total, 0);
     const totalDescontos = onList.reduce((soma, employee) => soma + pagamentoDe(employee.id).desconto, 0);
     const totalExtras = onList.reduce((soma, employee) => soma + pagamentoDe(employee.id).extra, 0);
@@ -119,7 +122,7 @@ export default function FrequenciaFuncionarios() {
         .map((employee) => {
             const entry = attendance.entryOf(employee.id);
             const presente = attendance.presentOf(employee.id);
-            const pagamento = calcularPagamento(presente === true, entry, valores, extraDe(employee.id));
+            const pagamento = calcularPagamento(presente === true, entry, valores, extraDe(employee.id), descontoFrango);
             return { employee, entry, presente, pagamento };
         });
     const totalImpresso = printLinhas.reduce((soma, linha) => soma + linha.pagamento.total, 0);
@@ -312,7 +315,7 @@ export default function FrequenciaFuncionarios() {
                                                 <span className={styles.rollTotal}>
                                                     Total {formatReais(pagamento.total)}
                                                     {pagamento.desconto > 0 && (
-                                                        <span className={styles.rollMeta}> · desc. frango {formatReais(DESCONTO_FRANGO)}</span>
+                                                        <span className={styles.rollMeta}> · desc. frango {formatReais(descontoFrango)}</span>
                                                     )}
                                                     {pagamento.extra !== 0 && (
                                                         <span className={styles.rollMeta}> · extra {formatReais(pagamento.extra)}</span>
@@ -368,7 +371,7 @@ export default function FrequenciaFuncionarios() {
                         {formatLongDate(workDate)} · Página {pageIndex + 1} de {printPages.length} · Pessoas: {printLinhas.length} · Total a pagar: {formatReais(totalImpresso)}
                     </p>
                     <p className={styles.printMeta}>
-                        Diárias: frango {formatReais(valores.frango)} · boi {formatReais(valores.boi)} · desconto de quem recebeu frango: {formatReais(DESCONTO_FRANGO)}
+                        Diárias: frango {formatReais(valores.frango)} · boi {formatReais(valores.boi)} · desconto de quem recebeu frango: {formatReais(descontoFrango)}
                     </p>
                     <table className={`${styles.printTable} ${styles.printReport}`}>
                         <thead>

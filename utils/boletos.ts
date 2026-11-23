@@ -2,11 +2,6 @@ import type { IBoleto } from '@/types';
 
 export type StatusBoleto = 'PAGO' | 'VENCIDO' | 'VENCE_EM_BREVE' | 'EM_ABERTO';
 
-// Lista fechada de bancos do pagamento. Como EMPRESAS, vai para a página de configurações depois.
-export const BANCOS: string[] = ['ITAU', 'BRADESCO', 'STONE', 'INTER', 'C6'];
-
-const DIAS_VENCE_EM_BREVE = 7;
-
 const formatarData = (data: Date) => {
   const ano = data.getFullYear();
   const mes = String(data.getMonth() + 1).padStart(2, '0');
@@ -20,12 +15,12 @@ export function hojeLocal(): string {
 }
 
 /** Status de um boleto. `hoje` é YYYY-MM-DD; comparação por string funciona nesse formato. */
-export function statusBoleto(boleto: IBoleto, hoje: string): StatusBoleto {
+export function statusBoleto(boleto: IBoleto, hoje: string, diasVenceEmBreve: number): StatusBoleto {
   if (boleto.paid_at) return 'PAGO';
   if (boleto.vencimento < hoje) return 'VENCIDO';
 
   const [ano, mes, dia] = hoje.split('-').map(Number);
-  const limite = formatarData(new Date(ano, mes - 1, dia + DIAS_VENCE_EM_BREVE));
+  const limite = formatarData(new Date(ano, mes - 1, dia + diasVenceEmBreve));
   if (boleto.vencimento <= limite) return 'VENCE_EM_BREVE';
 
   return 'EM_ABERTO';
@@ -43,10 +38,6 @@ export function parseValor(texto: string): number | null {
   if (!Number.isFinite(valor) || valor <= 0) return null;
   return Math.round(valor * 100) / 100;
 }
-
-// Lista fechada de empresas do campo EMPRESA. Por enquanto fica no código;
-// a página de configurações do sistema vai passar a editar essa lista.
-export const EMPRESAS: string[] = ['MIKI', 'RODIN', 'LEITE MENDEL', 'GBS', 'ALUGUEL SHLOMO', 'HCI', 'UNIMED RABINO', 'CLARO MOLDEM', 'CLARO SITIO','INTERNETE SITIO', 'CLARO BC', 'EQUATORIAL SITIO', 'EQUATORIAL SITIO TAXA', 'EQUATORIAL BC', 'EQUATORIAL RABINO'];
 
 /** Primeira mensagem de erro do cadastro, ou null se estiver tudo certo. */
 export function validarFormulario(form: { numero: string; empresa: string; valor: string }): string | null {

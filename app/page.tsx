@@ -19,7 +19,8 @@ import {
    CalendarDays,
    ListChecks,
   Printer,
-  Receipt
+  Receipt,
+  Settings
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -72,6 +73,12 @@ export default function Dashboard() {
         { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
         { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
         { title: 'Funcionários', path: '/cadastro/funcionarios', icon: <Briefcase size={24} /> },
+      ]
+    },
+    {
+      nome: 'Sistema',
+      itens: [
+        { title: 'Configurações', path: '/configuracoes', icon: <Settings size={24} /> },
       ]
     },
     {

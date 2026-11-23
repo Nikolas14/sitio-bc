@@ -5,10 +5,13 @@ import { supabase } from '@/api/supabase';
 import * as htmlToImage from 'html-to-image';
 import { ITransaction } from '@/types';
 import { useCobranca } from './useCobranca';
+import { useConfiguracoes } from '@/hooks/useConfiguracoes';
 
 export function useCobrancaManager(id: string) {
   // Hook de busca de dados (Master-Detail)
   const { trans, items, loading, error, refresh } = useCobranca(id);
+  const { config } = useConfiguracoes();
+  const acrescimoFreteKg = config?.acrescimoFreteKg;
 
   const [shipping, setShipping] = useState(0);
   const [latamKg, setLatamKg] = useState(0);
@@ -27,11 +30,12 @@ export function useCobrancaManager(id: string) {
   }, [trans]);
 
   useEffect(() => {
-    if (trans?.status === 'PENDENTE') {
+    // Só calcula depois que a configuração carregou; senão o frete sairia sem o acréscimo.
+    if (trans?.status === 'PENDENTE' && acrescimoFreteKg !== undefined) {
       // Arredonda em 2 casas decimais para não gerar dízimas no frete
-      setShipping(Math.round(Number(latamKg) * (Number(shippingRate) + 0.5) * 100) / 100);
+      setShipping(Math.round(Number(latamKg) * (Number(shippingRate) + acrescimoFreteKg) * 100) / 100);
     }
-  }, [latamKg, shippingRate, trans?.status]);
+  }, [latamKg, shippingRate, trans?.status, acrescimoFreteKg]);
 
   // Trava de segurança: impede edição se o status não for PENDENTE ou ENVIADO
   const isLocked = useMemo(() => {
