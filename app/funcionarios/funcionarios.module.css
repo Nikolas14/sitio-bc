@@ -57,6 +57,11 @@
 .toggleSpacer { width: 130px; flex-shrink: 0; }
 .togglePresent.on { background: #16a34a; border-color: #16a34a; color: white; }
 .toggleAbsent.on { background: #e11d48; border-color: #e11d48; color: white; }
+/* Um abate por linha (Frango, Boi): nome e os dois botões */
+.abateStack { display: flex; flex-direction: column; gap: 8px; }
+.abateRow { display: flex; align-items: center; gap: 8px; }
+.abateName { width: 56px; color: #64748b; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.abateRow .toggle { width: 110px; text-align: center; }
 
 /* Histórico */
 .statGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 24px; }
@@ -70,6 +75,7 @@
 .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; }
 .pillPresent { background: #dcfce7; color: #15803d; }
 .pillAbsent { background: #ffe4e6; color: #be123c; }
+.pillGroup { display: flex; flex-wrap: wrap; gap: 6px; }
 
 @media (max-width: 760px) {
     .mainArea { padding: 20px 16px; }
@@ -79,6 +85,7 @@
     .toggleGroup { width: 100%; }
     .toggleGroup > button { width: auto; flex: 1; }
     .toggleSpacer { display: none; }
+    .abateRow .toggle { flex: 1; width: auto; }
 }
 
 /* Filtro por grupo */

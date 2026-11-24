@@ -26,13 +26,13 @@
 .btnPay { color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; }
 
 /* Lista */
-.listaCard { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.05); overflow: hidden; }
+.listaCard { flex: 1; min-height: 0; display: flex; flex-direction: column; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.05); overflow: hidden; }
 .listaHeader { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 16px 22px; border-bottom: 1px solid #f1f5f9; }
 .listaHeader h2 { color: #0f172a; font-size: 16px; font-weight: 900; margin: 0; }
 .listaHeader span { color: #64748b; font-size: 13px; }
-.tableWrap { overflow-x: auto; }
+.tableWrap { flex: 1; min-height: 0; overflow: auto; }
 .table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.table th { text-align: left; color: #94a3b8; font-size: 10px; font-weight: 800; letter-spacing: .05em; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
+.table th { position: sticky; top: 0; z-index: 1; background: white; text-align: left; color: #94a3b8; font-size: 10px; font-weight: 800; letter-spacing: .05em; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
 .table td { padding: 12px 14px; color: #1e293b; border-bottom: 1px solid #f8fafc; white-space: nowrap; }
 .row { cursor: pointer; }
 .row:hover td { background: #f8fafc; }
@@ -42,6 +42,7 @@
 
 .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .04em; }
 .badgeVencido { color: #9f1239; background: #ffe4e6; }
+.badgeHoje { color: #9a3412; background: #ffedd5; }
 .badgeBreve { color: #92400e; background: #fef3c7; }
 .badgeEmAberto { color: #1e40af; background: #dbeafe; }
 .badgePago { color: #166534; background: #dcfce7; }

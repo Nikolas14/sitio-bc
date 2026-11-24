@@ -2,6 +2,7 @@
 import React, { forwardRef } from 'react';
 import styles from './PrintTemplate.module.css';
 import { ITransaction, IReceiptItem } from '@/types';
+import { useConfiguracoes } from '@/hooks/useConfiguracoes';
 
 type Props = {
   trans: ITransaction;
@@ -22,6 +23,8 @@ const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL
 const formatCurrency = (v: number) => moeda.format(v || 0);
 
 export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, financial, shipping, tax, discount }, ref) => {
+  const { config } = useConfiguracoes();
+  const empresa = config?.empresa;
 
   // Itens do mesmo produto viram uma linha só: soma quantidades e totais.
   const linhas = Object.values(
@@ -42,7 +45,7 @@ export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, 
       {/* O REF vai aqui para capturar apenas o que importa */}
       <div ref={ref} className={styles.printContainer}>
         <div className={styles.header}>
-          <h1 className={styles.companyName}>Beit Chabad Belém</h1>
+          <h1 className={styles.companyName}>{empresa?.nome ?? ''}</h1>
           <p className={styles.subtitle}>Nota de Envio / Cobrança</p>
         </div>
 
@@ -114,7 +117,7 @@ export const PrintTemplate = forwardRef<HTMLDivElement, Props>(({ trans, items, 
         <div className={styles.footer}>
           <div className={styles.pixBox}>
             <p><strong>PAGAMENTO VIA PIX</strong></p>
-            <p className={styles.pixKey}>CNPJ: 02.256.458/0001-31</p>
+            <p className={styles.pixKey}>CNPJ: {empresa?.cnpj ?? ''}</p>
           </div>
           <p className={styles.thankYou}>Obrigado pela sua confiança!</p>
         </div>

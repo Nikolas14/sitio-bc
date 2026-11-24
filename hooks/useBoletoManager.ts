@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/api/supabase';
 import { IBoleto } from '@/types';
 import { FiltroStatus, hojeLocal, parseValor, passaFiltroStatus, statusBoleto, validarFormulario } from '@/utils/boletos';
+import { useConfiguracoes } from '@/hooks/useConfiguracoes';
 
 export interface BoletoFormData {
     numero: string;
@@ -24,6 +25,8 @@ const CODIGO_DUPLICADO = '23505';
 const MENSAGEM_DUPLICADO = 'Já existe um boleto com esse número.';
 
 export function useBoletoManager() {
+    const { config } = useConfiguracoes();
+    const diasVenceEmBreve = config?.diasVenceEmBreve ?? 0;
     const [boletos, setBoletos] = useState<IBoleto[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [formData, setFormData] = useState<BoletoFormData>(formVazio);
@@ -168,7 +171,7 @@ export function useBoletoManager() {
         const term = searchTerm.toLowerCase();
         const hoje = hojeLocal();
         return boletos
-            .filter((boleto) => passaFiltroStatus(statusBoleto(boleto, hoje), filtroStatus))
+            .filter((boleto) => passaFiltroStatus(statusBoleto(boleto, hoje, diasVenceEmBreve), filtroStatus))
             .filter((boleto) => !filtroEmpresa || boleto.empresa === filtroEmpresa)
             .filter((boleto) =>
                 [boleto.numero, boleto.empresa].some((value) => value?.toLowerCase().includes(term)),
@@ -179,7 +182,7 @@ export function useBoletoManager() {
                 if (!a.paid_at && !b.paid_at) return a.vencimento.localeCompare(b.vencimento);
                 return (b.paid_at ?? '').localeCompare(a.paid_at ?? '');
             });
-    }, [boletos, searchTerm, filtroStatus, filtroEmpresa]);
+    }, [boletos, searchTerm, filtroStatus, filtroEmpresa, diasVenceEmBreve]);
 
     const totalPagos = useMemo(() => boletos.filter((boleto) => boleto.paid_at).length, [boletos]);
 

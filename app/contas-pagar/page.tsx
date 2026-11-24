@@ -1,19 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
 import { useBoletoManager, formVazio, type BoletoFormData } from '@/hooks/useBoletoManager';
 import { useToast } from '@/components/Toast/Toast';
 import SearchSelect, { normalize } from '@/components/SearchSelect/SearchSelect';
-import { BANCOS, EMPRESAS, hojeLocal, statusBoleto, type FiltroStatus, type StatusBoleto } from '@/utils/boletos';
+import { hojeLocal, statusBoleto, type FiltroStatus, type StatusBoleto } from '@/utils/boletos';
+import { useConfiguracoes } from '@/hooks/useConfiguracoes';
 import type { IBoleto } from '@/types';
 import styles from './page.module.css';
 
 const STATUS_LABEL: Record<StatusBoleto, string> = {
     PAGO: 'Pago',
     VENCIDO: 'Vencido',
+    VENCE_HOJE: 'Vence hoje',
     VENCE_EM_BREVE: 'Vence em breve',
     EM_ABERTO: 'Em aberto',
 };
@@ -21,6 +23,7 @@ const STATUS_LABEL: Record<StatusBoleto, string> = {
 const STATUS_CLASS: Record<StatusBoleto, string> = {
     PAGO: styles.badgePago,
     VENCIDO: styles.badgeVencido,
+    VENCE_HOJE: styles.badgeHoje,
     VENCE_EM_BREVE: styles.badgeBreve,
     EM_ABERTO: styles.badgeEmAberto,
 };
@@ -37,6 +40,7 @@ const formatarValor = (valor: number) => valor.toLocaleString('pt-BR', { style: 
 const OPCOES_STATUS: { valor: FiltroStatus; rotulo: string }[] = [
     { valor: 'ABERTO', rotulo: 'Em aberto' },
     { valor: 'VENCIDO', rotulo: 'Vencidos' },
+    { valor: 'VENCE_HOJE', rotulo: 'Vence hoje' },
     { valor: 'VENCE_EM_BREVE', rotulo: 'Vence em breve' },
     { valor: 'PAGO', rotulo: 'Pagos' },
     { valor: 'TODOS', rotulo: 'Todos' },
@@ -52,6 +56,17 @@ const formatarData = (iso: string) => {
 
 export default function ContasPagar() {
     const manager = useBoletoManager();
+    const { config } = useConfiguracoes();
+    // Opções em ordem alfabética (pt-BR) nos campos e no filtro.
+    const empresas = useMemo(
+        () => [...(config?.empresas ?? [])].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+        [config?.empresas],
+    );
+    const bancos = useMemo(
+        () => [...(config?.bancos ?? [])].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+        [config?.bancos],
+    );
+    const diasVenceEmBreve = config?.diasVenceEmBreve ?? 0;
     const toast = useToast();
     const [novo, setNovo] = useState<BoletoFormData>(formVazio);
     const [password, setPassword] = useState('');
@@ -212,7 +227,7 @@ export default function ContasPagar() {
 
                     <span className={styles.filtroTitulo}>EMPRESA</span>
                     <SearchSelect
-                        items={EMPRESAS}
+                        items={empresas}
                         selected={manager.filtroEmpresa || null}
                         onSelect={(nome) => manager.setFiltroEmpresa(nome ?? '')}
                         matches={matchesNome}
@@ -220,7 +235,7 @@ export default function ContasPagar() {
                         getLabel={(nome) => nome}
                         placeholder="Todas as empresas"
                         emptyText="Empresa não encontrada"
-                        maxResults={EMPRESAS.length}
+                        maxResults={empresas.length}
                     />
                 </div>
             </Sidebar>
@@ -232,7 +247,7 @@ export default function ContasPagar() {
                         <div>
                             <span className={styles.label}>EMPRESA</span>
                             <SearchSelect
-                                items={EMPRESAS}
+                                items={empresas}
                                 selected={novo.empresa || null}
                                 onSelect={(nome) => setNovo({ ...novo, empresa: nome ?? '' })}
                                 matches={matchesNome}
@@ -240,7 +255,7 @@ export default function ContasPagar() {
                                 getLabel={(nome) => nome}
                                 placeholder="Buscar empresa..."
                                 emptyText="Empresa não encontrada"
-                                maxResults={EMPRESAS.length}
+                                maxResults={empresas.length}
                             />
                         </div>
                         <div>
@@ -251,7 +266,6 @@ export default function ContasPagar() {
                                 value={novo.numero}
                                 onChange={(event) => setNovo({ ...novo, numero: event.target.value })}
                                 placeholder="Número"
-                                required
                             />
                         </div>
                         <div>
@@ -308,7 +322,7 @@ export default function ContasPagar() {
                                 </thead>
                                 <tbody>
                                     {manager.filteredBoletos.map((boleto) => {
-                                        const status = statusBoleto(boleto, hoje);
+                                        const status = statusBoleto(boleto, hoje, diasVenceEmBreve);
                                         return (
                                             <tr key={boleto.id} className={styles.row} onClick={() => abrirFicha(boleto)}>
                                                 <td>{formatarData(boleto.vencimento)}</td>
@@ -359,7 +373,7 @@ export default function ContasPagar() {
                                         <>
                                             <span className={styles.label}>{label}</span>
                                             <SearchSelect
-                                                items={EMPRESAS}
+                                                items={empresas}
                                                 selected={manager.formData.empresa || null}
                                                 onSelect={(nome) => manager.setFormData({ ...manager.formData, empresa: nome ?? '' })}
                                                 matches={matchesNome}
@@ -367,7 +381,7 @@ export default function ContasPagar() {
                                                 getLabel={(nome) => nome}
                                                 placeholder="Buscar empresa..."
                                                 emptyText="Empresa não encontrada"
-                                                maxResults={EMPRESAS.length}
+                                                maxResults={empresas.length}
                                             />
                                         </>
                                     ) : editing ? (
@@ -381,7 +395,7 @@ export default function ContasPagar() {
                                                 value={manager.formData[key]}
                                                 onChange={(event) => manager.setFormData({ ...manager.formData, [key]: event.target.value })}
                                                 placeholder={placeholder}
-                                                required
+                                                required={key !== 'numero'}
                                             />
                                         </>
                                     ) : (
@@ -422,7 +436,7 @@ export default function ContasPagar() {
                                             <div className={styles.paymentSelect}>
                                                 <span className={styles.label}>BANCO DO PAGAMENTO</span>
                                                 <SearchSelect
-                                                    items={BANCOS}
+                                                    items={bancos}
                                                     selected={banco || null}
                                                     onSelect={(nome) => setBanco(nome ?? '')}
                                                     matches={matchesNome}
@@ -430,7 +444,7 @@ export default function ContasPagar() {
                                                     getLabel={(nome) => nome}
                                                     placeholder="Buscar banco..."
                                                     emptyText="Banco não encontrado"
-                                                    maxResults={BANCOS.length}
+                                                    maxResults={bancos.length}
                                                 />
                                             </div>
                                             <button type="button" className={styles.btnSave} onClick={confirmarPagamento} disabled={manager.loading}>

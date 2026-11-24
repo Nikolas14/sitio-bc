@@ -48,12 +48,15 @@ export interface IAttendance {
   frango: boolean; // confirmou para o abate do frango
   boi: boolean; // confirmou para o abate do boi
   received_chicken: boolean; // recebeu o frango (só faz sentido para quem foi no frango)
-  present: boolean | null; // quem realmente foi; null = ainda não lançado
+  present_frango: boolean | null; // foi no abate do frango; null = ainda não lançado
+  present_boi: boolean | null; // foi no abate do boi; null = ainda não lançado
   created_at?: string;
 }
 
 export interface IAbateDay {
-  work_date: string; // YYYY-MM-DD
+  work_date: string; // YYYY-MM-DD, segunda-feira da semana
+  frango: boolean; // a semana tem abate de frango
+  boi: boolean; // a semana tem abate de boi
   signed_at: string | null; // lista assinada em
 }
 

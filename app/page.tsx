@@ -10,16 +10,14 @@ import {
   TrendingUp,
   List,
   BarChart3,
-  PlusCircle,
   Tags,
-   Users,
    ScanBarcode,
-   Briefcase,
    ClipboardCheck,
    CalendarDays,
    ListChecks,
   Printer,
-  Receipt
+  Receipt,
+  Settings
 } from 'lucide-react'; // Instale: npm install lucide-react
 import styles from './page.module.css';
 
@@ -67,11 +65,9 @@ export default function Dashboard() {
       ]
     },
     {
-      nome: 'Cadastros',
+      nome: 'Sistema',
       itens: [
-        { title: 'Produtos', path: '/cadastro/produto', icon: <PlusCircle size={24} /> },
-        { title: 'Clientes', path: '/cadastro/cliente', icon: <Users size={24} /> },
-        { title: 'Funcionários', path: '/cadastro/funcionarios', icon: <Briefcase size={24} /> },
+        { title: 'Configurações', path: '/configuracoes', icon: <Settings size={24} /> },
       ]
     },
     {
