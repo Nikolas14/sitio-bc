@@ -2,24 +2,46 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/api/supabase';
 import { IAttendance } from '@/types';
 import { addDays } from '@/utils/dates';
+import type { AbateKind } from '@/hooks/useConfirmationList';
 
-type AttendanceRow = Pick<IAttendance, 'id' | 'employee_id' | 'confirmed' | 'frango' | 'boi' | 'received_chicken' | 'present'>;
+type AttendanceRow = Pick<
+    IAttendance,
+    'id' | 'employee_id' | 'confirmed' | 'frango' | 'boi' | 'received_chicken' | 'present_frango' | 'present_boi'
+>;
 export interface AttendanceEntry {
   confirmed: boolean; // vai em pelo menos um abate (vem da lista de chamada)
   frango: boolean; // confirmou para o frango
   boi: boolean; // confirmou para o boi
   receivedChicken: boolean; // recebeu o frango
-  present: boolean | null; // quem realmente foi; null = ainda não lançado
+  presentFrango: boolean | null; // foi no frango; null = ainda não lançado
+  presentBoi: boolean | null; // foi no boi; null = ainda não lançado
 }
 
-const EMPTY: AttendanceEntry = { confirmed: false, frango: false, boi: false, receivedChicken: false, present: null };
-const isEmpty = (entry: AttendanceEntry) => !entry.confirmed && entry.present === null;
+export interface SemanaAbates {
+  frango: boolean;
+  boi: boolean;
+}
+
+const EMPTY: AttendanceEntry = {
+  confirmed: false,
+  frango: false,
+  boi: false,
+  receivedChicken: false,
+  presentFrango: null,
+  presentBoi: null,
+};
+const isEmpty = (entry: AttendanceEntry) => !entry.confirmed && entry.presentFrango === null && entry.presentBoi === null;
+
+// Campo do rascunho que guarda a presença de cada abate.
+const CAMPO_PRESENTE: Record<AbateKind, 'presentFrango' | 'presentBoi'> = { frango: 'presentFrango', boi: 'presentBoi' };
 
 /**
- * Frequência real de um dia (YYYY-MM-DD). Parte de quem está na lista de chamada:
- * quem confirmou entra como presente até ser marcado como falta.
+ * Frequência real de uma semana (workDate = segunda-feira). Parte de quem está na lista de chamada:
+ * quem confirmou um abate entra como presente nele até ser marcado como falta.
+ * A presença é separada por abate: pode faltar no frango e ir no boi.
  */
 export function useAttendanceDay(workDate: string | null) {
+    const [semana, setSemana] = useState<SemanaAbates>({ frango: false, boi: false });
     const [savedRows, setSavedRows] = useState<AttendanceRow[]>([]);
     const [draft, setDraft] = useState<Record<string, AttendanceEntry>>({});
     const [loading, setLoading] = useState(true);
@@ -30,16 +52,22 @@ export function useAttendanceDay(workDate: string | null) {
         // Sem data ainda (aguardando a lista mais recente): não carrega nada.
         if (!workDate) return;
         setLoading(true);
-        const { data, error } = await supabase
-            .from('ESTOQUE_employee_attendance')
-            .select('id, employee_id, confirmed, frango, boi, received_chicken, present')
-            .eq('work_date', workDate);
+        const [pessoas, dia] = await Promise.all([
+            supabase
+                .from('ESTOQUE_employee_attendance')
+                .select('id, employee_id, confirmed, frango, boi, received_chicken, present_frango, present_boi')
+                .eq('work_date', workDate),
+            supabase.from('ESTOQUE_abate_day').select('frango, boi').eq('work_date', workDate).maybeSingle(),
+        ]);
 
-        if (error) {
-            setError(error.message);
+        const erro = pessoas.error?.message ?? dia.error?.message ?? null;
+        if (erro) {
+            setError(erro);
         } else {
-            const rows = (data ?? []) as AttendanceRow[];
+            const rows = (pessoas.data ?? []) as AttendanceRow[];
+            const registro = dia.data as SemanaAbates | null;
             setError(null);
+            setSemana(registro ? { frango: registro.frango, boi: registro.boi } : { frango: false, boi: false });
             setSavedRows(rows);
             setDraft(Object.fromEntries(rows.map((row) => [
                 row.employee_id,
@@ -48,7 +76,8 @@ export function useAttendanceDay(workDate: string | null) {
                     frango: row.frango,
                     boi: row.boi,
                     receivedChicken: row.received_chicken,
-                    present: row.present,
+                    presentFrango: row.present_frango,
+                    presentBoi: row.present_boi,
                 },
             ])));
         }
@@ -65,21 +94,23 @@ export function useAttendanceDay(workDate: string | null) {
 
     const entryOf = (employeeId: string): AttendanceEntry => draft[employeeId] ?? EMPTY;
 
-    // Status na frequência real: quem está na lista é presumido presente até ser marcado.
-    const presentOf = (employeeId: string): boolean | null => {
+    // Presença em um abate. Quem está nesse abate na lista é presumido presente até ser marcado.
+    // Sem o abate na lista, não há presença nele (null).
+    const presentOf = (employeeId: string, kind: AbateKind): boolean | null => {
         const entry = entryOf(employeeId);
-        if (entry.present !== null) return entry.present;
-        return entry.confirmed ? true : null;
+        if (!entry[kind]) return null;
+        return entry[CAMPO_PRESENTE[kind]] ?? true;
     };
 
     // Clicar no status que já está marcado limpa a marcação.
-    const setPresent = (employeeId: string, present: boolean) => {
+    const setPresent = (employeeId: string, kind: AbateKind, present: boolean) => {
         setDraft((prev) => {
             const current = prev[employeeId] ?? EMPTY;
-            const next = current.present === present ? null : present;
-            // Quem foi marcado como falta não recebe frango.
-            const receivedChicken = next === false ? false : current.receivedChicken;
-            return { ...prev, [employeeId]: { ...current, present: next, receivedChicken } };
+            const campo = CAMPO_PRESENTE[kind];
+            const next = current[campo] === present ? null : present;
+            // Quem faltou no frango não recebe frango.
+            const receivedChicken = kind === 'frango' && next === false ? false : current.receivedChicken;
+            return { ...prev, [employeeId]: { ...current, [campo]: next, receivedChicken } };
         });
     };
 
@@ -90,16 +121,20 @@ export function useAttendanceDay(workDate: string | null) {
         });
     };
 
-    // Grava a presença real. Quem está na lista e não foi marcado como falta vira presente.
-    // A lista (frango/boi) não é alterada aqui.
+    // Grava a presença real. Quem está na lista em um abate e não foi marcado como falta vira presente nele.
+    // A lista de chamada não é alterada aqui.
     const save = async (): Promise<string | null> => {
         if (!workDate) return 'Data ainda não carregada';
         setSaving(true);
 
         const resolve = (employeeId: string): AttendanceEntry => {
             const entry = entryOf(employeeId);
-            if (entry.confirmed && entry.present === null) return { ...entry, present: true };
-            return entry;
+            if (!entry.confirmed) return entry;
+            return {
+                ...entry,
+                presentFrango: entry.frango ? (entry.presentFrango ?? true) : entry.presentFrango,
+                presentBoi: entry.boi ? (entry.presentBoi ?? true) : entry.presentBoi,
+            };
         };
 
         const upserts = Object.keys(draft)
@@ -109,8 +144,11 @@ export function useAttendanceDay(workDate: string | null) {
                 employee_id: employeeId,
                 work_date: workDate,
                 confirmed: entry.confirmed,
+                frango: entry.frango,
+                boi: entry.boi,
                 received_chicken: entry.receivedChicken,
-                present: entry.present,
+                present_frango: entry.presentFrango,
+                present_boi: entry.presentBoi,
             }));
 
         const removeIds = savedRows
@@ -143,12 +181,17 @@ export function useAttendanceDay(workDate: string | null) {
         return null;
     };
 
-    return { loading, saving, error, entryOf, presentOf, setPresent, setReceivedChicken, save };
+    return { semana, loading, saving, error, entryOf, presentOf, setPresent, setReceivedChicken, save };
 }
 
-/** Todas as chamadas de um funcionário, da mais recente para a mais antiga. */
+export type AttendanceHistoryRow = Pick<
+    IAttendance,
+    'work_date' | 'confirmed' | 'frango' | 'boi' | 'received_chicken' | 'present_frango' | 'present_boi'
+>;
+
+/** Todas as semanas de um funcionário, da mais recente para a mais antiga. */
 export function useEmployeeAttendance(employeeId: string | null) {
-    const [rows, setRows] = useState<Pick<IAttendance, 'work_date' | 'confirmed' | 'present'>[]>([]);
+    const [rows, setRows] = useState<AttendanceHistoryRow[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -161,7 +204,7 @@ export function useEmployeeAttendance(employeeId: string | null) {
             setRows([]);
             const { data, error } = await supabase
                 .from('ESTOQUE_employee_attendance')
-                .select('work_date, confirmed, present')
+                .select('work_date, confirmed, frango, boi, received_chicken, present_frango, present_boi')
                 .eq('employee_id', employeeId)
                 .order('work_date', { ascending: false });
 
@@ -170,7 +213,7 @@ export function useEmployeeAttendance(employeeId: string | null) {
                 setError(error.message);
             } else {
                 setError(null);
-                setRows((data ?? []) as Pick<IAttendance, 'work_date' | 'confirmed' | 'present'>[]);
+                setRows((data ?? []) as AttendanceHistoryRow[]);
             }
             setLoading(false);
         }, 0);
@@ -188,10 +231,13 @@ export interface AttendanceWeekRow {
   employee_id: string;
   work_date: string;
   confirmed: boolean;
-  present: boolean | null;
+  frango: boolean;
+  boi: boolean;
+  present_frango: boolean | null;
+  present_boi: boolean | null;
 }
 
-/** Data (YYYY-MM-DD) da lista mais recente já gravada. Null se não houver nenhuma ou a consulta falhar. */
+/** Segunda-feira (YYYY-MM-DD) da semana mais recente já gravada. Null se não houver nenhuma ou a consulta falhar. */
 export async function fetchUltimaData(): Promise<string | null> {
     const { data, error } = await supabase
         .from('ESTOQUE_employee_attendance')
@@ -207,7 +253,7 @@ export async function fetchUltimaData(): Promise<string | null> {
 export async function fetchAttendanceWeek(weekStart: string): Promise<AttendanceWeekRow[] | null> {
     const { data, error } = await supabase
         .from('ESTOQUE_employee_attendance')
-        .select('employee_id, work_date, confirmed, present')
+        .select('employee_id, work_date, confirmed, frango, boi, present_frango, present_boi')
         .gte('work_date', weekStart)
         .lte('work_date', addDays(weekStart, 6));
 

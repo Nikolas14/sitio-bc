@@ -4,10 +4,16 @@ import { useState } from 'react';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import { useEmployeeManager } from '@/hooks/useEmployeeManager';
-import { useEmployeeAttendance } from '@/hooks/useAttendance';
-import { formatShortDate, weekdayOf } from '@/utils/dates';
+import { useEmployeeAttendance, type AttendanceHistoryRow } from '@/hooks/useAttendance';
+import { formatShortDate } from '@/utils/dates';
 import { employeeGroupText } from '@/utils/employeeGroups';
 import styles from '../funcionarios.module.css';
+
+// Os dois abates da semana: chave na linha, campo da presença e rótulo.
+const ABATES = [
+    { chave: 'frango', campo: 'present_frango', rotulo: 'Frango' },
+    { chave: 'boi', campo: 'present_boi', rotulo: 'Boi' },
+] as const;
 
 export default function HistoricoFuncionarios() {
     const manager = useEmployeeManager();
@@ -15,9 +21,18 @@ export default function HistoricoFuncionarios() {
     const selected = manager.employees.find((e) => e.id === selectedId) ?? null;
     const history = useEmployeeAttendance(selectedId);
 
+    // Abates em que a pessoa estava na lista da semana.
+    const abatesDaLinha = (row: AttendanceHistoryRow) => ABATES.filter((abate) => row[abate.chave]);
+    const rotuloAbates = (row: AttendanceHistoryRow) => {
+        const nomes = abatesDaLinha(row).map((abate) => abate.rotulo);
+        return nomes.length === 0 ? 'Não' : nomes.join(' e ');
+    };
+
+    // Cada abate em que a pessoa estava vale uma presença ou uma falta.
+    const lancamentos = history.rows.flatMap((row) => abatesDaLinha(row).map((abate) => row[abate.campo]));
     const confirmacoes = history.rows.filter((row) => row.confirmed).length;
-    const presencas = history.rows.filter((row) => row.present === true).length;
-    const faltas = history.rows.filter((row) => row.present === false).length;
+    const presencas = lancamentos.filter((presente) => presente === true).length;
+    const faltas = lancamentos.filter((presente) => presente === false).length;
     const lancadas = presencas + faltas;
     const percentual = lancadas > 0 ? Math.round((presencas / lancadas) * 100) : 0;
 
@@ -63,11 +78,11 @@ export default function HistoricoFuncionarios() {
                         <div className={styles.statGrid}>
                             <div className={styles.statCard}>
                                 <span className={styles.statValue}>{confirmacoes}</span>
-                                <span className={styles.statLabel}>Confirmações</span>
+                                <span className={styles.statLabel}>Semanas na lista</span>
                             </div>
                             <div className={styles.statCard}>
                                 <span className={styles.statValue}>{presencas} · {faltas}</span>
-                                <span className={styles.statLabel}>Presenças · Faltas</span>
+                                <span className={styles.statLabel}>Presenças · Faltas (por abate)</span>
                             </div>
                             <div className={styles.statCard}>
                                 <span className={styles.statValue}>{percentual}%</span>
@@ -83,27 +98,33 @@ export default function HistoricoFuncionarios() {
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
-                                        <th>Data</th>
-                                        <th>Dia</th>
-                                        <th>Confirmou</th>
+                                        <th>Semana de</th>
+                                        <th>Abates</th>
                                         <th>Situação</th>
+                                        <th>Recebeu frango</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {history.rows.map((row) => (
                                         <tr key={row.work_date}>
                                             <td>{formatShortDate(row.work_date)}</td>
-                                            <td className={styles.weekday}>{weekdayOf(row.work_date)}</td>
-                                            <td>{row.confirmed ? 'Sim' : 'Não'}</td>
+                                            <td>{rotuloAbates(row)}</td>
                                             <td>
-                                                {row.present === null ? (
-                                                    <span className={`${styles.pill} ${styles.pillMuted}`}>Sem lançamento</span>
-                                                ) : (
-                                                    <span className={`${styles.pill} ${row.present ? styles.pillPresent : styles.pillAbsent}`}>
-                                                        {row.present ? 'Presente' : 'Falta'}
-                                                    </span>
-                                                )}
+                                                <div className={styles.pillGroup}>
+                                                    {abatesDaLinha(row).length === 0 && '—'}
+                                                    {abatesDaLinha(row).map((abate) => {
+                                                        const presente = row[abate.campo];
+                                                        const classe = presente === null ? styles.pillMuted : presente ? styles.pillPresent : styles.pillAbsent;
+                                                        const texto = presente === null ? 'Sem lançamento' : presente ? 'Presente' : 'Falta';
+                                                        return (
+                                                            <span key={abate.chave} className={`${styles.pill} ${classe}`}>
+                                                                {abate.rotulo}: {texto}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
                                             </td>
+                                            <td>{row.frango ? (row.received_chicken ? 'Sim' : 'Não') : '—'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -114,7 +135,7 @@ export default function HistoricoFuncionarios() {
                     <div className={styles.emptyState}>
                         <div className={styles.emptyIcon}>◌</div>
                         <h2>Histórico de frequência</h2>
-                        <p>Selecione um funcionário na lista para ver as confirmações e presenças por data.</p>
+                        <p>Selecione um funcionário na lista para ver as semanas, as presenças por abate e o recebimento de frango.</p>
                     </div>
                 )}
             </Main>

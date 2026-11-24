@@ -8,13 +8,17 @@ export interface AbateKinds {
 }
 
 const NONE: AbateKinds = { frango: false, boi: false };
+// Semana nova: tem frango e boi, como antes.
+const PADRAO_SEMANA: AbateKinds = { frango: true, boi: true };
 
 /**
- * Lista de chamada de um dia. Cada pessoa entra marcando em quais abates vai
- * (frango, boi ou os dois). Cada ação grava direto no banco.
+ * Lista de chamada de uma semana (workDate = segunda-feira). Cada pessoa entra marcando em quais
+ * abates vai (frango, boi ou os dois). A semana registra se tem frango e se tem boi.
+ * Cada ação grava direto no banco.
  */
 export function useConfirmationList(workDate: string | null) {
     const [entries, setEntries] = useState<Record<string, AbateKinds>>({});
+    const [semana, setSemana] = useState<AbateKinds | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -23,20 +27,26 @@ export function useConfirmationList(workDate: string | null) {
     const fetchAll = useCallback(async (): Promise<string | null> => {
         // Sem data ainda (aguardando a lista mais recente): não busca nada.
         if (!workDate) return null;
-        const { data, error } = await supabase
-            .from('ESTOQUE_employee_attendance')
-            .select('employee_id, frango, boi')
-            .eq('work_date', workDate)
-            .eq('confirmed', true);
+        const [pessoas, dia] = await Promise.all([
+            supabase
+                .from('ESTOQUE_employee_attendance')
+                .select('employee_id, frango, boi')
+                .eq('work_date', workDate)
+                .eq('confirmed', true),
+            supabase.from('ESTOQUE_abate_day').select('frango, boi').eq('work_date', workDate).maybeSingle(),
+        ]);
 
-        if (error) {
-            setError(error.message);
-            return error.message;
+        const erro = pessoas.error?.message ?? dia.error?.message ?? null;
+        if (erro) {
+            setError(erro);
+            return erro;
         }
 
-        const rows = (data ?? []) as { employee_id: string; frango: boolean; boi: boolean }[];
+        const rows = (pessoas.data ?? []) as { employee_id: string; frango: boolean; boi: boolean }[];
         setError(null);
         setEntries(Object.fromEntries(rows.map((row) => [row.employee_id, { frango: row.frango, boi: row.boi }])));
+        const registro = dia.data as AbateKinds | null;
+        setSemana(registro ? { frango: registro.frango, boi: registro.boi } : PADRAO_SEMANA);
         return null;
     }, [workDate]);
 
@@ -56,6 +66,14 @@ export function useConfirmationList(workDate: string | null) {
     }, [load]);
 
     const kindsOf = (employeeId: string): AbateKinds => entries[employeeId] ?? NONE;
+
+    // Grava o registro da semana (tem frango? tem boi?).
+    const writeSemana = async (next: AbateKinds): Promise<string | null> => {
+        const { error: upsertError } = await supabase
+            .from('ESTOQUE_abate_day')
+            .upsert({ work_date: workDate, frango: next.frango, boi: next.boi }, { onConflict: 'work_date' });
+        return upsertError?.message ?? null;
+    };
 
     // Grava os abates de uma pessoa. Sem nenhum abate, a pessoa sai da lista.
     const writeKinds = async (employeeId: string, next: AbateKinds): Promise<string | null> => {
@@ -83,7 +101,8 @@ export function useConfirmationList(workDate: string | null) {
             .eq('employee_id', employeeId)
             .eq('work_date', workDate)
             .eq('confirmed', false)
-            .is('present', null);
+            .is('present_frango', null)
+            .is('present_boi', null);
         return deleteError?.message ?? null;
     };
 
@@ -102,9 +121,14 @@ export function useConfirmationList(workDate: string | null) {
         return null;
     };
 
+    // Ao primeiro lançamento da semana, o registro da semana também é gravado.
     const addEmployee = (employeeId: string, kinds: AbateKinds): Promise<string | null> => {
         if (!kinds.frango && !kinds.boi) return Promise.resolve('Escolha pelo menos um abate.');
-        return commit(() => writeKinds(employeeId, kinds));
+        return commit(async () => {
+            const registro = await writeSemana(semana ?? PADRAO_SEMANA);
+            if (registro) return registro;
+            return writeKinds(employeeId, kinds);
+        });
     };
 
     const setPersonKind = (employeeId: string, kind: AbateKind, value: boolean): Promise<string | null> =>
@@ -113,7 +137,11 @@ export function useConfirmationList(workDate: string | null) {
     const removeEmployee = (employeeId: string): Promise<string | null> =>
         commit(() => writeKinds(employeeId, NONE));
 
-    // Tira todo mundo da lista do dia. Lançamentos de presença (frequência) são mantidos.
+    // Liga ou desliga o abate da semana (frango ou boi).
+    const setSemanaKind = (kind: AbateKind, value: boolean): Promise<string | null> =>
+        commit(() => writeSemana({ ...(semana ?? PADRAO_SEMANA), [kind]: value }));
+
+    // Tira todo mundo da lista da semana. Lançamentos de presença (frequência) são mantidos.
     const clearList = (): Promise<string | null> =>
         commit(async () => {
             const { error: updateError } = await supabase
@@ -127,7 +155,8 @@ export function useConfirmationList(workDate: string | null) {
                 .delete()
                 .eq('work_date', workDate)
                 .eq('confirmed', false)
-                .is('present', null);
+                .is('present_frango', null)
+                .is('present_boi', null);
             return deleteError?.message ?? null;
         });
 
@@ -135,11 +164,13 @@ export function useConfirmationList(workDate: string | null) {
         loading,
         saving,
         error,
+        semana: semana ?? PADRAO_SEMANA,
         confirmedIds: Object.keys(entries),
         kindsOf,
         addEmployee,
         setPersonKind,
         removeEmployee,
+        setSemanaKind,
         clearList,
     };
 }

@@ -8,7 +8,7 @@ import { useToast } from '@/components/Toast/Toast';
 import { useEmployeeManager } from '@/hooks/useEmployeeManager';
 import { useConfirmationList, AbateKind, AbateKinds } from '@/hooks/useConfirmationList';
 import { fetchUltimaData } from '@/hooks/useAttendance';
-import { formatLongDate, todayISO } from '@/utils/dates';
+import { addDays, formatLongDate, formatShortDate, mondayOf, todayISO } from '@/utils/dates';
 import { employeeGroupText } from '@/utils/employeeGroups';
 import type { IEmployee } from '@/types';
 import styles from '../funcionarios.module.css';
@@ -23,7 +23,6 @@ const PRINT_TITLES: Record<PrintKind, string> = {
     boi: 'Dia do boi',
 };
 
-
 const matchesEmployee = (employee: IEmployee, query: string) =>
     [employee.name, employee.cpf, employee.phone, employee.group_name]
         .some((value) => normalize(value || '').includes(query));
@@ -31,10 +30,13 @@ const matchesEmployee = (employee: IEmployee, query: string) =>
 export default function ListaChamadaFuncionarios() {
     const manager = useEmployeeManager();
     const toast = useToast();
+    // Uma lista por semana: a tela guarda uma data da semana e trabalha com a segunda-feira.
     const [workDate, setWorkDate] = useState(todayISO);
     // Ao abrir, a tela vai para a última lista gravada. Só carrega depois de saber a data.
     const [dataCarregada, setDataCarregada] = useState(false);
-    const list = useConfirmationList(dataCarregada ? workDate : null);
+    const semanaInicio = mondayOf(workDate);
+    const semanaFim = addDays(semanaInicio, 6);
+    const list = useConfirmationList(dataCarregada ? semanaInicio : null);
 
     useEffect(() => {
         let ativo = true;
@@ -52,7 +54,7 @@ export default function ListaChamadaFuncionarios() {
     const [pending, setPending] = useState<IEmployee | null>(null);
     const [pendingKinds, setPendingKinds] = useState<AbateKinds>(NO_KINDS);
 
-    // Lista em ordem alfabética: quem já está na lista do dia.
+    // Lista em ordem alfabética: quem já está na lista da semana.
     const confirmed = useMemo(
         () => manager.employees
             .filter((employee) => list.confirmedIds.includes(employee.id))
@@ -94,13 +96,18 @@ export default function ListaChamadaFuncionarios() {
         if (error) toast.error(`Erro ao atualizar ${employee.name}: ${error}`);
     };
 
+    const handleSemanaKind = async (kind: AbateKind) => {
+        const error = await list.setSemanaKind(kind, !list.semana[kind]);
+        if (error) toast.error(`Erro ao atualizar a semana: ${error}`);
+    };
+
     const handleRemove = async (employee: IEmployee) => {
         const error = await list.removeEmployee(employee.id);
         if (error) toast.error(`Erro ao remover ${employee.name}: ${error}`);
     };
 
     const handleClear = async () => {
-        if (!window.confirm('Zerar a lista deste dia? Todos saem da lista. A frequência já lançada é mantida.')) return;
+        if (!window.confirm('Zerar a lista desta semana? Todos saem da lista. A frequência já lançada é mantida.')) return;
         const error = await list.clearList();
         if (error === null) toast.success('Lista zerada.');
         else toast.error(`Erro ao zerar a lista: ${error}`);
@@ -143,7 +150,7 @@ export default function ListaChamadaFuncionarios() {
 
                 <div className={styles.sidebarBody}>
                     <div>
-                        <span className={styles.fieldLabel}>Data do abate</span>
+                        <span className={styles.fieldLabel}>Semana</span>
                         <input
                             type="date"
                             className={styles.dateInput}
@@ -155,6 +162,7 @@ export default function ListaChamadaFuncionarios() {
                                 }
                             }}
                         />
+                        <span className={styles.fieldLabel}>De {formatShortDate(semanaInicio)} a {formatShortDate(semanaFim)}</span>
                         <button
                             type="button"
                             className={styles.btnPrintWide}
@@ -163,8 +171,30 @@ export default function ListaChamadaFuncionarios() {
                                 handleSelectPending(null);
                             }}
                         >
-                            Começar nova lista (hoje)
+                            Começar nova lista (esta semana)
                         </button>
+                    </div>
+
+                    <div>
+                        <span className={styles.fieldLabel}>Tem na semana</span>
+                        <div className={styles.chipGroup}>
+                            <button
+                                type="button"
+                                className={`${styles.chip} ${list.semana.frango ? styles.chipActive : ''}`}
+                                onClick={() => void handleSemanaKind('frango')}
+                                disabled={list.saving}
+                            >
+                                Frango
+                            </button>
+                            <button
+                                type="button"
+                                className={`${styles.chip} ${list.semana.boi ? styles.chipActive : ''}`}
+                                onClick={() => void handleSemanaKind('boi')}
+                                disabled={list.saving}
+                            >
+                                Boi
+                            </button>
+                        </div>
                     </div>
 
                     <div>
@@ -235,7 +265,7 @@ export default function ListaChamadaFuncionarios() {
             <Main className={styles.mainArea}>
                 <div className={styles.card}>
                     <span className={styles.eyebrow}>LISTA DE CHAMADA · WHATSAPP</span>
-                    <h2 className={styles.pageTitle}>{formatLongDate(workDate)}</h2>
+                    <h2 className={styles.pageTitle}>Semana de {formatLongDate(semanaInicio)}</h2>
                     <p className={styles.pageSub}>
                         Marque em quais abates cada pessoa vai. Quem não vai em nenhum sai da lista.
                     </p>
@@ -306,7 +336,7 @@ export default function ListaChamadaFuncionarios() {
                 <section key={pageIndex} className={styles.printPage}>
                     <h1 className={styles.printTitle}>Lista de chamada · {PRINT_TITLES[printActive]}</h1>
                     <p className={styles.printMeta}>
-                        {formatLongDate(workDate)} · Página {pageIndex + 1} de {printPages.length} · Total: {printRows.length}
+                        Semana de {formatShortDate(semanaInicio)} a {formatShortDate(semanaFim)} · Página {pageIndex + 1} de {printPages.length} · Total: {printRows.length}
                     </p>
                     <table className={styles.printTable}>
                         <thead>

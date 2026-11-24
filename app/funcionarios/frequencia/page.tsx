@@ -6,36 +6,33 @@ import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import { useToast } from '@/components/Toast/Toast';
 import { useEmployeeManager } from '@/hooks/useEmployeeManager';
 import { fetchAttendanceWeek, fetchUltimaData, useAttendanceDay, type AttendanceWeekRow } from '@/hooks/useAttendance';
+import type { AbateKind } from '@/hooks/useConfirmationList';
 import { addDays, formatLongDate, formatShortDate, mondayOf, todayISO } from '@/utils/dates';
 import { calcularPagamento, formatReais, parseValor } from '@/utils/diarias';
 import { useConfiguracoes } from '@/hooks/useConfiguracoes';
 import { employeeGroupText } from '@/utils/employeeGroups';
 import styles from '../funcionarios.module.css';
 
-type AbateFilter = 'todos' | 'frango' | 'boi';
-
-const ABATE_FILTERS: { value: AbateFilter; label: string }[] = [
-    { value: 'todos', label: 'Todos' },
-    { value: 'frango', label: 'Frango' },
-    { value: 'boi', label: 'Boi' },
-];
-
 // Cada página impressa tem 30 linhas; as que faltam ficam em branco.
 const PRINT_ROWS_PER_PAGE = 30;
 
-// Dias da semana na lista impressa (segunda a domingo).
-const DIAS_SEMANA = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+// P = presente, F = falta. Presença sem lançamento conta como presente (quem está na lista).
+const marcaDoAbate = (presente: boolean | null) => (presente === false ? 'F' : 'P');
+
+const ROTULO_ABATE: Record<AbateKind, string> = { frango: 'Frango', boi: 'Boi' };
 
 export default function FrequenciaFuncionarios() {
     const manager = useEmployeeManager();
     const toast = useToast();
     const { config } = useConfiguracoes();
     const descontoFrango = config?.descontoFrango ?? 0;
+    // Uma frequência por semana: a tela guarda uma data da semana e trabalha com a segunda-feira.
     const [workDate, setWorkDate] = useState(todayISO);
-    // Ao abrir, a tela vai para a lista mais recente. Só carrega a frequência depois de saber a data.
+    // Ao abrir, a tela vai para a semana mais recente. Só carrega a frequência depois de saber a data.
     const [dataCarregada, setDataCarregada] = useState(false);
-    const [abateFilter, setAbateFilter] = useState<AbateFilter>('todos');
-    const attendance = useAttendanceDay(dataCarregada ? workDate : null);
+    const semanaInicio = mondayOf(workDate);
+    const semanaFim = addDays(semanaInicio, 6);
+    const attendance = useAttendanceDay(dataCarregada ? semanaInicio : null);
 
     useEffect(() => {
         let ativo = true;
@@ -61,42 +58,39 @@ export default function FrequenciaFuncionarios() {
     const [extras, setExtras] = useState<Record<string, string>>({});
     const extraDe = (employeeId: string) => parseValor(extras[employeeId] ?? '', true) ?? 0;
 
-    // Quem está na lista de chamada do dia.
+    // Presença em cada abate. Quem não está na lista daquele abate não entra na conta.
+    const foiEm = (employeeId: string) => ({
+        frango: attendance.presentOf(employeeId, 'frango') === true,
+        boi: attendance.presentOf(employeeId, 'boi') === true,
+    });
+
+    // Quem está na lista de chamada da semana.
     const onList = manager.employees.filter((employee) => attendance.entryOf(employee.id).confirmed);
-    const presentes = onList.filter((employee) => attendance.presentOf(employee.id) === true).length;
-    const faltas = onList.filter((employee) => attendance.presentOf(employee.id) === false).length;
+    const contarPresenca = (kind: AbateKind, presente: boolean) =>
+        onList.filter((employee) => attendance.presentOf(employee.id, kind) === presente).length;
     const receberam = onList.filter((employee) => attendance.entryOf(employee.id).receivedChicken).length;
 
-    // Pagamento do dia: diárias de quem foi, menos o desconto de quem recebeu frango.
+    // Pagamento da semana: diária de cada abate em que a pessoa foi, menos o desconto de quem recebeu frango.
     const pagamentoDe = (employeeId: string) =>
-        calcularPagamento(attendance.presentOf(employeeId) === true, attendance.entryOf(employeeId), valores, extraDe(employeeId), descontoFrango);
+        calcularPagamento(foiEm(employeeId), attendance.entryOf(employeeId).receivedChicken, valores, extraDe(employeeId), descontoFrango);
     const totalAPagar = onList.reduce((soma, employee) => soma + pagamentoDe(employee.id).total, 0);
     const totalDescontos = onList.reduce((soma, employee) => soma + pagamentoDe(employee.id).desconto, 0);
     const totalExtras = onList.reduce((soma, employee) => soma + pagamentoDe(employee.id).extra, 0);
 
-    const rows = manager.filteredEmployees.filter((employee) => {
-        const entry = attendance.entryOf(employee.id);
-        if (!entry.confirmed) return false;
-        return abateFilter === 'todos' || entry[abateFilter];
-    });
+    const rows = manager.filteredEmployees.filter((employee) => attendance.entryOf(employee.id).confirmed);
 
-    // Impressão: pagamento do dia ou frequência da semana. Uma por vez.
+    // Impressão: pagamento da semana ou frequência da semana. Uma por vez.
     const [impressao, setImpressao] = useState<'pagamento' | 'semana' | null>(null);
     const [semanaImpressa, setSemanaImpressa] = useState<AttendanceWeekRow[]>([]);
-    const semanaInicio = mondayOf(workDate);
-    const semanaFim = addDays(semanaInicio, 6);
-    const semanaDias = Array.from({ length: 7 }, (_, i) => addDays(semanaInicio, i));
 
-    // Uma linha por pessoa que esteve na lista em algum dia da semana.
-    // P = presente, F = falta, vazio = não estava na lista naquele dia.
+    // Uma linha por pessoa da lista da semana, com a marca de cada abate: P = presente, F = falta, — = não foi escalada.
     const linhasDaSemana = manager.employees.flatMap((employee) => {
-        const marcas = semanaDias.map((dia) => {
-            const row = semanaImpressa.find((r) => r.employee_id === employee.id && r.work_date === dia);
-            if (!row || !row.confirmed) return '';
-            return (row.present ?? true) ? 'P' : 'F';
-        });
-        if (marcas.every((marca) => marca === '')) return [];
-        return [{ employee, marcas, dias: marcas.filter((marca) => marca === 'P').length }];
+        const row = semanaImpressa.find((r) => r.employee_id === employee.id && r.confirmed);
+        if (!row) return [];
+        const frango = row.frango ? marcaDoAbate(row.present_frango) : '—';
+        const boi = row.boi ? marcaDoAbate(row.present_boi) : '—';
+        const presencas = [frango, boi].filter((marca) => marca === 'P').length;
+        return [{ employee, frango, boi, presencas }];
     });
     const semanaPages = Array.from(
         { length: Math.max(1, Math.ceil(linhasDaSemana.length / PRINT_ROWS_PER_PAGE)) },
@@ -116,15 +110,15 @@ export default function FrequenciaFuncionarios() {
         setSemanaImpressa(rows);
         setImpressao('semana');
     };
-    // Só quem foi (presente). Quem faltou não entra no relatório.
-    const printLinhas = onList
-        .filter((employee) => attendance.presentOf(employee.id) === true)
-        .map((employee) => {
-            const entry = attendance.entryOf(employee.id);
-            const presente = attendance.presentOf(employee.id);
-            const pagamento = calcularPagamento(presente === true, entry, valores, extraDe(employee.id), descontoFrango);
-            return { employee, entry, presente, pagamento };
-        });
+
+    // Quem foi em pelo menos um abate. Quem faltou nos dois não entra no relatório.
+    const printLinhas = onList.flatMap((employee) => {
+        const foi = foiEm(employee.id);
+        if (!foi.frango && !foi.boi) return [];
+        const entry = attendance.entryOf(employee.id);
+        const pagamento = pagamentoDe(employee.id);
+        return [{ employee, entry, foi, pagamento }];
+    });
     const totalImpresso = printLinhas.reduce((soma, linha) => soma + linha.pagamento.total, 0);
     const printColunas = [
         'Nº',
@@ -136,8 +130,8 @@ export default function FrequenciaFuncionarios() {
         'Recebeu frango',
     ];
     const printValoresDaLinha = (linha: (typeof printLinhas)[number], numero: number) => {
-        const { employee, entry, pagamento } = linha;
-        const abate = entry.frango && entry.boi ? 'Frango e Boi' : entry.frango ? 'Frango' : 'Boi';
+        const { employee, entry, foi, pagamento } = linha;
+        const abate = foi.frango && foi.boi ? 'Frango e Boi' : foi.frango ? 'Frango' : 'Boi';
         return [
             String(numero),
             employee.name,
@@ -145,7 +139,7 @@ export default function FrequenciaFuncionarios() {
             employee.pix_key || '',
             employee.notes || '',
             abate,
-            entry.frango ? (entry.receivedChicken ? 'Sim' : 'Não') : '',
+            foi.frango ? (entry.receivedChicken ? 'Sim' : 'Não') : '',
         ];
     };
 
@@ -172,6 +166,37 @@ export default function FrequenciaFuncionarios() {
         else toast.error(`Erro ao salvar frequência: ${saveError}`);
     };
 
+    // Falta e Presente de um abate da pessoa.
+    const botoesAbate = (employeeId: string, kind: AbateKind) => {
+        const presente = attendance.presentOf(employeeId, kind);
+        return (
+            <div className={styles.abateRow}>
+                <span className={styles.abateName}>{ROTULO_ABATE[kind]}</span>
+                <button
+                    type="button"
+                    className={`${styles.toggle} ${styles.toggleAbsent} ${presente === false ? styles.on : ''}`}
+                    onClick={() => attendance.setPresent(employeeId, kind, false)}
+                    disabled={attendance.saving}
+                >
+                    Falta
+                </button>
+                <button
+                    type="button"
+                    className={`${styles.toggle} ${styles.togglePresent} ${presente === true ? styles.on : ''}`}
+                    onClick={() => attendance.setPresent(employeeId, kind, true)}
+                    disabled={attendance.saving}
+                >
+                    Presente
+                </button>
+            </div>
+        );
+    };
+
+    const abatesDaSemana = [
+        attendance.semana.frango ? 'Frango' : null,
+        attendance.semana.boi ? 'Boi' : null,
+    ].filter(Boolean).join(' e ') || 'nenhum';
+
     return (
         <>
         <PageLayout className={styles.screenOnly}>
@@ -188,7 +213,7 @@ export default function FrequenciaFuncionarios() {
 
                 <div className={styles.sidebarBody}>
                     <div>
-                        <span className={styles.fieldLabel}>Data do abate</span>
+                        <span className={styles.fieldLabel}>Semana</span>
                         <input
                             type="date"
                             className={styles.dateInput}
@@ -197,23 +222,8 @@ export default function FrequenciaFuncionarios() {
                                 if (e.target.value) setWorkDate(e.target.value);
                             }}
                         />
-                        <span className={styles.fieldLabel}>Semana: {formatShortDate(semanaInicio)} a {formatShortDate(semanaFim)}</span>
-                    </div>
-
-                    <div>
-                        <span className={styles.fieldLabel}>Abate</span>
-                        <div className={styles.chipGroup}>
-                            {ABATE_FILTERS.map((filter) => (
-                                <button
-                                    key={filter.value}
-                                    type="button"
-                                    className={`${styles.chip} ${abateFilter === filter.value ? styles.chipActive : ''}`}
-                                    onClick={() => setAbateFilter(filter.value)}
-                                >
-                                    {filter.label}
-                                </button>
-                            ))}
-                        </div>
+                        <span className={styles.fieldLabel}>De {formatShortDate(semanaInicio)} a {formatShortDate(semanaFim)}</span>
+                        <span className={styles.fieldLabel}>Tem na semana: {abatesDaSemana}</span>
                     </div>
 
                     <div>
@@ -247,8 +257,8 @@ export default function FrequenciaFuncionarios() {
 
                     <div className={styles.summaryBox}>
                         <div className={styles.summaryRow}><span>Na lista</span><strong>{onList.length}</strong></div>
-                        <div className={styles.summaryRow}><span>Presentes</span><strong>{presentes}</strong></div>
-                        <div className={styles.summaryRow}><span>Faltas</span><strong>{faltas}</strong></div>
+                        <div className={styles.summaryRow}><span>Presentes (frango · boi)</span><strong>{contarPresenca('frango', true)} · {contarPresenca('boi', true)}</strong></div>
+                        <div className={styles.summaryRow}><span>Faltas (frango · boi)</span><strong>{contarPresenca('frango', false)} · {contarPresenca('boi', false)}</strong></div>
                         <div className={styles.summaryRow}><span>Receberam frango</span><strong>{receberam}</strong></div>
                         <div className={styles.summaryRow}><span>Descontos (frango)</span><strong>{formatReais(totalDescontos)}</strong></div>
                         <div className={styles.summaryRow}><span>Extras</span><strong>{formatReais(totalExtras)}</strong></div>
@@ -264,7 +274,7 @@ export default function FrequenciaFuncionarios() {
                         Imprimir frequência da semana
                     </button>
                     <button type="button" className={styles.btnPrintWide} onClick={() => setImpressao('pagamento')} disabled={onList.length === 0}>
-                        Imprimir pagamento do dia
+                        Imprimir pagamento da semana
                     </button>
                 </div>
             </Sidebar>
@@ -272,22 +282,22 @@ export default function FrequenciaFuncionarios() {
             <Main className={styles.mainArea}>
                 <div className={styles.card}>
                     <span className={styles.eyebrow}>FREQUÊNCIA REAL</span>
-                    <h2 className={styles.pageTitle}>{formatLongDate(workDate)}</h2>
+                    <h2 className={styles.pageTitle}>Semana de {formatLongDate(semanaInicio)}</h2>
                     <p className={styles.pageSub}>
-                        Quem está na lista de chamada aparece aqui. Marque Falta para quem não foi. Clique de novo para desfazer.
+                        Quem está na lista de chamada aparece aqui. Marque Falta em cada abate que a pessoa não foi. Clique de novo para desfazer.
                     </p>
 
                     {manager.loading || attendance.loading ? (
                         <p className={styles.listMessage}>Carregando lista...</p>
                     ) : onList.length === 0 ? (
-                        <p className={styles.listMessage}>Ninguém na lista deste dia. Monte a lista em Lista de chamada.</p>
+                        <p className={styles.listMessage}>Ninguém na lista desta semana. Monte a lista em Lista de chamada.</p>
                     ) : rows.length === 0 ? (
-                        <p className={styles.listMessage}>Nenhum funcionário encontrado neste filtro.</p>
+                        <p className={styles.listMessage}>Nenhum funcionário encontrado nesta busca.</p>
                     ) : (
                         <div className={styles.rollList}>
                             {rows.map((employee) => {
                                 const entry = attendance.entryOf(employee.id);
-                                const status = attendance.presentOf(employee.id);
+                                const foi = foiEm(employee.id);
                                 const pagamento = pagamentoDe(employee.id);
                                 const extraTexto = extras[employee.id] ?? '';
                                 const extraValido = parseValor(extraTexto, true) !== undefined;
@@ -311,7 +321,7 @@ export default function FrequenciaFuncionarios() {
                                                     onChange={(e) => setExtras((prev) => ({ ...prev, [employee.id]: e.target.value }))}
                                                 />
                                             </label>
-                                            {(status === true || pagamento.extra !== 0) && (
+                                            {(foi.frango || foi.boi || pagamento.extra !== 0) && (
                                                 <span className={styles.rollTotal}>
                                                     Total {formatReais(pagamento.total)}
                                                     {pagamento.desconto > 0 && (
@@ -324,7 +334,7 @@ export default function FrequenciaFuncionarios() {
                                             )}
                                         </div>
                                         <div className={styles.toggleGroup}>
-                                            {entry.frango && status === true ? (
+                                            {entry.frango && foi.frango ? (
                                                 <button
                                                     type="button"
                                                     className={`${styles.toggle} ${styles.toggleConfirm} ${entry.receivedChicken ? styles.on : ''}`}
@@ -336,22 +346,10 @@ export default function FrequenciaFuncionarios() {
                                             ) : (
                                                 <span className={styles.toggleSpacer} aria-hidden="true" />
                                             )}
-                                            <button
-                                                type="button"
-                                                className={`${styles.toggle} ${styles.toggleAbsent} ${status === false ? styles.on : ''}`}
-                                                onClick={() => attendance.setPresent(employee.id, false)}
-                                                disabled={attendance.saving}
-                                            >
-                                                Falta
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`${styles.toggle} ${styles.togglePresent} ${status === true ? styles.on : ''}`}
-                                                onClick={() => attendance.setPresent(employee.id, true)}
-                                                disabled={attendance.saving}
-                                            >
-                                                Presente
-                                            </button>
+                                            <div className={styles.abateStack}>
+                                                {entry.frango && botoesAbate(employee.id, 'frango')}
+                                                {entry.boi && botoesAbate(employee.id, 'boi')}
+                                            </div>
                                         </div>
                                     </div>
                                 );
@@ -366,9 +364,9 @@ export default function FrequenciaFuncionarios() {
         <div className={styles.printSheet}>
             {printPages.map((paginaLinhas, pageIndex) => (
                 <section key={pageIndex} className={styles.printPage}>
-                    <h1 className={styles.printTitle}>Frequência · Pagamento do dia</h1>
+                    <h1 className={styles.printTitle}>Frequência · Pagamento da semana</h1>
                     <p className={styles.printMeta}>
-                        {formatLongDate(workDate)} · Página {pageIndex + 1} de {printPages.length} · Pessoas: {printLinhas.length} · Total a pagar: {formatReais(totalImpresso)}
+                        Semana de {formatShortDate(semanaInicio)} a {formatShortDate(semanaFim)} · Página {pageIndex + 1} de {printPages.length} · Pessoas: {printLinhas.length} · Total a pagar: {formatReais(totalImpresso)}
                     </p>
                     <p className={styles.printMeta}>
                         Diárias: frango {formatReais(valores.frango)} · boi {formatReais(valores.boi)} · desconto de quem recebeu frango: {formatReais(descontoFrango)}
@@ -405,17 +403,16 @@ export default function FrequenciaFuncionarios() {
                         Semana de {formatShortDate(semanaInicio)} a {formatShortDate(semanaFim)} · Página {pageIndex + 1} de {semanaPages.length} · Pessoas: {linhasDaSemana.length}
                     </p>
                     <p className={styles.printMeta}>
-                        P = presente · F = falta · em branco = não estava na lista naquele dia
+                        P = presente · F = falta · — = não estava neste abate
                     </p>
                     <table className={`${styles.printTable} ${styles.printReport} ${styles.printWeek}`}>
                         <thead>
                             <tr>
                                 <th>Nº</th>
                                 <th>Nome</th>
-                                {semanaDias.map((dia, i) => (
-                                    <th key={dia} className={styles.printCentro}>{DIAS_SEMANA[i]}<br />{dia.slice(8, 10)}/{dia.slice(5, 7)}</th>
-                                ))}
-                                <th className={styles.printCentro}>Dias</th>
+                                <th className={styles.printCentro}>Frango</th>
+                                <th className={styles.printCentro}>Boi</th>
+                                <th className={styles.printCentro}>Presenças</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -423,10 +420,9 @@ export default function FrequenciaFuncionarios() {
                                 <tr key={rowIndex}>
                                     <td>{linha ? pageIndex * PRINT_ROWS_PER_PAGE + rowIndex + 1 : ''}</td>
                                     <td>{linha?.employee.name ?? ''}</td>
-                                    {Array.from({ length: 7 }, (_, i) => (
-                                        <td key={i} className={styles.printCentro}>{linha?.marcas[i] ?? ''}</td>
-                                    ))}
-                                    <td className={styles.printCentro}>{linha ? linha.dias : ''}</td>
+                                    <td className={styles.printCentro}>{linha?.frango ?? ''}</td>
+                                    <td className={styles.printCentro}>{linha?.boi ?? ''}</td>
+                                    <td className={styles.printCentro}>{linha ? linha.presencas : ''}</td>
                                 </tr>
                             ))}
                         </tbody>
