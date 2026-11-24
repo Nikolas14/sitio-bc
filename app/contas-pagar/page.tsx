@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import HeaderInput from '@/components/HeaderInput/HeaderInput';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
@@ -15,6 +15,7 @@ import styles from './page.module.css';
 const STATUS_LABEL: Record<StatusBoleto, string> = {
     PAGO: 'Pago',
     VENCIDO: 'Vencido',
+    VENCE_HOJE: 'Vence hoje',
     VENCE_EM_BREVE: 'Vence em breve',
     EM_ABERTO: 'Em aberto',
 };
@@ -22,6 +23,7 @@ const STATUS_LABEL: Record<StatusBoleto, string> = {
 const STATUS_CLASS: Record<StatusBoleto, string> = {
     PAGO: styles.badgePago,
     VENCIDO: styles.badgeVencido,
+    VENCE_HOJE: styles.badgeHoje,
     VENCE_EM_BREVE: styles.badgeBreve,
     EM_ABERTO: styles.badgeEmAberto,
 };
@@ -38,6 +40,7 @@ const formatarValor = (valor: number) => valor.toLocaleString('pt-BR', { style: 
 const OPCOES_STATUS: { valor: FiltroStatus; rotulo: string }[] = [
     { valor: 'ABERTO', rotulo: 'Em aberto' },
     { valor: 'VENCIDO', rotulo: 'Vencidos' },
+    { valor: 'VENCE_HOJE', rotulo: 'Vence hoje' },
     { valor: 'VENCE_EM_BREVE', rotulo: 'Vence em breve' },
     { valor: 'PAGO', rotulo: 'Pagos' },
     { valor: 'TODOS', rotulo: 'Todos' },
@@ -54,8 +57,15 @@ const formatarData = (iso: string) => {
 export default function ContasPagar() {
     const manager = useBoletoManager();
     const { config } = useConfiguracoes();
-    const empresas = config?.empresas ?? [];
-    const bancos = config?.bancos ?? [];
+    // Opções em ordem alfabética (pt-BR) nos campos e no filtro.
+    const empresas = useMemo(
+        () => [...(config?.empresas ?? [])].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+        [config?.empresas],
+    );
+    const bancos = useMemo(
+        () => [...(config?.bancos ?? [])].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+        [config?.bancos],
+    );
     const diasVenceEmBreve = config?.diasVenceEmBreve ?? 0;
     const toast = useToast();
     const [novo, setNovo] = useState<BoletoFormData>(formVazio);
@@ -256,7 +266,6 @@ export default function ContasPagar() {
                                 value={novo.numero}
                                 onChange={(event) => setNovo({ ...novo, numero: event.target.value })}
                                 placeholder="Número"
-                                required
                             />
                         </div>
                         <div>
@@ -386,7 +395,7 @@ export default function ContasPagar() {
                                                 value={manager.formData[key]}
                                                 onChange={(event) => manager.setFormData({ ...manager.formData, [key]: event.target.value })}
                                                 placeholder={placeholder}
-                                                required
+                                                required={key !== 'numero'}
                                             />
                                         </>
                                     ) : (

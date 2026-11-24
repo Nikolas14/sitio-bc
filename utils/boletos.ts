@@ -1,6 +1,6 @@
 import type { IBoleto } from '@/types';
 
-export type StatusBoleto = 'PAGO' | 'VENCIDO' | 'VENCE_EM_BREVE' | 'EM_ABERTO';
+export type StatusBoleto = 'PAGO' | 'VENCIDO' | 'VENCE_HOJE' | 'VENCE_EM_BREVE' | 'EM_ABERTO';
 
 const formatarData = (data: Date) => {
   const ano = data.getFullYear();
@@ -18,6 +18,7 @@ export function hojeLocal(): string {
 export function statusBoleto(boleto: IBoleto, hoje: string, diasVenceEmBreve: number): StatusBoleto {
   if (boleto.paid_at) return 'PAGO';
   if (boleto.vencimento < hoje) return 'VENCIDO';
+  if (boleto.vencimento === hoje) return 'VENCE_HOJE';
 
   const [ano, mes, dia] = hoje.split('-').map(Number);
   const limite = formatarData(new Date(ano, mes - 1, dia + diasVenceEmBreve));
@@ -41,13 +42,12 @@ export function parseValor(texto: string): number | null {
 
 /** Primeira mensagem de erro do cadastro, ou null se estiver tudo certo. */
 export function validarFormulario(form: { numero: string; empresa: string; valor: string }): string | null {
-  if (!form.numero.trim()) return 'Preencha o número do boleto.';
   if (!form.empresa.trim()) return 'Preencha a empresa.';
   if (parseValor(form.valor) === null) return 'Valor inválido.';
   return null;
 }
 
-export type FiltroStatus = 'ABERTO' | 'VENCIDO' | 'VENCE_EM_BREVE' | 'PAGO' | 'TODOS';
+export type FiltroStatus = 'ABERTO' | 'VENCIDO' | 'VENCE_HOJE' | 'VENCE_EM_BREVE' | 'PAGO' | 'TODOS';
 
 /** Se o status entra no filtro escolhido. 'ABERTO' é tudo que ainda não foi pago. */
 export function passaFiltroStatus(status: StatusBoleto, filtro: FiltroStatus): boolean {
