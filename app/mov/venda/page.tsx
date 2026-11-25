@@ -13,6 +13,7 @@ import FinancialSummary from '../components/FinancialSummary/FinancialSummary';
 import DiscountInput from '../../../components/DiscountInput/DiscountInput';
 import HeaderPadrao from '@/components/HeaderPadrao/HeaderPadrao';
 import CustomerFields from '@/components/CustomerFields/CustomerFields';
+import ProjecoesClienteModal from '@/components/ProjecoesClienteModal/ProjecoesClienteModal';
 import type { ICustomer } from '@/types';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import { useToast } from '@/components/Toast/Toast';
@@ -30,6 +31,7 @@ export default function VendaSimplificadaPage() {
   const [barcode, setBarcode] = useState('');
   const [loading, setLoading] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [projecoesCliente, setProjecoesCliente] = useState<ICustomer | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -87,6 +89,7 @@ export default function VendaSimplificadaPage() {
       if (opError) throw opError;
 
       toast.success("Venda realizada com sucesso!");
+      setProjecoesCliente(customer);
       setItems([]);
       setCustomer(null);
       setIdentifier('');
@@ -100,7 +103,7 @@ export default function VendaSimplificadaPage() {
     } finally {
       setLoading(false);
     }
-  }, [items, customerLabel, customer?.id, financial, discountPercent, toast]);
+  }, [items, customerLabel, customer, financial, discountPercent, toast]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -229,6 +232,14 @@ export default function VendaSimplificadaPage() {
           isVenda={true}
         />
       </Main>
+
+      {projecoesCliente && (
+        <ProjecoesClienteModal
+          customerId={projecoesCliente.id}
+          customerName={projecoesCliente.name}
+          onClose={() => setProjecoesCliente(null)}
+        />
+      )}
     </PageLayout>
   );
 }
