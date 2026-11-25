@@ -14,7 +14,7 @@ import TransactionCard from './components/TransactionCard/TransactionCard';
 import TransactionItemsTable from './components/TransactionItemsTable/TransactionItemsTable';
 import TransactionFinanceSummary from './components/TransactionFinanceSummary/TransactionFinanceSummary';
 import TransactionReceiptHeader from './components/TransactionReceiptHeader/TransactionReceiptHeader';
-import DeleteTransactionModal from './components/DeleteTransactionModal/DeleteTransactionModal';
+import AdminPasswordModal from '@/components/AdminPasswordModal/AdminPasswordModal';
 import { PageLayout, Sidebar, Main } from '@/components/PageLayout/PageLayout';
 import { useToast } from '@/components/Toast/Toast';
 
@@ -22,7 +22,7 @@ export default function TransacoesInterface() {
   const toast = useToast();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [password, setPassword] = useState('');
 
   // Hooks de Dados
   const { 
@@ -47,7 +47,7 @@ export default function TransacoesInterface() {
   }, [active]);
 
   // Função para Deletar
-  const handleConfirmDelete = async (password: string) => {
+  const handleConfirmDelete = async () => {
     const { verifyAdminPassword } = await import('@/utils/adminAuth');
     const ok = await verifyAdminPassword(password);
 
@@ -57,7 +57,6 @@ export default function TransacoesInterface() {
     }
 
     if (active) {
-      setIsDeleting(true);
       const res = await deleteTransaction(active.id);
 
       if (res.success) {
@@ -68,8 +67,8 @@ export default function TransacoesInterface() {
         toast.error("Erro técnico ao tentar deletar.");
       }
       
-      setIsDeleting(false);
       setIsModalOpen(false);
+      setPassword('');
     }
   };
 
@@ -161,12 +160,15 @@ export default function TransacoesInterface() {
       </Main>
 
       {/* MODAL DE SEGURANÇA */}
-      <DeleteTransactionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleConfirmDelete}
-        isDeleting={isDeleting}
-      />
+      {isModalOpen && (
+        <AdminPasswordModal
+          password={password}
+          setPassword={setPassword}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => { setIsModalOpen(false); setPassword(''); }}
+          subtitle="Esta ação estornará o estoque e apagará o registro permanentemente."
+        />
+      )}
     </PageLayout>
   );
 }
